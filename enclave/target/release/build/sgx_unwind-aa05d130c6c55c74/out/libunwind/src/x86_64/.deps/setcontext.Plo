@@ -1,0 +1,5 @@
+x86_64/setcontext.lo: \
+ /root/sgx/sgx_unwind/../sgx_unwind/libunwind/src/x86_64/setcontext.S \
+ /root/sgx/sgx_unwind/../sgx_unwind/libunwind/src/x86_64/ucontext_i.h
+
+/root/sgx/sgx_unwind/../sgx_unwind/libunwind/src/x86_64/ucontext_i.h:
