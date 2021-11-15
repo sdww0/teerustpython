@@ -1,3 +1,9 @@
+# 
+
+
+**如果已经移植，则该枝会被删除**
+
+
 rustpython v0.1.2 (/home/waoa/RustPython)
 ├── cfg-if v1.0.0
 ├── clap v2.33.3
@@ -27,16 +33,6 @@ rustpython v0.1.2 (/home/waoa/RustPython)
 ├── rustpython-compiler v0.1.2 (/home/waoa/RustPython/compiler/porcelain)
 │   ├── rustpython-bytecode v0.1.2 (/home/waoa/RustPython/bytecode)
 │   │   ├── bincode v1.3.3
-│   │   │   └── serde v1.0.130
-│   │   │       └── serde_derive v1.0.130 (proc-macro)
-│   │   │           ├── proc-macro2 v1.0.32
-│   │   │           │   └── unicode-xid v0.2.2
-│   │   │           ├── quote v1.0.10
-│   │   │           │   └── proc-macro2 v1.0.32 (*)
-│   │   │           └── syn v1.0.81
-│   │   │               ├── proc-macro2 v1.0.32 (*)
-│   │   │               ├── quote v1.0.10 (*)
-│   │   │               └── unicode-xid v0.2.2
 │   │   ├── bitflags v1.3.2
 │   │   ├── bstr v0.2.17
 │   │   │   ├── lazy_static v1.4.0
@@ -50,14 +46,6 @@ rustpython v0.1.2 (/home/waoa/RustPython)
 │   │   │       ├── cfg-if v1.0.0
 │   │   │       └── static_assertions v1.1.0
 │   │   ├── num-bigint v0.4.3
-│   │   │   ├── num-integer v0.1.44
-│   │   │   │   └── num-traits v0.2.14 (*)
-│   │   │   │   [build-dependencies]
-│   │   │   │   └── autocfg v1.0.1
-│   │   │   ├── num-traits v0.2.14 (*)
-│   │   │   └── serde v1.0.130 (*)
-│   │   │   [build-dependencies]
-│   │   │   └── autocfg v1.0.1
 │   │   ├── num-complex v0.4.0
 │   │   │   ├── num-traits v0.2.14 (*)
 │   │   │   └── serde v1.0.130 (*)
@@ -65,8 +53,6 @@ rustpython v0.1.2 (/home/waoa/RustPython)
 │   ├── rustpython-compiler-core v0.1.2 (/home/waoa/RustPython/compiler)
 │   │   ├── ahash v0.7.6
 │   │   │   ├── getrandom v0.2.3
-│   │   │   │   ├── cfg-if v1.0.0
-│   │   │   │   └── libc v0.2.107
 │   │   │   └── once_cell v1.8.0
 │   │   │   [build-dependencies]
 │   │   │   └── version_check v0.9.3
@@ -109,12 +95,6 @@ rustpython v0.1.2 (/home/waoa/RustPython)
 │   │   │       │       └── smallvec v1.7.0
 │   │   │       ├── radium v0.6.2
 │   │   │       ├── rand v0.8.4
-│   │   │       │   ├── libc v0.2.107
-│   │   │       │   ├── rand_chacha v0.3.1
-│   │   │       │   │   ├── ppv-lite86 v0.2.15
-│   │   │       │   │   └── rand_core v0.6.3
-│   │   │       │   │       └── getrandom v0.2.3 (*)
-│   │   │       │   └── rand_core v0.6.3 (*)
 │   │   │       ├── siphasher v0.3.7
 │   │   │       ├── unic-ucd-category v0.9.0
 │   │   │       │   ├── matches v0.1.9
@@ -137,9 +117,6 @@ rustpython v0.1.2 (/home/waoa/RustPython)
 │   │   │   │   │   ├── phf_shared v0.10.0
 │   │   │   │   │   │   └── siphasher v0.3.7
 │   │   │   │   │   └── rand v0.8.4
-│   │   │   │   │       ├── libc v0.2.107
-│   │   │   │   │       ├── rand_chacha v0.3.1 (*)
-│   │   │   │   │       └── rand_core v0.6.3 (*)
 │   │   │   │   ├── phf_shared v0.10.0 (*)
 │   │   │   │   ├── proc-macro-hack v0.5.19 (proc-macro)
 │   │   │   │   ├── proc-macro2 v1.0.32 (*)
@@ -168,14 +145,9 @@ rustpython v0.1.2 (/home/waoa/RustPython)
 │   │       ├── diff v0.1.12
 │   │       ├── ena v0.14.0
 │   │       │   └── log v0.4.14
-│   │       │       └── cfg-if v1.0.0
 │   │       ├── itertools v0.10.1 (*)
 │   │       ├── lalrpop-util v0.19.6
 │   │       │   └── regex v1.5.4
-│   │       │       ├── aho-corasick v0.7.18
-│   │       │       │   └── memchr v2.4.1
-│   │       │       ├── memchr v2.4.1
-│   │       │       └── regex-syntax v0.6.25
 │   │       ├── petgraph v0.5.1
 │   │       │   ├── fixedbitset v0.2.0
 │   │       │   └── indexmap v1.7.0 (*)
@@ -194,10 +166,6 @@ rustpython v0.1.2 (/home/waoa/RustPython)
 │   │       │   └── crunchy v0.2.2
 │   │       └── unicode-xid v0.2.2
 │   └── thiserror v1.0.30
-│       └── thiserror-impl v1.0.30 (proc-macro)
-│           ├── proc-macro2 v1.0.32 (*)
-│           ├── quote v1.0.10 (*)
-│           └── syn v1.0.81 (*)
 ├── rustpython-parser v0.1.2 (/home/waoa/RustPython/parser) (*)
 ├── rustpython-stdlib v0.1.2 (/home/waoa/RustPython/stdlib)
 │   ├── adler32 v1.2.0
@@ -248,7 +216,7 @@ rustpython v0.1.2 (/home/waoa/RustPython)
 │   ├── lexical-parse-float v0.8.2 (*)
 │   ├── libc v0.2.107
 │   ├── libz-sys v1.1.3 (*)
-│   ├── md-5 v0.9.1
+│   ├── md-5 v0.9.1 (感觉重合了)
 │   │   ├── block-buffer v0.9.0
 │   │   │   ├── block-padding v0.2.1
 │   │   │   └── generic-array v0.14.4 (*)
@@ -294,9 +262,6 @@ rustpython v0.1.2 (/home/waoa/RustPython)
 │   │   ├── rustpython-bytecode v0.1.2 (/home/waoa/RustPython/bytecode) (*)
 │   │   ├── rustpython-compiler v0.1.2 (/home/waoa/RustPython/compiler/porcelain) (*)
 │   │   ├── serde_json v1.0.69
-│   │   │   ├── itoa v0.4.8
-│   │   │   ├── ryu v1.0.5
-│   │   │   └── serde v1.0.130 (*)
 │   │   ├── syn v1.0.81 (*)
 │   │   ├── syn-ext v0.3.1
 │   │   │   └── syn v1.0.81 (*)
@@ -317,11 +282,6 @@ rustpython v0.1.2 (/home/waoa/RustPython)
 │   │   │   └── regex v1.5.4 (*)
 │   │   ├── cfg-if v1.0.0
 │   │   ├── chrono v0.4.19
-│   │   │   ├── libc v0.2.107
-│   │   │   ├── num-integer v0.1.44 (*)
-│   │   │   ├── num-traits v0.2.14 (*)
-│   │   │   └── time v0.1.43
-│   │   │       └── libc v0.2.107
 │   │   ├── crossbeam-utils v0.8.5 (*)
 │   │   ├── exitcode v1.1.2
 │   │   ├── flate2 v1.0.22 (*)
@@ -436,17 +396,7 @@ rustpython v0.1.2 (/home/waoa/RustPython)
 │   │   └── rustc_version v0.4.0
 │   │       └── semver v1.0.4
 │   ├── sha-1 v0.9.8
-│   │   ├── block-buffer v0.9.0 (*)
-│   │   ├── cfg-if v1.0.0
-│   │   ├── cpufeatures v0.2.1
-│   │   ├── digest v0.9.0 (*)
-│   │   └── opaque-debug v0.3.0
 │   ├── sha2 v0.9.8
-│   │   ├── block-buffer v0.9.0 (*)
-│   │   ├── cfg-if v1.0.0
-│   │   ├── cpufeatures v0.2.1
-│   │   ├── digest v0.9.0 (*)
-│   │   └── opaque-debug v0.3.0
 │   ├── sha3 v0.9.1
 │   │   ├── block-buffer v0.9.0 (*)
 │   │   ├── digest v0.9.0 (*)
