@@ -33,7 +33,7 @@ use syn::parse::Error;
 
 macro_rules! err_span {
     ($span:expr, $($msg:tt)*) => (
-        syn::Error::new_spanned(&$span, format!($($msg)*))
+        $crate::Diagnostic::spanned_error(&$span, format!($($msg)*))
     )
 }
 
@@ -43,19 +43,19 @@ macro_rules! bail_span {
     )
 }
 
-// macro_rules! push_err_span {
-//     ($diagnostics:expr, $($t:tt)*) => {
-//         $diagnostics.push(err_span!($($t)*))
-//     };
-// }
+macro_rules! push_err_span {
+    ($diagnostics:expr, $($t:tt)*) => {
+        $diagnostics.push(err_span!($($t)*))
+    };
+}
 
-// macro_rules! push_diag_result {
-//     ($diags:expr, $x:expr $(,)?) => {
-//         if let Err(e) = $x {
-//             $diags.push(e);
-//         }
-//     };
-// }
+macro_rules! push_diag_result {
+    ($diags:expr, $x:expr $(,)?) => {
+        if let Err(e) = $x {
+            $diags.push(e);
+        }
+    };
+}
 
 #[derive(Debug)]
 pub struct Diagnostic {
@@ -84,11 +84,29 @@ impl Diagnostic {
         }
     }
 
-    pub(crate) fn spans_error<T: Into<String>>(spans: (Span, Span), text: T) -> Diagnostic {
+    pub fn span_error<T: Into<String>>(span: Span, text: T) -> Diagnostic {
+        Diagnostic {
+            inner: Repr::Single {
+                text: text.into(),
+                span: Some((span, span)),
+            },
+        }
+    }
+
+    pub fn spans_error<T: Into<String>>(spans: (Span, Span), text: T) -> Diagnostic {
         Diagnostic {
             inner: Repr::Single {
                 text: text.into(),
                 span: Some(spans),
+            },
+        }
+    }
+
+    pub fn spanned_error<T: Into<String>>(node: &dyn ToTokens, text: T) -> Diagnostic {
+        Diagnostic {
+            inner: Repr::Single {
+                text: text.into(),
+                span: extract_spans(node),
             },
         }
     }
@@ -103,6 +121,7 @@ impl Diagnostic {
         }
     }
 
+    #[allow(unconditional_recursion)]
     pub fn panic(&self) -> ! {
         match &self.inner {
             Repr::Single { text, .. } => panic!("{}", text),

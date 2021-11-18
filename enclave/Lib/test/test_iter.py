@@ -109,6 +109,8 @@ class TestCase(unittest.TestCase):
             self.assertEqual(list(it), seq[1:])
 
     # Test basic use of iter() function
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_iter_basic(self):
         self.check_iterator(iter(range(10)), list(range(10)))
 
@@ -120,6 +122,8 @@ class TestCase(unittest.TestCase):
         self.assertTrue(it is it2)
 
     # Test that for loops over iterators work
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_iter_for_loop(self):
         self.check_for_loop(iter(range(10)), list(range(10)))
 
@@ -147,21 +151,31 @@ class TestCase(unittest.TestCase):
         self.assertEqual(res, TRIPLETS)
 
     # Test a class with __iter__ in a for loop
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_iter_class_for(self):
         self.check_for_loop(IteratingSequenceClass(10), list(range(10)))
 
     # Test a class with __iter__ with explicit iter()
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_iter_class_iter(self):
         self.check_iterator(iter(IteratingSequenceClass(10)), list(range(10)))
 
     # Test for loop on a sequence class without __iter__
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_seq_class_for(self):
         self.check_for_loop(SequenceClass(10), list(range(10)))
 
     # Test iter() on a sequence class without __iter__
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_seq_class_iter(self):
         self.check_iterator(iter(SequenceClass(10)), list(range(10)))
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_mutating_seq_class_iter_pickle(self):
         orig = SequenceClass(5)
         for proto in range(pickle.HIGHEST_PROTOCOL + 1):
@@ -198,6 +212,8 @@ class TestCase(unittest.TestCase):
             self.assertTrue(isinstance(it, collections.abc.Iterator))
             self.assertEqual(list(it), [])
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_mutating_seq_class_exhausted_iter(self):
         a = SequenceClass(5)
         exhit = iter(a)
@@ -210,6 +226,8 @@ class TestCase(unittest.TestCase):
         self.assertEqual(list(a), [0, 1, 2, 3, 4, 5, 6])
 
     # Test a new_style class with __iter__ but no next() method
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_new_style_iter_class(self):
         class IterClass(object):
             def __iter__(self):
@@ -290,21 +308,32 @@ class TestCase(unittest.TestCase):
         self.check_for_loop(MySequenceClass(20), list(range(10)), pickle=False)
 
     # Test a big range
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_iter_big_range(self):
         self.check_for_loop(iter(range(10000)), list(range(10000)))
 
+    # Test an empty list
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_iter_empty(self):
         self.check_for_loop(iter([]), [])
 
     # Test a tuple
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_iter_tuple(self):
         self.check_for_loop(iter((0,1,2,3,4,5,6,7,8,9)), list(range(10)))
 
     # Test a range
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_iter_range(self):
         self.check_for_loop(iter(range(10)), list(range(10)))
 
     # Test a string
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_iter_string(self):
         self.check_for_loop(iter("abcde"), ["a", "b", "c", "d", "e"])
 
@@ -745,6 +774,9 @@ class TestCase(unittest.TestCase):
             self.assertEqual(indexOf(iclass, i), i)
         self.assertRaises(ValueError, indexOf, iclass, -1)
 
+    # Test iterators with file.writelines().
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_writelines(self):
         f = open(TESTFN, "w")
 
@@ -880,6 +912,8 @@ class TestCase(unittest.TestCase):
     # This tests various things that weren't sink states in Python 2.2.1,
     # plus various things that always were fine.
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_sinkstate_list(self):
         # This used to fail
         a = list(range(5))
@@ -900,6 +934,8 @@ class TestCase(unittest.TestCase):
         self.assertEqual(list(b), ['a', 'b', 'c', 'd', 'e'])
         self.assertEqual(list(b), [])
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_sinkstate_sequence(self):
         # This used to fail
         a = SequenceClass(5)
@@ -994,14 +1030,15 @@ class TestCase(unittest.TestCase):
         with self.assertRaises(OverflowError):
             next(it)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_iter_neg_setstate(self):
         it = iter(UnlimitedSequenceClass())
         it.__setstate__(-42)
         self.assertEqual(next(it), 0)
         self.assertEqual(next(it), 1)
 
-    # TODO: RUSTPYTHON
-    @unittest.expectedFailure
+    @unittest.skip("TODO: RUSTPYTHON")
     def test_free_after_iterating(self):
         check_free_after_iterating(self, iter, SequenceClass, (0,))
 

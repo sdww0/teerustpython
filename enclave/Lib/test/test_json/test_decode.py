@@ -57,6 +57,7 @@ class TestDecode:
         self.assertIs(a, c)
         self.assertIs(b, d)
 
+    @unittest.skip("TODO: RUSTPYTHON: cache/memoize keys")
     def test_keys_reuse(self):
         s = '[{"a_key": 1, "b_\xe9": 2}, {"a_key": 3, "b_\xe9": 4}]'
         self.check_keys_reuse(s, self.loads)
@@ -102,9 +103,4 @@ class TestDecode:
             self.loads('{}', encoding='fake')
 
 class TestPyDecode(TestDecode, PyTest): pass
-# TODO: RUSTPYTHON
-class TestCDecode(TestDecode, CTest): # pass
-    # TODO: RUSTPYTHON
-    @unittest.expectedFailure
-    def test_keys_reuse(self):
-        return super().test_keys_reuse()
+class TestCDecode(TestDecode, CTest): pass

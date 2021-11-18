@@ -19,7 +19,6 @@
 | smallvec v1.7.0               |        |          |
 | scopeguard v1.1.0             |        |          |
 | static_assertions v1.1.0      |        |          |
-| ppv-lite86 v0.2.15            |        |          |
 | regex-syntax v0.6.25          |        |          |
 | parking_lot_core v0.8.5       |        |          |
 | once_cell v1.8.0              |        |          |
@@ -63,7 +62,6 @@
 | maplit v1.0.2                 |        |          |
 | utf8parse v0.2.0              |        |          |
 | textwrap v0.14.2              |        |          |
-| cpufeatures v0.2.1            |        |          |
 | subtle v2.4.1                 |        |          |
 | hex v0.4.3                    | √      |          |
 | adler32 v1.2.0                |        |          |
@@ -125,7 +123,6 @@
 | dirs-sys-next v0.1.2          |        |          |
 | atty v0.2.14                  |        |          |
 | fd-lock v3.0.0                |        |          |
-| time v0.1.43                  |        |          |
 | uname v0.1.1                  |        |          |
 | socket2 v0.4.2                |        |          |
 | num_cpus v1.13.0              |        |          |
@@ -136,7 +133,7 @@
 | ena v0.14.0                   |        |          |
 | rustc_version v0.4.0          |        |          |
 | regex v1.5.4                  | √      |          |
-| rand_core v0.6.3              |        |          |
+| rand_core v0.6.3              |  √       |          |
 | dirs-next v2.0.0              |        |          |
 | unic-normal v0.9.0            |        |          |
 | parking_lot v0.11.2           |        |          |
@@ -185,5 +182,4 @@
 | num_enum_derive v0.5.4        |        |          |
 | num_enum v0.5.4               |        |          |
 | sre-engine v0.1.2             |        |          |
-
 

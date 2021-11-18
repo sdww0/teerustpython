@@ -1,11 +1,11 @@
-#![cfg_attr(target_os = "wasi", allow(dead_code))]
-use rustpython_vm::builtins::{PyDictRef, PyStrRef};
+use rustpython_vm::obj::objstr::PyStringRef;
+use rustpython_vm::pyobject::{PyIterable, PyResult, TryFromObject};
+use rustpython_vm::scope::{NameProtocol, Scope};
 use rustpython_vm::VirtualMachine;
-use rustpython_vm::{function::ArgIterable, PyResult, TryFromObject};
 
 pub struct ShellHelper<'vm> {
     vm: &'vm VirtualMachine,
-    globals: PyDictRef,
+    scope: Scope,
 }
 
 fn reverse_string(s: &mut String) {
@@ -51,49 +51,48 @@ fn split_idents_on_dot(line: &str) -> Option<(usize, Vec<String>)> {
 }
 
 impl<'vm> ShellHelper<'vm> {
-    pub fn new(vm: &'vm VirtualMachine, globals: PyDictRef) -> Self {
-        ShellHelper { vm, globals }
+    pub fn new(vm: &'vm VirtualMachine, scope: Scope) -> Self {
+        ShellHelper { vm, scope }
     }
 
     #[allow(clippy::type_complexity)]
     fn get_available_completions<'w>(
         &self,
         words: &'w [String],
-    ) -> Option<(&'w str, impl Iterator<Item = PyResult<PyStrRef>> + 'vm)> {
+    ) -> Option<(
+        &'w str,
+        Box<dyn Iterator<Item = PyResult<PyStringRef>> + 'vm>,
+    )> {
         // the very first word and then all the ones after the dot
         let (first, rest) = words.split_first().unwrap();
 
         let str_iter_method = |obj, name| {
-            let iter = self.vm.call_special_method(obj, name, ())?;
-            ArgIterable::<PyStrRef>::try_from_object(self.vm, iter)?.iter(self.vm)
+            let iter = self.vm.call_method(obj, name, vec![])?;
+            PyIterable::<PyStringRef>::try_from_object(self.vm, iter)?.iter(self.vm)
         };
 
-        let (word_start, iter1, iter2) = if let Some((last, parents)) = rest.split_last() {
+        if let Some((last, parents)) = rest.split_last() {
             // we need to get an attribute based off of the dir() of an object
 
             // last: the last word, could be empty if it ends with a dot
             // parents: the words before the dot
 
-            let mut current = self
-                .globals
-                .get_item_option(first.as_str(), self.vm)
-                .ok()??;
+            let mut current = self.scope.load_global(self.vm, first)?;
 
             for attr in parents {
-                current = current.clone().get_attr(attr.as_str(), self.vm).ok()?;
+                current = self.vm.get_attribute(current.clone(), attr.as_str()).ok()?;
             }
 
-            let current_iter = str_iter_method(current, "__dir__").ok()?;
+            let current_iter = str_iter_method(&current, "__dir__").ok()?;
 
-            (last, current_iter, None)
+            Some((&last, Box::new(current_iter) as _))
         } else {
             // we need to get a variable based off of globals/builtins
 
-            let globals = str_iter_method(self.globals.as_object().to_owned(), "keys").ok()?;
-            let builtins = str_iter_method(self.vm.builtins.clone(), "__dir__").ok()?;
-            (first, globals, Some(builtins))
-        };
-        Some((word_start, iter1.chain(iter2.into_iter().flatten())))
+            let globals = str_iter_method(self.scope.globals.as_object(), "keys").ok()?;
+            let builtins = str_iter_method(&self.vm.builtins, "__dir__").ok()?;
+            Some((&first, Box::new(Iterator::chain(globals, builtins)) as _))
+        }
     }
 
     fn complete_opt(&self, line: &str) -> Option<(usize, Vec<String>)> {
@@ -162,13 +161,11 @@ cfg_if::cfg_if! {
                     .complete_opt(&line[0..pos])
                     // as far as I can tell, there's no better way to do both completion
                     // and indentation (or even just indentation)
-                    .unwrap_or_else(|| (pos, vec!["\t".to_owned()])))
+                    .unwrap_or_else(|| (line.len(), vec!["\t".to_owned()])))
             }
         }
 
-        impl Hinter for ShellHelper<'_> {
-            type Hint = String;
-        }
+        impl Hinter for ShellHelper<'_> {}
         impl Highlighter for ShellHelper<'_> {}
         impl Validator for ShellHelper<'_> {}
         impl Helper for ShellHelper<'_> {}

@@ -147,6 +147,7 @@ class zipimporter:
         The optional 'path' argument is ignored -- it's there for compatibility
         with the importer protocol.
         """
+        print(self)
         return self.find_loader(fullname, path)[0]
 
 

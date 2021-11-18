@@ -1,121 +1,57 @@
-cargo-features = ["edition2021"]
-
 [package]
 name = "rustpython"
 version = "0.1.2"
 authors = ["RustPython Team"]
-edition = "2021"
+edition = "2018"
 description = "A python interpreter written in rust."
 repository = "https://github.com/RustPython/RustPython"
 license = "MIT"
-include = ["LICENSE", "Cargo.toml", "src/**/*.rs"]
-
 
 [workspace]
-resolver = "2"
-members = [
-    ".", "ast", "bytecode", "common", "compiler", "compiler/porcelain",
-    "derive", "jit", "parser", "vm", "vm/pylib-crate", "stdlib", "wasm/lib",
-]
+members = [".", "derive", "vm", "wasm/lib", "parser", "compiler", "bytecode", "examples/freeze"]
 
-[lib]
-name = "helloworldsampleenclave"
-crate-type = ["staticlib"]
+[[bench]]
+name = "bench"
+path = "./benchmarks/bench.rs"
 
 [features]
-default = ["threading", "pylib", "stdlib", "zlib"]
-stdlib = ["rustpython-stdlib"]
 flame-it = ["rustpython-vm/flame-it", "flame", "flamescope"]
 freeze-stdlib = ["rustpython-vm/freeze-stdlib"]
-jit = ["rustpython-vm/jit"]
-threading = ["rustpython-vm/threading"]
-pylib = ["rustpython-vm/pylib"]
-zlib = ["stdlib", "rustpython-stdlib/zlib"]
-ssl = ["rustpython-stdlib/ssl"]
-ssl-vendor = ["rustpython-stdlib/ssl-vendor"]
 
+ssl = ["rustpython-vm/ssl"]
 
 [dependencies]
 log = "0.4"
-env_logger = { version = "0.9.0", default-features = false, features = ["atty", "termcolor"] }
+env_logger = "0.7"
 clap = "2.33"
-rustpython-compiler = { path = "compiler/porcelain", version = "0.1.1" }
-rustpython-parser = { path = "parser", version = "0.1.1" }
-rustpython-vm = { path = "vm", version = "0.1.1", default-features = false, features = ["compile-parse"] }
-rustpython-stdlib = {path = "stdlib", optional = true, default-features = false, features = ["compile-parse"]}
-dirs = { package = "dirs-next", version = "2.0.0" }
+rustpython-compiler = {path = "compiler", version = "0.1.1"}
+rustpython-parser = {path = "parser", version = "0.1.1"}
+rustpython-vm = {path = "vm", version = "0.1.1"}
+dirs = { package = "dirs-next", version = "1.0" }
 num-traits = "0.2.8"
-cfg-if = "1.0"
-libc = "0.2"
+cfg-if = "0.1"
 
 flame = { version = "0.2", optional = true }
 flamescope = { version = "0.1", optional = true }
 
 [target.'cfg(not(target_os = "wasi"))'.dependencies]
-rustyline = "9"
+rustyline = "6.0"
 
 
-[target.'cfg(not(target_env = "sgx"))'.dependencies]
-sgx_types = { git = "https://github.com/apache/teaclave-sgx-sdk.git" }
-sgx_tstd = { git = "https://github.com/apache/teaclave-sgx-sdk.git" }
-
-[patch.'https://github.com/apache/teaclave-sgx-sdk.git']
-sgx_alloc = { path = "../../../sgx_alloc" }
-sgx_backtrace = { path = "../../../sgx_backtrace" }
-sgx_backtrace_sys = { path = "../../../sgx_backtrace_sys" }
-sgx_build_helper = { path = "../../../sgx_build_helper" }
-sgx_cov = { path = "../../../sgx_cov" }
-sgx_crypto_helper = { path = "../../../sgx_crypto_helper" }
-sgx_demangle = { path = "../../../sgx_demangle" }
-sgx_libc = { path = "../../../sgx_libc" }
-sgx_rand = { path = "../../../sgx_rand" }
-sgx_rand_derive = { path = "../../../sgx_rand_derive" }
-sgx_serialize = { path = "../../../sgx_serialize" }
-sgx_serialize_derive = { path = "../../../sgx_serialize_derive" }
-sgx_serialize_derive_internals = { path = "../../../sgx_serialize_derive_internals" }
-sgx_tcrypto = { path = "../../../sgx_tcrypto" }
-sgx_tcrypto_helper = { path = "../../../sgx_tcrypto_helper" }
-sgx_tdh = { path = "../../../sgx_tdh" }
-sgx_tkey_exchange = { path = "../../../sgx_tkey_exchange" }
-sgx_tprotected_fs = { path = "../../../sgx_tprotected_fs" }
-sgx_trts = { path = "../../../sgx_trts" }
-sgx_tse = { path = "../../../sgx_tse" }
-sgx_tseal = { path = "../../../sgx_tseal" }
-sgx_tstd = { path = "../../../sgx_tstd" }
-sgx_tunittest = { path = "../../../sgx_tunittest" }
-sgx_types = { path = "../../../sgx_types" }
-#sgx_ucrypto = { path = "../../../sgx_ucrypto" }
-sgx_unwind = { path = "../../../sgx_unwind" }
-#sgx_urts = { path = "../../../sgx_urts" }
 
 
-[dev-dependencies]
-cpython = "0.7.0"
-python3-sys = "0.7.0"
-criterion = "0.3"
 
-[[bench]]
-name = "execution"
-harness = false
-
-[[bench]]
-name = "microbenchmarks"
-harness = false
+[dev-dependencies.cpython]
+version = "0.2"
 
 [[bin]]
 name = "rustpython"
 path = "src/main.rs"
 
-[profile.dev.package."*"]
-opt-level = 3
-
-[profile.test]
-opt-level = 3
-lto = "thin"
-
-[profile.bench]
-lto = true
-codegen-units = 1
-opt-level = 3
-
 [patch.crates-io]
+# REDOX START, Uncommment when you want to compile/check with redoxer
+# # following patches are just waiting on a new version to be released to crates.io
+# nix = { git = "https://github.com/nix-rust/nix" }
+# crossbeam-utils = { git = "https://github.com/crossbeam-rs/crossbeam" }
+# socket2 = { git = "https://github.com/alexcrichton/socket2-rs" }
+# REDOX END

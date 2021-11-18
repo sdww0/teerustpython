@@ -3,7 +3,6 @@
 # by abc.py to load everything else at startup.
 
 from _weakref import ref
-from types import GenericAlias
 
 __all__ = ['WeakSet']
 
@@ -198,5 +197,3 @@ class WeakSet:
 
     def __repr__(self):
         return repr(self.data)
-
-    __class_getitem__ = classmethod(GenericAlias)

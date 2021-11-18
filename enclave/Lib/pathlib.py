@@ -16,8 +16,7 @@ from urllib.parse import quote_from_bytes as urlquote_from_bytes
 supports_symlinks = True
 if os.name == 'nt':
     import nt
-    # XXX RUSTPYTHON TODO: nt._getfinalpathname
-    if False and sys.getwindowsversion()[:2] >= (6, 0):
+    if sys.getwindowsversion()[:2] >= (6, 0):
         from nt import _getfinalpathname
     else:
         supports_symlinks = False
@@ -43,10 +42,7 @@ _IGNORED_WINERRORS = (
 )
 
 def _ignore_error(exception):
-    # XXX RUSTPYTHON: added check for FileNotFoundError, file.exists() on windows throws it
-    # but with a errno==ESRCH for some reason
-    return (isinstance(exception, FileNotFoundError) or
-            getattr(exception, 'errno', None) in _IGNORED_ERROS or
+    return (getattr(exception, 'errno', None) in _IGNORED_ERROS or
             getattr(exception, 'winerror', None) in _IGNORED_WINERRORS)
 
 

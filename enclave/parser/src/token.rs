@@ -10,13 +10,13 @@ pub enum Tok {
     Int { value: BigInt },
     Float { value: f64 },
     Complex { real: f64, imag: f64 },
-    String { value: String, kind: StringKind },
+    String { value: String, is_fstring: bool },
     Bytes { value: Vec<u8> },
     Newline,
     Indent,
     Dedent,
-    StartModule,
-    StartInteractive,
+    StartProgram,
+    StartStatement,
     StartExpression,
     EndOfFile,
     Lpar,
@@ -106,13 +106,6 @@ pub enum Tok {
     Yield,
 }
 
-#[derive(PartialEq, Eq, Debug, Clone)]
-pub enum StringKind {
-    Normal,
-    F,
-    U,
-}
-
 impl fmt::Display for Tok {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         use Tok::*;
@@ -121,11 +114,9 @@ impl fmt::Display for Tok {
             Int { value } => write!(f, "'{}'", value),
             Float { value } => write!(f, "'{}'", value),
             Complex { real, imag } => write!(f, "{}j{}", real, imag),
-            String { value, kind } => {
-                match kind {
-                    StringKind::F => f.write_str("f")?,
-                    StringKind::U => f.write_str("u")?,
-                    StringKind::Normal => {}
+            String { value, is_fstring } => {
+                if *is_fstring {
+                    write!(f, "f")?
                 }
                 write!(f, "{:?}", value)
             }
@@ -133,11 +124,13 @@ impl fmt::Display for Tok {
                 write!(f, "b\"")?;
                 for i in value {
                     match i {
+                        0..=8 => write!(f, "\\x0{}", i)?,
                         9 => f.write_str("\\t")?,
                         10 => f.write_str("\\n")?,
+                        11 => write!(f, "\\x0{:x}", i)?,
                         13 => f.write_str("\\r")?,
                         32..=126 => f.write_char(*i as char)?,
-                        _ => write!(f, "\\x{:02x}", i)?,
+                        _ => write!(f, "\\x{:x}", i)?,
                     }
                 }
                 f.write_str("\"")
@@ -145,8 +138,8 @@ impl fmt::Display for Tok {
             Newline => f.write_str("Newline"),
             Indent => f.write_str("Indent"),
             Dedent => f.write_str("Dedent"),
-            StartModule => f.write_str("StartProgram"),
-            StartInteractive => f.write_str("StartInteractive"),
+            StartProgram => f.write_str("StartProgram"),
+            StartStatement => f.write_str("StartStatement"),
             StartExpression => f.write_str("StartExpression"),
             EndOfFile => f.write_str("EOF"),
             Lpar => f.write_str("'('"),

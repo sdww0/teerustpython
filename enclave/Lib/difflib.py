@@ -32,7 +32,6 @@ __all__ = ['get_close_matches', 'ndiff', 'restore', 'SequenceMatcher',
 
 from heapq import nlargest as _nlargest
 from collections import namedtuple as _namedtuple
-from types import GenericAlias
 
 Match = _namedtuple('Match', 'a b size')
 
@@ -686,8 +685,6 @@ class SequenceMatcher:
         # shorter sequence
         return _calculate_ratio(min(la, lb), la + lb)
 
-    __class_getitem__ = classmethod(GenericAlias)
-
 def get_close_matches(word, possibilities, n=3, cutoff=0.6):
     """Use SequenceMatcher to return list of the best "good enough" matches.
 
@@ -736,15 +733,20 @@ def get_close_matches(word, possibilities, n=3, cutoff=0.6):
     # Strip scores for the best n matches
     return [x for score, x in result]
 
+def _count_leading(line, ch):
+    """
+    Return number of `ch` characters at the start of `line`.
 
-def _keep_original_ws(s, tag_s):
-    """Replace whitespace with the original whitespace characters in `s`"""
-    return ''.join(
-        c if tag_c == " " and c.isspace() else tag_c
-        for c, tag_c in zip(s, tag_s)
-    )
+    Example:
 
+    >>> _count_leading('   abc', ' ')
+    3
+    """
 
+    i, n = 0, len(line)
+    while i < n and line[i] == ch:
+        i += 1
+    return i
 
 class Differ:
     r"""
@@ -1031,7 +1033,7 @@ class Differ:
 
     def _qformat(self, aline, bline, atags, btags):
         r"""
-        Format "?" output and deal with tabs.
+        Format "?" output and deal with leading tabs.
 
         Example:
 
@@ -1045,16 +1047,22 @@ class Differ:
         '+ \tabcdefGhijkl\n'
         '? \t ^ ^  ^\n'
         """
-        atags = _keep_original_ws(aline, atags).rstrip()
-        btags = _keep_original_ws(bline, btags).rstrip()
+
+        # Can hurt, but will probably help most of the time.
+        common = min(_count_leading(aline, "\t"),
+                     _count_leading(bline, "\t"))
+        common = min(common, _count_leading(atags[:common], " "))
+        common = min(common, _count_leading(btags[:common], " "))
+        atags = atags[common:].rstrip()
+        btags = btags[common:].rstrip()
 
         yield "- " + aline
         if atags:
-            yield f"? {atags}\n"
+            yield "? %s%s\n" % ("\t" * common, atags)
 
         yield "+ " + bline
         if btags:
-            yield f"? {btags}\n"
+            yield "? %s%s\n" % ("\t" * common, btags)
 
 # With respect to junk, an earlier version of ndiff simply refused to
 # *start* a match with a junk element.  The result was cases like this:
@@ -1077,7 +1085,7 @@ import re
 
 def IS_LINE_JUNK(line, pat=re.compile(r"\s*(?:#\s*)?$").match):
     r"""
-    Return True for ignorable line: iff `line` is blank or contains a single '#'.
+    Return 1 for ignorable line: iff `line` is blank or contains a single '#'.
 
     Examples:
 
@@ -1093,7 +1101,7 @@ def IS_LINE_JUNK(line, pat=re.compile(r"\s*(?:#\s*)?$").match):
 
 def IS_CHARACTER_JUNK(ch, ws=" \t"):
     r"""
-    Return True for ignorable character: iff `ch` is a space or tab.
+    Return 1 for ignorable character: iff `ch` is a space or tab.
 
     Examples:
 

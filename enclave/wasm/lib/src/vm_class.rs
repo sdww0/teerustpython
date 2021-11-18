@@ -1,76 +1,63 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::{Rc, Weak};
+use std::sync::Arc;
 
 use js_sys::{Object, TypeError};
 use wasm_bindgen::prelude::*;
 
-use rustpython_vm::compile::{self, Mode};
-use rustpython_vm::scope::Scope;
-use rustpython_vm::{InitParameter, Interpreter, PySettings, VirtualMachine};
-use rustpython_vm::{ItemProtocol, PyObjectRef, PyObjectWeak, PyValue};
+use rustpython_compiler::compile;
+use rustpython_vm::pyobject::{ItemProtocol, PyObject, PyObjectPayload, PyObjectRef, PyValue};
+use rustpython_vm::scope::{NameProtocol, Scope};
+use rustpython_vm::{InitParameter, PySettings, VirtualMachine};
 
 use crate::browser_module::setup_browser_module;
-use crate::convert::{self, PyResultExt};
+use crate::convert::{self, JsHandle, PyResultExt};
 use crate::js_module;
 use crate::wasm_builtins;
+use rustpython_compiler::mode::Mode;
 
 pub(crate) struct StoredVirtualMachine {
-    pub interp: Interpreter,
-    pub scope: Scope,
+    pub vm: VirtualMachine,
+    pub scope: RefCell<Scope>,
     /// you can put a Rc in here, keep it as a Weak, and it'll be held only for
     /// as long as the StoredVM is alive
     held_objects: RefCell<Vec<PyObjectRef>>,
 }
 
-#[pymodule]
-mod _window {}
-
-fn init_window_module(vm: &VirtualMachine) -> PyObjectRef {
-    let module = _window::make_module(vm);
-
-    extend_module!(vm, module, {
-        "window" => js_module::PyJsValue::new(wasm_builtins::window()).into_ref(vm),
-    });
-
-    module
-}
-
 impl StoredVirtualMachine {
     fn new(id: String, inject_browser_module: bool) -> StoredVirtualMachine {
-        let mut scope = None;
-        let interp = Interpreter::new_with_init(PySettings::default(), |vm| {
-            vm.wasm_id = Some(id);
+        let mut settings = PySettings::default();
 
-            js_module::setup_js_module(vm);
-            if inject_browser_module {
-                vm.add_native_module("_window".to_owned(), Box::new(init_window_module));
-                setup_browser_module(vm);
-            }
+        // After js, browser modules injected, the VM will not be initialized.
+        settings.initialization_parameter = InitParameter::NoInitialize;
 
-            VM_INIT_FUNCS.with(|cell| {
-                for f in cell.borrow().iter() {
-                    f(vm)
-                }
-            });
+        let mut vm: VirtualMachine = VirtualMachine::new(settings);
 
-            scope = Some(vm.new_scope_with_builtins());
+        vm.wasm_id = Some(id);
+        let scope = vm.new_scope_with_builtins();
 
-            InitParameter::Internal
-        });
+        js_module::setup_js_module(&mut vm);
+        if inject_browser_module {
+            Arc::get_mut(&mut vm.state).unwrap().stdlib_inits.insert(
+                "_window".to_owned(),
+                Box::new(|vm| {
+                    py_module!(vm, "_window", {
+                        "window" => js_module::PyJsValue::new(wasm_builtins::window()).into_ref(vm),
+                    })
+                }),
+            );
+            setup_browser_module(&mut vm);
+        }
+
+        vm.initialize(InitParameter::InitializeInternal);
 
         StoredVirtualMachine {
-            interp,
-            scope: scope.unwrap(),
+            vm,
+            scope: RefCell::new(scope),
             held_objects: RefCell::new(Vec::new()),
         }
     }
-}
-
-/// Add a hook to add builtins or frozen modules to the RustPython VirtualMachine while it's
-/// initializing.
-pub fn add_init_func(f: fn(&mut VirtualMachine)) {
-    VM_INIT_FUNCS.with(|cell| cell.borrow_mut().push(f))
 }
 
 // It's fine that it's thread local, since WASM doesn't even have threads yet. thread_local!
@@ -78,7 +65,6 @@ pub fn add_init_func(f: fn(&mut VirtualMachine)) {
 // https://rustwasm.github.io/2018/10/24/multithreading-rust-and-wasm.html#atomic-instructions
 thread_local! {
     static STORED_VMS: RefCell<HashMap<String, Rc<StoredVirtualMachine>>> = RefCell::default();
-    static VM_INIT_FUNCS: RefCell<Vec<fn(&mut VirtualMachine)>> = RefCell::default();
 }
 
 pub fn get_vm_id(vm: &VirtualMachine) -> &str {
@@ -184,20 +170,16 @@ impl WASMVirtualMachine {
         Ok(self.with_unchecked(f))
     }
 
-    pub(crate) fn with_vm<F, R>(&self, f: F) -> Result<R, JsValue>
-    where
-        F: FnOnce(&VirtualMachine, &StoredVirtualMachine) -> R,
-    {
-        self.with(|stored| stored.interp.enter(|vm| f(vm, stored)))
-    }
-
     pub fn valid(&self) -> bool {
         STORED_VMS.with(|cell| cell.borrow().contains_key(&self.id))
     }
 
-    pub(crate) fn push_held_rc(&self, obj: PyObjectRef) -> Result<PyObjectWeak, JsValue> {
+    pub(crate) fn push_held_rc(
+        &self,
+        obj: PyObjectRef,
+    ) -> Result<std::sync::Weak<PyObject<dyn PyObjectPayload>>, JsValue> {
         self.with(|stored_vm| {
-            let weak = obj.downgrade();
+            let weak = std::sync::Arc::downgrade(&obj);
             stored_vm.held_objects.borrow_mut().push(obj);
             weak
         })
@@ -222,15 +204,19 @@ impl WASMVirtualMachine {
 
     #[wasm_bindgen(js_name = addToScope)]
     pub fn add_to_scope(&self, name: String, value: JsValue) -> Result<(), JsValue> {
-        self.with_vm(move |vm, StoredVirtualMachine { ref scope, .. }| {
-            let value = convert::js_to_py(vm, value);
-            scope.globals.set_item(name, value, vm).into_js(vm)
-        })?
+        self.with(
+            move |StoredVirtualMachine {
+                      ref vm, ref scope, ..
+                  }| {
+                let value = convert::js_to_py(vm, value);
+                scope.borrow_mut().store_name(&vm, &name, value);
+            },
+        )
     }
 
     #[wasm_bindgen(js_name = setStdout)]
     pub fn set_stdout(&self, stdout: JsValue) -> Result<(), JsValue> {
-        self.with_vm(|vm, _| {
+        self.with(move |StoredVirtualMachine { ref vm, .. }| {
             fn error() -> JsValue {
                 TypeError::new("Unknown stdout option, please pass a function or 'console'").into()
             }
@@ -241,8 +227,9 @@ impl WASMVirtualMachine {
                     _ => return Err(error()),
                 }
             } else if stdout.is_function() {
-                let func = js_sys::Function::from(stdout);
+                let func_handle = JsHandle::new(stdout);
                 make_stdout_object(vm, move |data, vm| {
+                    let func = js_sys::Function::from(func_handle.get());
                     func.call1(&JsValue::UNDEFINED, &data.into())
                         .map_err(|err| convert::js_py_typeerror(vm, err))?;
                     Ok(())
@@ -254,7 +241,7 @@ impl WASMVirtualMachine {
             } else {
                 return Err(error());
             };
-            vm.sys_module.set_attr("stdout", stdout, vm).unwrap();
+            vm.set_attr(&vm.sys_module, "stdout", stdout).unwrap();
             Ok(())
         })?
     }
@@ -266,32 +253,34 @@ impl WASMVirtualMachine {
         source: &str,
         imports: Option<Object>,
     ) -> Result<(), JsValue> {
-        self.with_vm(|vm, _| {
+        self.with(|StoredVirtualMachine { ref vm, .. }| {
             let code = vm
                 .compile(source, Mode::Exec, name.clone())
                 .map_err(convert::syntax_err)?;
             let attrs = vm.ctx.new_dict();
             attrs
-                .set_item("__name__", vm.new_pyobj(name.as_str()), vm)
-                .into_js(vm)?;
+                .set_item("__name__", vm.new_str(name.clone()), vm)
+                .to_js(vm)?;
 
             if let Some(imports) = imports {
                 for entry in convert::object_entries(&imports) {
                     let (key, value) = entry?;
                     let key: String = Object::from(key).to_string().into();
                     attrs
-                        .set_item(key.as_str(), convert::js_to_py(vm, value), vm)
-                        .into_js(vm)?;
+                        .set_item(&key, convert::js_to_py(vm, value), vm)
+                        .to_js(vm)?;
                 }
             }
 
-            vm.run_code_obj(code, Scope::new(None, attrs.clone()))
-                .into_js(vm)?;
+            vm.run_code_obj(code, Scope::new(None, attrs.clone(), vm))
+                .to_js(vm)?;
 
-            let module = vm.new_module(&name, attrs, None);
+            let module = vm.new_module(&name, attrs);
 
-            let sys_modules = vm.sys_module.clone().get_attr("modules", vm).into_js(vm)?;
-            sys_modules.set_item(name, module, vm).into_js(vm)?;
+            let sys_modules = vm
+                .get_attribute(vm.sys_module.clone(), "modules")
+                .to_js(vm)?;
+            sys_modules.set_item(&name, module, vm).to_js(vm)?;
 
             Ok(())
         })?
@@ -299,8 +288,8 @@ impl WASMVirtualMachine {
 
     #[wasm_bindgen(js_name = injectJSModule)]
     pub fn inject_js_module(&self, name: String, module: Object) -> Result<(), JsValue> {
-        self.with_vm(|vm, _| {
-            let py_module = vm.new_module(&name, vm.ctx.new_dict(), None);
+        self.with(|StoredVirtualMachine { ref vm, .. }| {
+            let py_module = vm.new_module(&name, vm.ctx.new_dict());
             for entry in convert::object_entries(&module) {
                 let (key, value) = entry?;
                 let key = Object::from(key).to_string();
@@ -309,8 +298,10 @@ impl WASMVirtualMachine {
                 });
             }
 
-            let sys_modules = vm.sys_module.clone().get_attr("modules", vm).into_js(vm)?;
-            sys_modules.set_item(name, py_module, vm).into_js(vm)?;
+            let sys_modules = vm
+                .get_attribute(vm.sys_module.clone(), "modules")
+                .to_js(vm)?;
+            sys_modules.set_item(&name, py_module, vm).to_js(vm)?;
 
             Ok(())
         })?
@@ -322,13 +313,17 @@ impl WASMVirtualMachine {
         mode: compile::Mode,
         source_path: Option<String>,
     ) -> Result<JsValue, JsValue> {
-        self.with_vm(|vm, StoredVirtualMachine { ref scope, .. }| {
-            let source_path = source_path.unwrap_or_else(|| "<wasm>".to_owned());
-            let code = vm.compile(source, mode, source_path);
-            let code = code.map_err(convert::syntax_err)?;
-            let result = vm.run_code_obj(code, scope.clone());
-            convert::pyresult_to_jsresult(vm, result)
-        })?
+        self.with(
+            |StoredVirtualMachine {
+                 ref vm, ref scope, ..
+             }| {
+                let source_path = source_path.unwrap_or_else(|| "<wasm>".to_owned());
+                let code = vm.compile(source, mode, source_path);
+                let code = code.map_err(convert::syntax_err)?;
+                let result = vm.run_code_obj(code, scope.borrow().clone());
+                convert::pyresult_to_jsresult(vm, result)
+            },
+        )?
     }
 
     pub fn exec(&self, source: &str, source_path: Option<String>) -> Result<JsValue, JsValue> {

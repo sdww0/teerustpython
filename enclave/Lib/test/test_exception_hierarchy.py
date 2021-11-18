@@ -34,19 +34,22 @@ class SubOSErrorWithStandaloneInit(OSError):
 
 class HierarchyTest(unittest.TestCase):
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_builtin_errors(self):
         self.assertEqual(OSError.__name__, 'OSError')
         self.assertIs(IOError, OSError)
         self.assertIs(EnvironmentError, OSError)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_socket_errors(self):
         self.assertIs(socket.error, IOError)
         self.assertIs(socket.gaierror.__base__, OSError)
         self.assertIs(socket.herror.__base__, OSError)
         self.assertIs(socket.timeout.__base__, OSError)
 
-    # TODO: RUSTPYTHON
-    @unittest.expectedFailure
+    @unittest.skip("TODO: RUSTPYTHON")
     def test_select_error(self):
         self.assertIs(select.error, OSError)
 
@@ -81,6 +84,8 @@ class HierarchyTest(unittest.TestCase):
         return _map
     _map = _make_map(_pep_map)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_errno_mapping(self):
         # The OSError constructor maps errnos to subclasses
         # A sample test for the basic functionality

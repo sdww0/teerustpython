@@ -179,6 +179,8 @@ class TokenTests(unittest.TestCase):
         self.assertEqual(1 if 0else 0, 0)
         self.assertRaises(SyntaxError, eval, "0 if 1Else 0")
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_underscore_literals(self):
         for lit in VALID_UNDERSCORE_LITERALS:
             self.assertEqual(eval(lit), eval(lit.replace('_', '')))
@@ -295,6 +297,7 @@ class GrammarTests(unittest.TestCase):
         # testlist ENDMARKER
         x = eval('1, 0 or 1')
 
+    @unittest.skip("TODO: RUSTPYTHON")
     def test_var_annot_basics(self):
         # all these should be allowed
         var1: int = 5
@@ -386,8 +389,7 @@ class GrammarTests(unittest.TestCase):
             XX: 'ANNOT'
         self.assertEqual(CC.__annotations__['xx'], 'ANNOT')
 
-    # TODO: RUSTPYTHON
-    @unittest.expectedFailure
+    @unittest.skip("TODO: RUSTPYTHON")
     def test_var_annot_module_semantics(self):
         with self.assertRaises(AttributeError):
             print(test.__annotations__)
@@ -397,6 +399,7 @@ class GrammarTests(unittest.TestCase):
                               {'123': 123, 'o': type})
         self.assertEqual(ann_module2.__annotations__, {})
 
+    @unittest.skip("TODO: RUSTPYTHON")
     def test_var_annot_in_module(self):
         # check that functions fail the same way when executed
         # outside of module where they were defined
@@ -457,7 +460,8 @@ class GrammarTests(unittest.TestCase):
     #     exec('X: str', {}, CNS2())
     #     self.assertEqual(nonloc_ns['__annotations__']['x'], str)
 
-
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_var_annot_rhs(self):
         ns = {}
         exec('x: tuple = 1, 2', ns)
@@ -471,6 +475,8 @@ class GrammarTests(unittest.TestCase):
         exec('x: Tuple[int, ...] = a,*b,c', ns)
         self.assertEqual(ns['x'], (1, 2, 3, 4, 5))
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_funcdef(self):
         ### [decorators] 'def' NAME parameters ['->' test] ':' suite
         ### decorator: '@' dotted_name [ '(' [arglist] ')' ] NEWLINE
@@ -1060,6 +1066,8 @@ class GrammarTests(unittest.TestCase):
         self.assertEqual(g2(False), 0)
         self.assertEqual(g2(True), ('end', 1))
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_yield(self):
         # Allowed as standalone statement
         def g(): yield 1
@@ -1154,13 +1162,14 @@ class GrammarTests(unittest.TestCase):
         global a, b
         global one, two, three, four, five, six, seven, eight, nine, ten
 
-    def test_nonlocal(self):
-        # 'nonlocal' NAME (',' NAME)*
-        x = 0
-        y = 0
-        def f():
-            nonlocal x
-            nonlocal x, y
+    # TODO: RUSTPYTHON
+    # def test_nonlocal(self):
+    #     # 'nonlocal' NAME (',' NAME)*
+    #     x = 0
+    #     y = 0
+    #     def f():
+    #         nonlocal x
+    #         nonlocal x, y
 
     def test_assert(self):
         # assertTruestmt: 'assert' test [',' test]
@@ -1180,8 +1189,7 @@ class GrammarTests(unittest.TestCase):
             self.fail("'assert True, msg' should not have "
                       "raised an AssertionError")
 
-    # TODO: RUSTPYTHON
-    @unittest.expectedFailure
+    @unittest.skip("TODO: RUSTPYTHON")
     # these tests fail if python is run with -O, so check __debug__
     @unittest.skipUnless(__debug__, "Won't work if __debug__ is False")
     def testAssert2(self):
@@ -1461,6 +1469,8 @@ class GrammarTests(unittest.TestCase):
         x = ~1 ^ 1 & 1 | 1 & 1 ^ -1
         x = -1*1/1 + 1*1 - ---1*1
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_selectors(self):
         ### trailer: '(' [testlist] ')' | '[' subscript ']' | '.' NAME
         ### subscript: expr | [expr] ':' [expr]

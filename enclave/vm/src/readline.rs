@@ -6,9 +6,9 @@ type OtherResult<T> = Result<T, OtherError>;
 
 pub enum ReadlineResult {
     Line(String),
-    Eof,
+    EOF,
     Interrupt,
-    Io(std::io::Error),
+    IO(std::io::Error),
     EncodingError,
     Other(OtherError),
 }
@@ -45,16 +45,16 @@ mod basic_readline {
             use std::io::prelude::*;
             print!("{}", prompt);
             if let Err(e) = io::stdout().flush() {
-                return ReadlineResult::Io(e);
+                return ReadlineResult::IO(e);
             }
 
             match io::stdin().lock().lines().next() {
                 Some(Ok(line)) => ReadlineResult::Line(line),
-                None => ReadlineResult::Eof,
+                None => ReadlineResult::EOF,
                 Some(Err(e)) => match e.kind() {
                     io::ErrorKind::Interrupted => ReadlineResult::Interrupt,
                     io::ErrorKind::InvalidData => ReadlineResult::EncodingError,
-                    _ => ReadlineResult::Io(e),
+                    _ => ReadlineResult::IO(e),
                 },
             }
         }
@@ -68,20 +68,26 @@ mod rustyline_readline {
     pub trait Helper: rustyline::Helper {}
     impl<T: rustyline::Helper> Helper for T {}
 
-    /// Readline: the REPL
     pub struct Readline<H: Helper> {
         repl: rustyline::Editor<H>,
     }
 
     impl<H: Helper> Readline<H> {
         pub fn new(helper: H) -> Self {
-            use rustyline::*;
+            use rustyline::{At, Cmd, CompletionType, Config, Editor, KeyPress, Movement, Word};
             let mut repl = Editor::with_config(
                 Config::builder()
                     .completion_type(CompletionType::List)
                     .tab_stop(8)
-                    .bracketed_paste(false) // multi-line paste
                     .build(),
+            );
+            repl.bind_sequence(
+                KeyPress::ControlLeft,
+                Cmd::Move(Movement::BackwardWord(1, Word::Vi)),
+            );
+            repl.bind_sequence(
+                KeyPress::ControlRight,
+                Cmd::Move(Movement::ForwardWord(1, At::AfterEnd, Word::Vi)),
             );
             repl.set_helper(Some(helper));
             Readline { repl }
@@ -112,8 +118,8 @@ mod rustyline_readline {
             match self.repl.readline(prompt) {
                 Ok(line) => ReadlineResult::Line(line),
                 Err(ReadlineError::Interrupted) => ReadlineResult::Interrupt,
-                Err(ReadlineError::Eof) => ReadlineResult::Eof,
-                Err(ReadlineError::Io(e)) => ReadlineResult::Io(e),
+                Err(ReadlineError::Eof) => ReadlineResult::EOF,
+                Err(ReadlineError::Io(e)) => ReadlineResult::IO(e),
                 #[cfg(unix)]
                 Err(ReadlineError::Utf8Error) => ReadlineResult::EncodingError,
                 #[cfg(windows)]

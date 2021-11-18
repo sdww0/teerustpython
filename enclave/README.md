@@ -2,11 +2,11 @@
 
 # [RustPython](https://rustpython.github.io/)
 
-A Python-3 (CPython >= 3.9.0) Interpreter written in Rust :snake: :scream:
+A Python-3 (CPython >= 3.5.0) Interpreter written in Rust :snake: :scream:
 :metal:.
 
 [![Build Status](https://github.com/RustPython/RustPython/workflows/CI/badge.svg)](https://github.com/RustPython/RustPython/actions?query=workflow%3ACI)
-[![codecov](https://codecov.io/gh/RustPython/RustPython/branch/main/graph/badge.svg)](https://codecov.io/gh/RustPython/RustPython)
+[![codecov](https://codecov.io/gh/RustPython/RustPython/branch/master/graph/badge.svg)](https://codecov.io/gh/RustPython/RustPython)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![Contributors](https://img.shields.io/github/contributors/RustPython/RustPython.svg)](https://github.com/RustPython/RustPython/graphs/contributors)
 [![Gitter](https://badges.gitter.im/RustPython/Lobby.svg)](https://gitter.im/rustpython/Lobby)
@@ -24,47 +24,28 @@ RustPython requires Rust latest stable version (e.g 1.43.0 at May 24th 2020).
 To check Rust version: `rustc --version` If you wish to update,
 `rustup update stable`.
 
-To build RustPython locally, do the following:
+To test RustPython, do the following:
 
     $ git clone https://github.com/RustPython/RustPython
     $ cd RustPython
-      # --release is needed (at least on windows) to prevent stack overflow
-    $ cargo run --release demo.py
+    $ cargo run demo.py
     Hello, RustPython!
 
 Or use the interactive shell:
 
-    $ cargo run --release
+    $ cargo run
     Welcome to rustpython
     >>>>> 2+2
     4
-    
-NOTE: For windows users, please set `RUSTPYTHONPATH` environment variable as `Lib` path in project directory.
-(e.g. When RustPython directory is `C:\RustPython`, set `RUSTPYTHONPATH` as `C:\RustPython\Lib`)
 
 You can also install and run RustPython with the following:
 
-    $ cargo install --git https://github.com/RustPython/RustPython
+    $ cargo install rustpython
     $ rustpython
     Welcome to the magnificent Rust Python interpreter
     >>>>>
 
-(The `rustpython-*` crates are currently yanked from crates.io due to being out
-of date and not building on newer rust versions; we hope to release a new
-version Soon™)
-
-If you'd like to make https requests, you can enable the `ssl` feature, which
-also lets you install the `pip` package manager. Note that on Windows, you may
-need to install OpenSSL, or you can enable the `ssl-vendor` feature instead,
-which compiles OpenSSL for you but requires a C compiler, perl, and `make`.
-
-Once you've installed rustpython with SSL support, you can install pip by
-running:
-
-    $ rustpython --install-pip
-
-You can also install RustPython through the `conda` package manager, though
-this isn't officially supported and may be out of date:
+Or through the `conda` package manager:
 
     $ conda install rustpython -c conda-forge
     $ rustpython
@@ -89,32 +70,8 @@ You can build the WebAssembly WASI file with:
 cargo build --release --target wasm32-wasi --features="freeze-stdlib"
 ```
 
-> Note: we use the `freeze-stdlib` to include the standard library inside the binary. You also have to run once `rustup target add wasm32-wasi`.
+> Note: we use the `freeze-stdlib` to include the standard library inside the binary.
 
-### JIT (Just in time) compiler
-
-RustPython has an **very** experimental JIT compiler that compile python functions into native code. 
-
-#### Building
-
-By default the JIT compiler isn't enabled, it's enabled with the `jit` cargo feature.
-
-    $ cargo run --features jit
-    
-This requires autoconf, automake, libtool, and clang to be installed.
-
-#### Using 
-
-To compile a function, call `__jit__()` on it.
-
-```python
-def foo():
-    a = 5
-    return 10 + a
-
-foo.__jit__()  # this will compile foo to native code and subsequent calls will execute that native code
-assert foo() == 15
-```
 
 ## Embedding RustPython into your Rust Applications
 
@@ -124,11 +81,12 @@ Then `examples/hello_embed.rs` and `examples/mini_repl.rs` may be of some assist
 
 ## Disclaimer
 
-RustPython is in development, and while the interpreter certainly can be used
-in interesting use cases like running Python in WASM and embedding into a Rust
-project, do note that RustPython is not totally production-ready.
+RustPython is in a development phase and should not be used in production or a
+fault intolerant setting.
 
-Contribution is more than welcome! See our contribution section for more
+Our current build supports only a subset of Python syntax.
+
+Contribution is also more than welcome! See our contribution section for more
 information on this.
 
 ## Conference videos
@@ -140,12 +98,12 @@ Checkout those talks on conferences:
 
 ## Use cases
 
-Although RustPython is a fairly young project, a few people have used it to
-make cool projects:
+Allthough rustpython is a very young project, it is already used in the wild:
 
 - [pyckitup](https://github.com/pickitup247/pyckitup): a game engine written in
   rust.
-- [Robot Rumble](https://github.com/robot-rumble/logic/): an arena-based AI competition platform
+- [codingworkshops.org](https://github.com/chicode/codingworkshops): a site
+  where you can learn how to code.
 
 ## Goals
 
@@ -158,7 +116,7 @@ Currently along with other areas of the project, documentation is still in an
 early phase.
 
 You can read the [online documentation](https://docs.rs/rustpython-vm) for the
-latest release, or the [user guide](https://rustpython.github.io/docs/).
+latest release.
 
 You can also generate documentation locally by running:
 
@@ -180,7 +138,7 @@ the best ways to get started are below:
 
 Most tasks are listed in the
 [issue tracker](https://github.com/RustPython/RustPython/issues). Check issues
-labeled with [good first issue](https://github.com/RustPython/RustPython/issues?q=label%3A%22good+first+issue%22+is%3Aissue+is%3Aopen+) if you wish to start coding.
+labeled with `good first issue` if you wish to start coding.
 
 To enhance CPython compatibility, try to increase unittest coverage by checking this article: [How to contribute to RustPython by CPython unittest](https://rustpython.github.io/guideline/2020/04/04/how-to-contribute-by-cpython-unittest.html)
 
@@ -189,6 +147,21 @@ methods are often the simplest and easiest way to contribute.
 
 You can also simply run `./whats_left.sh` to assist in finding any unimplemented
 method.
+
+## Using a different standard library
+
+As of now the standard library is under construction. You can change a standard
+library by setting the RUSTPYTHONPATH environment variable.
+
+To do this, follow this method:
+
+```shell
+$ export RUSTPYTHONPATH=./Lib  # this is same as the default value
+$ cargo run -- -c 'import xdrlib'
+```
+
+You can play around with other standard libraries for python. For example, the
+[ouroboros library](https://github.com/pybee/ouroboros) or CPython Lib.
 
 ## Compiling to WebAssembly
 

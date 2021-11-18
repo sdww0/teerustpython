@@ -4,27 +4,20 @@ Read and write ZIP files.
 XXX references to utf-8 need further investigation.
 """
 import binascii
+import functools
 import importlib.util
 import io
 import itertools
-try:
-    import os
-except ImportError:
-    import _dummy_os as os
+import os
 import posixpath
-try:
-    import shutil
-except ImportError:
-    pass
+import shutil
 import stat
 import struct
 import sys
-try:
-    import threading
-except ImportError:
-    import _dummy_thread as threading
+import threading
 import time
 import contextlib
+from collections import OrderedDict
 
 try:
     import zlib # We may need its compression method
@@ -45,8 +38,7 @@ except ImportError:
 
 __all__ = ["BadZipFile", "BadZipfile", "error",
            "ZIP_STORED", "ZIP_DEFLATED", "ZIP_BZIP2", "ZIP_LZMA",
-           "is_zipfile", "ZipInfo", "ZipFile", "PyZipFile", "LargeZipFile",
-           "Path"]
+           "is_zipfile", "ZipInfo", "ZipFile", "PyZipFile", "LargeZipFile"]
 
 class BadZipFile(Exception):
     pass
@@ -386,11 +378,11 @@ class ZipInfo (object):
         self.volume = 0                 # Volume number of file header
         self.internal_attr = 0          # Internal attributes
         self.external_attr = 0          # External file attributes
-        self.compress_size = 0          # Size of the compressed file
-        self.file_size = 0              # Size of the uncompressed file
         # Other attributes are set by class ZipFile:
         # header_offset         Byte offset to the file header
         # CRC                   CRC-32 of the uncompressed file
+        # compress_size         Size of the compressed file
+        # file_size             Size of the uncompressed file
 
     def __repr__(self):
         result = ['<%s filename=%r' % (self.__class__.__name__, self.filename)]
@@ -475,23 +467,44 @@ class ZipInfo (object):
             if ln+4 > len(extra):
                 raise BadZipFile("Corrupt extra field %04x (size=%d)" % (tp, ln))
             if tp == 0x0001:
-                data = extra[4:ln+4]
+                if ln >= 24:
+                    counts = unpack('<QQQ', extra[4:28])
+                elif ln == 16:
+                    counts = unpack('<QQ', extra[4:20])
+                elif ln == 8:
+                    counts = unpack('<Q', extra[4:12])
+                elif ln == 0:
+                    counts = ()
+                else:
+                    raise BadZipFile("Corrupt extra field %04x (size=%d)" % (tp, ln))
+
+                idx = 0
+
                 # ZIP64 extension (large files and/or large archives)
-                try:
-                    if self.file_size in (0xFFFF_FFFF_FFFF_FFFF, 0xFFFF_FFFF):
-                        field = "File size"
-                        self.file_size, = unpack('<Q', data[:8])
-                        data = data[8:]
-                    if self.compress_size == 0xFFFF_FFFF:
-                        field = "Compress size"
-                        self.compress_size, = unpack('<Q', data[:8])
-                        data = data[8:]
-                    if self.header_offset == 0xFFFF_FFFF:
-                        field = "Header offset"
-                        self.header_offset, = unpack('<Q', data[:8])
-                except struct.error:
-                    raise BadZipFile(f"Corrupt zip64 extra field. "
-                                     f"{field} not found.") from None
+                if self.file_size in (0xffffffffffffffff, 0xffffffff):
+                    if len(counts) <= idx:
+                        raise BadZipFile(
+                            "Corrupt zip64 extra field. File size not found."
+                        )
+                    self.file_size = counts[idx]
+                    idx += 1
+
+                if self.compress_size == 0xFFFFFFFF:
+                    if len(counts) <= idx:
+                        raise BadZipFile(
+                            "Corrupt zip64 extra field. Compress size not found."
+                        )
+                    self.compress_size = counts[idx]
+                    idx += 1
+
+                if self.header_offset == 0xffffffff:
+                    if len(counts) <= idx:
+                        raise BadZipFile(
+                            "Corrupt zip64 extra field. Header offset not found."
+                        )
+                    old = self.header_offset
+                    self.header_offset = counts[idx]
+                    idx+=1
 
             extra = extra[ln+4:]
 
@@ -899,16 +912,12 @@ class ZipExtFile(io.BufferedIOBase):
         return self._readbuffer[self._offset: self._offset + 512]
 
     def readable(self):
-        if self.closed:
-            raise ValueError("I/O operation on closed file.")
         return True
 
     def read(self, n=-1):
         """Read and return up to n bytes.
         If the argument is omitted, None, or negative, data is read and returned until EOF is reached.
         """
-        if self.closed:
-            raise ValueError("read from closed file.")
         if n is None or n < 0:
             buf = self._readbuffer[self._offset:]
             self._readbuffer = b''
@@ -1045,13 +1054,9 @@ class ZipExtFile(io.BufferedIOBase):
             super().close()
 
     def seekable(self):
-        if self.closed:
-            raise ValueError("I/O operation on closed file.")
         return self._seekable
 
     def seek(self, offset, whence=0):
-        if self.closed:
-            raise ValueError("seek on closed file.")
         if not self._seekable:
             raise io.UnsupportedOperation("underlying stream is not seekable")
         curr_pos = self.tell()
@@ -1100,8 +1105,6 @@ class ZipExtFile(io.BufferedIOBase):
         return self.tell()
 
     def tell(self):
-        if self.closed:
-            raise ValueError("tell on closed file.")
         if not self._seekable:
             raise io.UnsupportedOperation("underlying stream is not seekable")
         filepos = self._orig_file_size - self._left - len(self._readbuffer) + self._offset
@@ -1543,7 +1546,7 @@ class ZipFile:
                 # strong encryption
                 raise NotImplementedError("strong encryption (flag bit 6)")
 
-            if fheader[_FH_GENERAL_PURPOSE_FLAG_BITS] & 0x800:
+            if zinfo.flag_bits & 0x800:
                 # UTF-8 filename
                 fname_str = fname.decode("utf-8")
             else:
@@ -1581,7 +1584,9 @@ class ZipFile:
                              "another write handle open on it. "
                              "Close the first handle before opening another.")
 
-        # Size and CRC are overwritten with correct data after processing the file
+        # Sizes and CRC are overwritten with correct data after processing the file
+        if not hasattr(zinfo, 'file_size'):
+            zinfo.file_size = 0
         zinfo.compress_size = 0
         zinfo.CRC = 0
 
@@ -1877,15 +1882,25 @@ class ZipFile:
 
             extract_version = max(min_version, zinfo.extract_version)
             create_version = max(min_version, zinfo.create_version)
-            filename, flag_bits = zinfo._encodeFilenameFlags()
-            centdir = struct.pack(structCentralDir,
-                                  stringCentralDir, create_version,
-                                  zinfo.create_system, extract_version, zinfo.reserved,
-                                  flag_bits, zinfo.compress_type, dostime, dosdate,
-                                  zinfo.CRC, compress_size, file_size,
-                                  len(filename), len(extra_data), len(zinfo.comment),
-                                  0, zinfo.internal_attr, zinfo.external_attr,
-                                  header_offset)
+            try:
+                filename, flag_bits = zinfo._encodeFilenameFlags()
+                centdir = struct.pack(structCentralDir,
+                                      stringCentralDir, create_version,
+                                      zinfo.create_system, extract_version, zinfo.reserved,
+                                      flag_bits, zinfo.compress_type, dostime, dosdate,
+                                      zinfo.CRC, compress_size, file_size,
+                                      len(filename), len(extra_data), len(zinfo.comment),
+                                      0, zinfo.internal_attr, zinfo.external_attr,
+                                      header_offset)
+            except DeprecationWarning:
+                print((structCentralDir, stringCentralDir, create_version,
+                       zinfo.create_system, extract_version, zinfo.reserved,
+                       zinfo.flag_bits, zinfo.compress_type, dostime, dosdate,
+                       zinfo.CRC, compress_size, file_size,
+                       len(zinfo.filename), len(extra_data), len(zinfo.comment),
+                       0, zinfo.internal_attr, zinfo.external_attr,
+                       header_offset), file=sys.stderr)
+                raise
             self.fp.write(centdir)
             self.fp.write(filename)
             self.fp.write(extra_data)
@@ -1927,8 +1942,6 @@ class ZipFile:
                              centDirSize, centDirOffset, len(self._comment))
         self.fp.write(endrec)
         self.fp.write(self._comment)
-        if self.mode == "a":
-            self.fp.truncate()
         self.fp.flush()
 
     def _fpclose(self, fp):
@@ -2112,6 +2125,24 @@ class PyZipFile(ZipFile):
         return (fname, archivename)
 
 
+def _unique_everseen(iterable, key=None):
+    "List unique elements, preserving order. Remember all elements ever seen."
+    # unique_everseen('AAAABBBCCDAABBB') --> A B C D
+    # unique_everseen('ABBCcAD', str.lower) --> A B C D
+    seen = set()
+    seen_add = seen.add
+    if key is None:
+        for element in itertools.filterfalse(seen.__contains__, iterable):
+            seen_add(element)
+            yield element
+    else:
+        for element in iterable:
+            k = key(element)
+            if k not in seen:
+                seen_add(k)
+                yield element
+
+
 def _parents(path):
     """
     Given a path with elements separated by
@@ -2153,18 +2184,6 @@ def _ancestry(path):
         path, tail = posixpath.split(path)
 
 
-_dedupe = dict.fromkeys
-"""Deduplicate an iterable in original order"""
-
-
-def _difference(minuend, subtrahend):
-    """
-    Return items in minuend not in subtrahend, retaining order
-    with O(1) lookup.
-    """
-    return itertools.filterfalse(set(subtrahend).__contains__, minuend)
-
-
 class CompleteDirs(ZipFile):
     """
     A ZipFile subclass that ensures that implied directories
@@ -2174,8 +2193,13 @@ class CompleteDirs(ZipFile):
     @staticmethod
     def _implied_dirs(names):
         parents = itertools.chain.from_iterable(map(_parents, names))
-        as_dirs = (p + posixpath.sep for p in parents)
-        return _dedupe(_difference(as_dirs, names))
+        # Deduplicate entries in original order
+        implied_dirs = OrderedDict.fromkeys(
+            p + posixpath.sep for p in parents
+            # Cast names to a set for O(1) lookups
+            if p + posixpath.sep not in set(names)
+        )
+        return implied_dirs
 
     def namelist(self):
         names = super(CompleteDirs, self).namelist()
@@ -2304,31 +2328,20 @@ class Path:
         self.root = FastLookup.make(root)
         self.at = at
 
-    def open(self, mode='r', *args, **kwargs):
-        """
-        Open this entry as text or binary following the semantics
-        of ``pathlib.Path.open()`` by passing arguments through
-        to io.TextIOWrapper().
-        """
-        pwd = kwargs.pop('pwd', None)
-        zip_mode = mode[0]
-        stream = self.root.open(self.at, zip_mode, pwd=pwd)
-        if 'b' in mode:
-            if args or kwargs:
-                raise ValueError("encoding args invalid for binary operation")
-            return stream
-        return io.TextIOWrapper(stream, *args, **kwargs)
+    @property
+    def open(self):
+        return functools.partial(self.root.open, self.at)
 
     @property
     def name(self):
         return posixpath.basename(self.at.rstrip("/"))
 
     def read_text(self, *args, **kwargs):
-        with self.open('r', *args, **kwargs) as strm:
-            return strm.read()
+        with self.open() as strm:
+            return io.TextIOWrapper(strm, *args, **kwargs).read()
 
     def read_bytes(self):
-        with self.open('rb') as strm:
+        with self.open() as strm:
             return strm.read()
 
     def _is_child(self, path):

@@ -838,7 +838,7 @@ class StreamRecoder:
 
     def writelines(self, list):
 
-        data = b''.join(list)
+        data = ''.join(list)
         data, bytesdecoded = self.decode(data, self.errors)
         return self.writer.write(data)
 
@@ -846,12 +846,6 @@ class StreamRecoder:
 
         self.reader.reset()
         self.writer.reset()
-
-    def seek(self, offset, whence=0):
-        # Seeks must be propagated to both the readers and writers
-        # as they might need to reset their internal buffers.
-        self.reader.seek(offset, whence)
-        self.writer.seek(offset, whence)
 
     def __getattr__(self, name,
                     getattr=getattr):
@@ -868,7 +862,7 @@ class StreamRecoder:
 
 ### Shortcuts
 
-def open(filename, mode='r', encoding=None, errors='strict', buffering=-1):
+def open(filename, mode='r', encoding=None, errors='strict', buffering=1):
 
     """ Open an encoded file using the given mode and return
         a wrapped version providing transparent encoding/decoding.
@@ -889,8 +883,7 @@ def open(filename, mode='r', encoding=None, errors='strict', buffering=-1):
         encoding error occurs.
 
         buffering has the same meaning as for the builtin open() API.
-        It defaults to -1 which means that the default buffer size will
-        be used.
+        It defaults to line buffered.
 
         The returned wrapped file object provides an extra attribute
         .encoding which allows querying the used encoding. This
@@ -905,16 +898,11 @@ def open(filename, mode='r', encoding=None, errors='strict', buffering=-1):
     file = builtins.open(filename, mode, buffering)
     if encoding is None:
         return file
-
-    try:
-        info = lookup(encoding)
-        srw = StreamReaderWriter(file, info.streamreader, info.streamwriter, errors)
-        # Add attributes to simplify introspection
-        srw.encoding = encoding
-        return srw
-    except:
-        file.close()
-        raise
+    info = lookup(encoding)
+    srw = StreamReaderWriter(file, info.streamreader, info.streamwriter, errors)
+    # Add attributes to simplify introspection
+    srw.encoding = encoding
+    return srw
 
 def EncodedFile(file, data_encoding, file_encoding=None, errors='strict'):
 

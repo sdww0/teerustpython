@@ -2,15 +2,15 @@
 //!
 //! This means source code is translated into separate tokens.
 
-use super::token::StringKind;
 pub use super::token::Tok;
-use crate::ast::Location;
 use crate::error::{LexicalError, LexicalErrorType};
+use crate::location::Location;
 use num_bigint::BigInt;
 use num_traits::identities::Zero;
 use num_traits::Num;
 use std::char;
 use std::cmp::Ordering;
+use std::collections::HashMap;
 use std::str::FromStr;
 use unic_emoji_char::is_emoji_presentation;
 use unic_ucd_ident::{is_xid_continue, is_xid_start};
@@ -66,63 +66,59 @@ pub struct Lexer<T: Iterator<Item = char>> {
     chr1: Option<char>,
     chr2: Option<char>,
     location: Location,
+    keywords: HashMap<String, Tok>,
 }
 
-pub static KEYWORDS: phf::Map<&'static str, Tok> = phf::phf_map! {
-    // Alphabetical keywords:
-    "..." => Tok::Ellipsis,
-    "False" => Tok::False,
-    "None" => Tok::None,
-    "True" => Tok::True,
+pub fn get_keywords() -> HashMap<String, Tok> {
+    let mut keywords: HashMap<String, Tok> = HashMap::new();
 
-    "and" => Tok::And,
-    "as" => Tok::As,
-    "assert" => Tok::Assert,
-    "async" => Tok::Async,
-    "await" => Tok::Await,
-    "break" => Tok::Break,
-    "class" => Tok::Class,
-    "continue" => Tok::Continue,
-    "def" => Tok::Def,
-    "del" => Tok::Del,
-    "elif" => Tok::Elif,
-    "else" => Tok::Else,
-    "except" => Tok::Except,
-    "finally" => Tok::Finally,
-    "for" => Tok::For,
-    "from" => Tok::From,
-    "global" => Tok::Global,
-    "if" => Tok::If,
-    "import" => Tok::Import,
-    "in" => Tok::In,
-    "is" => Tok::Is,
-    "lambda" => Tok::Lambda,
-    "nonlocal" => Tok::Nonlocal,
-    "not" => Tok::Not,
-    "or" => Tok::Or,
-    "pass" => Tok::Pass,
-    "raise" => Tok::Raise,
-    "return" => Tok::Return,
-    "try" => Tok::Try,
-    "while" => Tok::While,
-    "with" => Tok::With,
-    "yield" => Tok::Yield,
-};
+    // Alphabetical keywords:
+    keywords.insert(String::from("..."), Tok::Ellipsis);
+    keywords.insert(String::from("False"), Tok::False);
+    keywords.insert(String::from("None"), Tok::None);
+    keywords.insert(String::from("True"), Tok::True);
+
+    keywords.insert(String::from("and"), Tok::And);
+    keywords.insert(String::from("as"), Tok::As);
+    keywords.insert(String::from("assert"), Tok::Assert);
+    keywords.insert(String::from("async"), Tok::Async);
+    keywords.insert(String::from("await"), Tok::Await);
+    keywords.insert(String::from("break"), Tok::Break);
+    keywords.insert(String::from("class"), Tok::Class);
+    keywords.insert(String::from("continue"), Tok::Continue);
+    keywords.insert(String::from("def"), Tok::Def);
+    keywords.insert(String::from("del"), Tok::Del);
+    keywords.insert(String::from("elif"), Tok::Elif);
+    keywords.insert(String::from("else"), Tok::Else);
+    keywords.insert(String::from("except"), Tok::Except);
+    keywords.insert(String::from("finally"), Tok::Finally);
+    keywords.insert(String::from("for"), Tok::For);
+    keywords.insert(String::from("from"), Tok::From);
+    keywords.insert(String::from("global"), Tok::Global);
+    keywords.insert(String::from("if"), Tok::If);
+    keywords.insert(String::from("import"), Tok::Import);
+    keywords.insert(String::from("in"), Tok::In);
+    keywords.insert(String::from("is"), Tok::Is);
+    keywords.insert(String::from("lambda"), Tok::Lambda);
+    keywords.insert(String::from("nonlocal"), Tok::Nonlocal);
+    keywords.insert(String::from("not"), Tok::Not);
+    keywords.insert(String::from("or"), Tok::Or);
+    keywords.insert(String::from("pass"), Tok::Pass);
+    keywords.insert(String::from("raise"), Tok::Raise);
+    keywords.insert(String::from("return"), Tok::Return);
+    keywords.insert(String::from("try"), Tok::Try);
+    keywords.insert(String::from("while"), Tok::While);
+    keywords.insert(String::from("with"), Tok::With);
+    keywords.insert(String::from("yield"), Tok::Yield);
+    keywords
+}
 
 pub type Spanned = (Location, Tok, Location);
 pub type LexResult = Result<Spanned, LexicalError>;
 
-#[inline]
-pub fn make_tokenizer(source: &str) -> impl Iterator<Item = LexResult> + '_ {
-    make_tokenizer_located(source, Location::new(0, 0))
-}
-
-pub fn make_tokenizer_located(
-    source: &str,
-    start_location: Location,
-) -> impl Iterator<Item = LexResult> + '_ {
+pub fn make_tokenizer<'a>(source: &'a str) -> impl Iterator<Item = LexResult> + 'a {
     let nlh = NewlineHandler::new(source.chars());
-    Lexer::new(nlh, start_location)
+    Lexer::new(nlh)
 }
 
 // The newline handler is an iterator which collapses different newline
@@ -186,7 +182,7 @@ impl<T> Lexer<T>
 where
     T: Iterator<Item = char>,
 {
-    pub fn new(input: T, start: Location) -> Self {
+    pub fn new(input: T) -> Self {
         let mut lxr = Lexer {
             chars: input,
             at_begin_of_line: true,
@@ -194,9 +190,10 @@ where
             indentation_stack: vec![Default::default()],
             pending: Vec::new(),
             chr0: None,
-            location: start,
+            location: Location::new(0, 0),
             chr1: None,
             chr2: None,
+            keywords: get_keywords(),
         };
         lxr.next_char();
         lxr.next_char();
@@ -218,10 +215,10 @@ where
         let mut saw_f = false;
         loop {
             // Detect r"", f"", b"" and u""
-            if !(saw_b || saw_u || saw_f) && matches!(self.chr0, Some('b') | Some('B')) {
+            if !(saw_b || saw_u || saw_f) && (self.chr0 == Some('b') || self.chr0 == Some('B')) {
                 saw_b = true;
             } else if !(saw_b || saw_r || saw_u || saw_f)
-                && matches!(self.chr0, Some('u') | Some('U'))
+                && (self.chr0 == Some('u') || self.chr0 == Some('U'))
             {
                 saw_u = true;
             } else if !(saw_r || saw_u) && (self.chr0 == Some('r') || self.chr0 == Some('R')) {
@@ -248,8 +245,8 @@ where
         }
         let end_pos = self.get_pos();
 
-        if let Some(tok) = KEYWORDS.get(name.as_str()) {
-            Ok((start_pos, tok.clone(), end_pos))
+        if self.keywords.contains_key(&name) {
+            Ok((start_pos, self.keywords[&name].clone(), end_pos))
         } else {
             Ok((start_pos, Tok::Name { name }, end_pos))
         }
@@ -316,21 +313,10 @@ where
 
             // 1e6 for example:
             if self.chr0 == Some('e') || self.chr0 == Some('E') {
-                if self.chr1 == Some('_') {
-                    return Err(LexicalError {
-                        error: LexicalErrorType::OtherError("Invalid Syntax".to_owned()),
-                        location: self.get_pos(),
-                    });
-                }
                 value_text.push(self.next_char().unwrap().to_ascii_lowercase());
+
                 // Optional +/-
                 if self.chr0 == Some('-') || self.chr0 == Some('+') {
-                    if self.chr1 == Some('_') {
-                        return Err(LexicalError {
-                            error: LexicalErrorType::OtherError("Invalid Syntax".to_owned()),
-                            location: self.get_pos(),
-                        });
-                    }
                     value_text.push(self.next_char().unwrap());
                 }
 
@@ -407,11 +393,23 @@ where
     /// Test if a digit is of a certain radix.
     fn is_digit_of_radix(c: Option<char>, radix: u32) -> bool {
         match radix {
-            2 => matches!(c, Some('0'..='1')),
-            8 => matches!(c, Some('0'..='7')),
-            10 => matches!(c, Some('0'..='9')),
-            16 => matches!(c, Some('0'..='9') | Some('a'..='f') | Some('A'..='F')),
-            other => unimplemented!("Radix not implemented: {}", other),
+            2 => match c {
+                Some('0'..='1') => true,
+                _ => false,
+            },
+            8 => match c {
+                Some('0'..='7') => true,
+                _ => false,
+            },
+            10 => match c {
+                Some('0'..='9') => true,
+                _ => false,
+            },
+            16 => match c {
+                Some('0'..='9') | Some('a'..='f') | Some('A'..='F') => true,
+                _ => false,
+            },
+            x => unimplemented!("Radix not implemented: {}", x),
         }
     }
 
@@ -419,7 +417,10 @@ where
     fn at_exponent(&self) -> bool {
         match self.chr0 {
             Some('e') | Some('E') => match self.chr1 {
-                Some('+') | Some('-') => matches!(self.chr2, Some('0'..='9')),
+                Some('+') | Some('-') => match self.chr2 {
+                    Some('0'..='9') => true,
+                    _ => false,
+                },
                 Some('0'..='9') => true,
                 _ => false,
             },
@@ -471,8 +472,7 @@ where
                 break;
             }
         }
-        let value = u32::from_str_radix(&octet_content, 8).unwrap();
-        char::from_u32(value).unwrap()
+        u8::from_str_radix(&octet_content, 8).unwrap() as char
     }
 
     fn parse_unicode_name(&mut self) -> Result<char, LexicalError> {
@@ -510,7 +510,7 @@ where
         &mut self,
         is_bytes: bool,
         is_raw: bool,
-        is_unicode: bool,
+        _is_unicode: bool,
         is_fstring: bool,
     ) -> LexResult {
         let quote_char = self.next_char().unwrap();
@@ -624,16 +624,9 @@ where
                 value: string_content.chars().map(|c| c as u8).collect(),
             }
         } else {
-            let kind = if is_fstring {
-                StringKind::F
-            } else if is_unicode {
-                StringKind::U
-            } else {
-                StringKind::Normal
-            };
             Tok::String {
                 value: string_content,
-                kind,
+                is_fstring,
             }
         };
 
@@ -699,7 +692,9 @@ where
                         // This is technically stricter than python3 but spaces before
                         // tabs is even more insane than mixing spaces and tabs.
                         return Err(LexicalError {
-                            error: LexicalErrorType::TabsAfterSpaces,
+                            error: LexicalErrorType::OtherError(
+                                "Tabs not allowed as part of indentation after spaces".to_owned(),
+                            ),
                             location: self.get_pos(),
                         });
                     }
@@ -736,7 +731,7 @@ where
             }
         }
 
-        Ok(IndentationLevel { tabs, spaces })
+        Ok(IndentationLevel { spaces, tabs })
     }
 
     fn handle_indentations(&mut self) -> Result<(), LexicalError> {
@@ -1208,7 +1203,7 @@ where
 
                 if self.chr0.is_none() {
                     return Err(LexicalError {
-                        error: LexicalErrorType::Eof,
+                        error: LexicalErrorType::EOF,
                         location: self.get_pos(),
                     });
                 }
@@ -1291,7 +1286,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::{make_tokenizer, NewlineHandler, StringKind, Tok};
+    use super::{make_tokenizer, NewlineHandler, Tok};
     use num_bigint::BigInt;
 
     const WINDOWS_EOL: &str = "\r\n";
@@ -1313,18 +1308,24 @@ mod tests {
         assert_eq!(vec!['b', '\\', '\n'], x);
     }
 
-    fn stok(s: &str) -> Tok {
-        Tok::String {
-            value: s.to_owned(),
-            kind: StringKind::Normal,
-        }
-    }
-
     #[test]
     fn test_raw_string() {
         let source = "r\"\\\\\" \"\\\\\"";
         let tokens = lex_source(source);
-        assert_eq!(tokens, vec![stok("\\\\"), stok("\\"), Tok::Newline,]);
+        assert_eq!(
+            tokens,
+            vec![
+                Tok::String {
+                    value: "\\\\".to_owned(),
+                    is_fstring: false,
+                },
+                Tok::String {
+                    value: "\\".to_owned(),
+                    is_fstring: false,
+                },
+                Tok::Newline,
+            ]
+        );
     }
 
     #[test]
@@ -1610,20 +1611,43 @@ mod tests {
 
     #[test]
     fn test_string() {
-        let source = r#""double" 'single' 'can\'t' "\\\"" '\t\r\n' '\g' r'raw\'' '\420' '\200\0a'"#;
+        let source = r#""double" 'single' 'can\'t' "\\\"" '\t\r\n' '\g' r'raw\'' '\200\0a'"#;
         let tokens = lex_source(source);
         assert_eq!(
             tokens,
             vec![
-                stok("double"),
-                stok("single"),
-                stok("can't"),
-                stok("\\\""),
-                stok("\t\r\n"),
-                stok("\\g"),
-                stok("raw\\'"),
-                stok("Đ"),
-                stok("\u{80}\u{0}a"),
+                Tok::String {
+                    value: String::from("double"),
+                    is_fstring: false,
+                },
+                Tok::String {
+                    value: String::from("single"),
+                    is_fstring: false,
+                },
+                Tok::String {
+                    value: String::from("can't"),
+                    is_fstring: false,
+                },
+                Tok::String {
+                    value: String::from("\\\""),
+                    is_fstring: false,
+                },
+                Tok::String {
+                    value: String::from("\t\r\n"),
+                    is_fstring: false,
+                },
+                Tok::String {
+                    value: String::from("\\g"),
+                    is_fstring: false,
+                },
+                Tok::String {
+                    value: String::from("raw\\'"),
+                    is_fstring: false,
+                },
+                Tok::String {
+                    value: String::from("\u{80}\u{0}a"),
+                    is_fstring: false,
+                },
                 Tok::Newline,
             ]
         );
@@ -1639,7 +1663,10 @@ mod tests {
                 assert_eq!(
                     tokens,
                     vec![
-                        stok("abcdef"),
+                        Tok::String {
+                            value: String::from("abcdef"),
+                            is_fstring: false,
+                        },
                         Tok::Newline,
                     ]
                 )
@@ -1674,7 +1701,7 @@ mod tests {
 
     #[test]
     fn test_escape_char_in_byte_literal() {
-        // backslash does not escape
+        // backslash doesnt escape
         let source = r##"b"omkmok\Xaa""##;
         let tokens = lex_source(source);
         let res = vec![111, 109, 107, 109, 111, 107, 92, 88, 97, 97];
@@ -1690,17 +1717,6 @@ mod tests {
             vec![
                 Tok::Bytes {
                     value: b"\\x1z".to_vec()
-                },
-                Tok::Newline
-            ]
-        );
-        let source = r"rb'\\'";
-        let tokens = lex_source(source);
-        assert_eq!(
-            tokens,
-            vec![
-                Tok::Bytes {
-                    value: b"\\\\".to_vec()
                 },
                 Tok::Newline
             ]
@@ -1726,6 +1742,15 @@ mod tests {
     fn test_escape_unicode_name() {
         let source = r#""\N{EN SPACE}""#;
         let tokens = lex_source(source);
-        assert_eq!(tokens, vec![stok("\u{2002}"), Tok::Newline])
+        assert_eq!(
+            tokens,
+            vec![
+                Tok::String {
+                    value: "\u{2002}".to_owned(),
+                    is_fstring: false,
+                },
+                Tok::Newline
+            ]
+        )
     }
 }

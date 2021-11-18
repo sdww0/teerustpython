@@ -1,104 +1,85 @@
-pub(crate) use pwd::make_module;
+use pwd::Passwd;
 
-#[pymodule]
-mod pwd {
-    use crate::{
-        builtins::{PyIntRef, PyStrRef},
-        function::{IntoPyException, IntoPyObject},
-        PyObjectRef, PyResult, PyStructSequence, VirtualMachine,
-    };
-    use nix::unistd::{self, User};
-    use std::ptr::NonNull;
+use crate::obj::objstr::PyStringRef;
+use crate::obj::objtype::PyClassRef;
+use crate::pyobject::{PyObjectRef, PyRef, PyResult, PyValue};
+use crate::vm::VirtualMachine;
 
-    #[pyattr]
-    #[pyclass(module = "pwd", name = "struct_passwd")]
-    #[derive(PyStructSequence)]
-    struct Passwd {
-        pw_name: String,
-        pw_passwd: String,
-        pw_uid: u32,
-        pw_gid: u32,
-        pw_gecos: String,
-        pw_dir: String,
-        pw_shell: String,
+impl PyValue for Passwd {
+    fn class(vm: &VirtualMachine) -> PyClassRef {
+        vm.class("pwd", "struct_passwd")
     }
-    #[pyimpl(with(PyStructSequence))]
-    impl Passwd {}
+}
 
-    impl From<User> for Passwd {
-        fn from(user: User) -> Self {
-            // this is just a pain...
-            let cstr_lossy = |s: std::ffi::CString| {
-                s.into_string()
-                    .unwrap_or_else(|e| e.into_cstring().to_string_lossy().into_owned())
-            };
-            let pathbuf_lossy = |p: std::path::PathBuf| {
-                p.into_os_string()
-                    .into_string()
-                    .unwrap_or_else(|s| s.to_string_lossy().into_owned())
-            };
-            Passwd {
-                pw_name: user.name,
-                pw_passwd: cstr_lossy(user.passwd),
-                pw_uid: user.uid.as_raw(),
-                pw_gid: user.gid.as_raw(),
-                pw_gecos: cstr_lossy(user.gecos),
-                pw_dir: pathbuf_lossy(user.dir),
-                pw_shell: pathbuf_lossy(user.shell),
-            }
+type PasswdRef = PyRef<Passwd>;
+
+impl PasswdRef {
+    fn pw_name(self) -> String {
+        self.name.clone()
+    }
+
+    fn pw_passwd(self) -> Option<String> {
+        self.passwd.clone()
+    }
+
+    fn pw_uid(self) -> u32 {
+        self.uid
+    }
+
+    fn pw_gid(self) -> u32 {
+        self.gid
+    }
+
+    fn pw_gecos(self) -> Option<String> {
+        self.gecos.clone()
+    }
+
+    fn pw_dir(self) -> String {
+        self.dir.clone()
+    }
+
+    fn pw_shell(self) -> String {
+        self.shell.clone()
+    }
+}
+
+fn pwd_getpwnam(name: PyStringRef, vm: &VirtualMachine) -> PyResult<Passwd> {
+    match Passwd::from_name(name.as_str()) {
+        Ok(Some(passwd)) => Ok(passwd),
+        _ => {
+            let name_repr = vm.to_repr(name.as_object())?;
+            let message = vm.new_str(format!("getpwnam(): name not found: {}", name_repr));
+            Err(vm.new_key_error(message))
         }
     }
+}
 
-    #[pyfunction]
-    fn getpwnam(name: PyStrRef, vm: &VirtualMachine) -> PyResult<Passwd> {
-        match User::from_name(name.as_str()).map_err(|err| err.into_pyexception(vm))? {
-            Some(user) => Ok(Passwd::from(user)),
-            None => {
-                let name_repr = name.as_object().repr(vm)?;
-                let message = vm
-                    .ctx
-                    .new_str(format!("getpwnam(): name not found: {}", name_repr))
-                    .into();
-                Err(vm.new_key_error(message))
-            }
+fn pwd_getpwuid(uid: u32, vm: &VirtualMachine) -> PyResult<Passwd> {
+    match Passwd::from_uid(uid) {
+        Some(passwd) => Ok(passwd),
+        _ => {
+            let message = vm.new_str(format!("getpwuid(): uid not found: {}", uid));
+            Err(vm.new_key_error(message))
         }
     }
+}
 
-    #[pyfunction]
-    fn getpwuid(uid: PyIntRef, vm: &VirtualMachine) -> PyResult<Passwd> {
-        let uid_t = libc::uid_t::try_from(uid.as_bigint()).map(unistd::Uid::from_raw);
-        let user = match uid_t {
-            Ok(uid) => User::from_uid(uid).map_err(|err| err.into_pyexception(vm))?,
-            Err(_) => None,
-        };
-        match user {
-            Some(user) => Ok(Passwd::from(user)),
-            None => {
-                let message = vm
-                    .ctx
-                    .new_str(format!("getpwuid(): uid not found: {}", uid.as_bigint()))
-                    .into();
-                Err(vm.new_key_error(message))
-            }
-        }
-    }
+pub fn make_module(vm: &VirtualMachine) -> PyObjectRef {
+    let ctx = &vm.ctx;
 
-    // TODO: maybe merge this functionality into nix?
-    #[pyfunction]
-    fn getpwall(vm: &VirtualMachine) -> PyResult<Vec<PyObjectRef>> {
-        // setpwent, getpwent, etc are not thread safe. Could use fgetpwent_r, but this is easier
-        static GETPWALL: parking_lot::Mutex<()> = parking_lot::const_mutex(());
-        let _guard = GETPWALL.lock();
-        let mut list = Vec::new();
+    let passwd_type = py_class!(ctx, "struct_passwd", ctx.object(), {
+        "pw_name" => ctx.new_readonly_getset("pw_name", PasswdRef::pw_name),
+        "pw_passwd" => ctx.new_readonly_getset("pw_passwd", PasswdRef::pw_passwd),
+        "pw_uid" => ctx.new_readonly_getset("pw_uid", PasswdRef::pw_uid),
+        "pw_gid" => ctx.new_readonly_getset("pw_gid", PasswdRef::pw_gid),
+        "pw_gecos" => ctx.new_readonly_getset("pw_gecos", PasswdRef::pw_gecos),
+        "pw_dir" => ctx.new_readonly_getset("pw_dir", PasswdRef::pw_dir),
+        "pw_shell" => ctx.new_readonly_getset("pw_shell", PasswdRef::pw_shell),
+    });
 
-        unsafe { libc::setpwent() };
-        while let Some(ptr) = NonNull::new(unsafe { libc::getpwent() }) {
-            let user = User::from(unsafe { ptr.as_ref() });
-            let passwd = Passwd::from(user).into_pyobject(vm);
-            list.push(passwd);
-        }
-        unsafe { libc::endpwent() };
-
-        Ok(list)
-    }
+    py_module!(vm, "pwd", {
+        "struct_passwd" => passwd_type,
+        "getpwnam" => ctx.new_function(pwd_getpwnam),
+        "getpwuid" => ctx.new_function(pwd_getpwuid),
+    })
 }

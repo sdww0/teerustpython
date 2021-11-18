@@ -2,7 +2,7 @@
 //! The goal is to provide a matching and a safe error API, maksing errors from LALR
 use lalrpop_util::ParseError as LalrpopError;
 
-use crate::ast::Location;
+use crate::location::Location;
 use crate::token::Tok;
 
 use std::error::Error;
@@ -22,14 +22,13 @@ pub enum LexicalErrorType {
     NestingError,
     IndentationError,
     TabError,
-    TabsAfterSpaces,
     DefaultArgumentError,
     PositionalArgumentError,
     DuplicateKeywordArgumentError,
     UnrecognizedToken { tok: char },
     FStringError(FStringErrorType),
     LineContinuationError,
-    Eof,
+    EOF,
     OtherError(String),
 }
 
@@ -46,9 +45,6 @@ impl fmt::Display for LexicalErrorType {
             LexicalErrorType::TabError => {
                 write!(f, "inconsistent use of tabs and spaces in indentation")
             }
-            LexicalErrorType::TabsAfterSpaces => {
-                write!(f, "Tabs not allowed as part of indentation after spaces")
-            }
             LexicalErrorType::DefaultArgumentError => {
                 write!(f, "non-default argument follows default argument")
             }
@@ -64,9 +60,15 @@ impl fmt::Display for LexicalErrorType {
             LexicalErrorType::LineContinuationError => {
                 write!(f, "unexpected character after line continuation character")
             }
-            LexicalErrorType::Eof => write!(f, "unexpected EOF while parsing"),
+            LexicalErrorType::EOF => write!(f, "unexpected EOF while parsing"),
             LexicalErrorType::OtherError(msg) => write!(f, "{}", msg),
         }
+    }
+}
+
+impl From<LexicalError> for LalrpopError<Location, Tok, LexicalError> {
+    fn from(err: LexicalError) -> Self {
+        lalrpop_util::ParseError::User { error: err }
     }
 }
 
@@ -129,7 +131,7 @@ pub struct ParseError {
 #[derive(Debug, PartialEq)]
 pub enum ParseErrorType {
     /// Parser encountered an unexpected end of input
-    Eof,
+    EOF,
     /// Parser encountered an extra token
     ExtraToken(Tok),
     /// Parser encountered an invalid token
@@ -146,7 +148,7 @@ impl From<LalrpopError<Location, Tok, LexicalError>> for ParseError {
         match err {
             // TODO: Are there cases where this isn't an EOF?
             LalrpopError::InvalidToken { location } => ParseError {
-                error: ParseErrorType::Eof,
+                error: ParseErrorType::EOF,
                 location,
             },
             LalrpopError::ExtraToken { token } => ParseError {
@@ -171,7 +173,7 @@ impl From<LalrpopError<Location, Tok, LexicalError>> for ParseError {
                 }
             }
             LalrpopError::UnrecognizedEOF { location, .. } => ParseError {
-                error: ParseErrorType::Eof,
+                error: ParseErrorType::EOF,
                 location,
             },
         }
@@ -187,7 +189,7 @@ impl fmt::Display for ParseError {
 impl fmt::Display for ParseErrorType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            ParseErrorType::Eof => write!(f, "Got unexpected EOF"),
+            ParseErrorType::EOF => write!(f, "Got unexpected EOF"),
             ParseErrorType::ExtraToken(ref tok) => write!(f, "Got extraneous token: {:?}", tok),
             ParseErrorType::InvalidToken => write!(f, "Got invalid token"),
             ParseErrorType::UnrecognizedToken(ref tok, ref expected) => {
@@ -196,39 +198,11 @@ impl fmt::Display for ParseErrorType {
                 } else if expected.as_deref() == Some("Indent") {
                     write!(f, "expected an indented block")
                 } else {
-                    write!(f, "invalid syntax. Got unexpected token {}", tok)
+                    write!(f, "Got unexpected token {}", tok)
                 }
             }
             ParseErrorType::Lexical(ref error) => write!(f, "{}", error),
         }
-    }
-}
-
-impl Error for ParseErrorType {}
-
-impl ParseErrorType {
-    pub fn is_indentation_error(&self) -> bool {
-        match self {
-            ParseErrorType::Lexical(LexicalErrorType::IndentationError) => true,
-            ParseErrorType::UnrecognizedToken(token, expected) => {
-                *token == Tok::Indent || expected.clone() == Some("Indent".to_owned())
-            }
-            _ => false,
-        }
-    }
-    pub fn is_tab_error(&self) -> bool {
-        matches!(
-            self,
-            ParseErrorType::Lexical(LexicalErrorType::TabError)
-                | ParseErrorType::Lexical(LexicalErrorType::TabsAfterSpaces)
-        )
-    }
-}
-
-impl std::ops::Deref for ParseError {
-    type Target = ParseErrorType;
-    fn deref(&self) -> &Self::Target {
-        &self.error
     }
 }
 

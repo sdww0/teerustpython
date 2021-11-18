@@ -12,6 +12,8 @@ from test import support, seq_tests
 
 class CommonTest(seq_tests.CommonTest):
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_init(self):
         # Iterable arg is optional
         self.assertEqual(self.type2test([]), self.type2test())
@@ -31,12 +33,16 @@ class CommonTest(seq_tests.CommonTest):
         self.assertNotEqual(id(a), id(b))
         self.assertEqual(a, b)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_getitem_error(self):
         a = []
         msg = "list indices must be integers or slices"
         with self.assertRaisesRegex(TypeError, msg):
             a['a']
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_setitem_error(self):
         a = []
         msg = "list indices must be integers or slices"
@@ -60,6 +66,8 @@ class CommonTest(seq_tests.CommonTest):
         self.assertEqual(str(a2), "[0, 1, 2, [...], 3]")
         self.assertEqual(repr(a2), "[0, 1, 2, [...], 3]")
 
+    # TODO: RUSTPYTHON
+    @unittest.skip("TODO: RUSTPYTHON")
     def test_repr_deep(self):
         a = self.type2test([])
         for i in range(sys.getrecursionlimit() + 100):
@@ -101,6 +109,8 @@ class CommonTest(seq_tests.CommonTest):
         # Bug 3689: make sure list-reversed-iterator doesn't have __len__
         self.assertRaises(TypeError, len, reversed([1,2,3]))
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_setitem(self):
         a = self.type2test([0, 1])
         a[0] = 0
@@ -362,8 +372,6 @@ class CommonTest(seq_tests.CommonTest):
             # verify that original order and values are retained.
             self.assertIs(x, y)
 
-    # TODO: RUSTPYTHON
-    @unittest.expectedFailure
     def test_index(self):
         super().test_index()
         a = self.type2test([-2, -1, 0, 0, 1, 2])

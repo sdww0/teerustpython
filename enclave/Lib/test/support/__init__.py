@@ -122,48 +122,6 @@ __all__ = [
     "ALWAYS_EQ", "LARGEST", "SMALLEST"
     ]
 
-# Timeout in seconds for tests using a network server listening on the network
-# local loopback interface like 127.0.0.1.
-#
-# The timeout is long enough to prevent test failure: it takes into account
-# that the client and the server can run in different threads or even different
-# processes.
-#
-# The timeout should be long enough for connect(), recv() and send() methods
-# of socket.socket.
-LOOPBACK_TIMEOUT = 5.0
-if sys.platform == 'win32' and ' 32 bit (ARM)' in sys.version:
-    # bpo-37553: test_socket.SendfileUsingSendTest is taking longer than 2
-    # seconds on Windows ARM32 buildbot
-    LOOPBACK_TIMEOUT = 10
-elif sys.platform == 'vxworks':
-    LOOPBACK_TIMEOUT = 10
-
-# Timeout in seconds for network requests going to the internet. The timeout is
-# short enough to prevent a test to wait for too long if the internet request
-# is blocked for whatever reason.
-#
-# Usually, a timeout using INTERNET_TIMEOUT should not mark a test as failed,
-# but skip the test instead: see transient_internet().
-INTERNET_TIMEOUT = 60.0
-
-# Timeout in seconds to mark a test as failed if the test takes "too long".
-#
-# The timeout value depends on the regrtest --timeout command line option.
-#
-# If a test using SHORT_TIMEOUT starts to fail randomly on slow buildbots, use
-# LONG_TIMEOUT instead.
-SHORT_TIMEOUT = 30.0
-
-# Timeout in seconds to detect when a test hangs.
-#
-# It is long enough to reduce the risk of test failure on the slowest Python
-# buildbots. It should not be used to mark a test as failed if the test takes
-# "too long". The timeout value depends on the regrtest --timeout command line
-# option.
-LONG_TIMEOUT = 5 * 60.0
-
-
 class Error(Exception):
     """Base class for regression test exceptions."""
 
@@ -418,24 +376,12 @@ if sys.platform.startswith("win"):
                       RuntimeWarning, stacklevel=4)
 
     def _unlink(filename):
-        # XXX RUSTPYTHON: on ci, unlink() raises PermissionError when target doesn't exist.
-        # Might also happen locally, but not sure
-        if not os.path.exists(filename):
-            return
         _waitfor(os.unlink, filename)
 
     def _rmdir(dirname):
-        # XXX RUSTPYTHON: on ci, unlink() raises PermissionError when target doesn't exist.
-        # Might also happen locally, but not sure
-        if not os.path.exists(dirname):
-            return
         _waitfor(os.rmdir, dirname)
 
     def _rmtree(path):
-        # XXX RUSTPYTHON: on ci, unlink() raises PermissionError when target doesn't exist.
-        # Might also happen locally, but not sure
-        if not os.path.exists(path):
-            return
         def _rmtree_inner(path):
             for name in _force_run(path, os.listdir, path):
                 fullname = os.path.join(path, name)
@@ -896,7 +842,6 @@ SOCK_MAX_SIZE = 16 * 1024 * 1024 + 1
 # requires_IEEE_754 = unittest.skipUnless(
 #     float.__getformat__("double").startswith("IEEE"),
 #     "test requires IEEE 754 doubles")
-requires_IEEE_754 = unittest.skipIf(False, "RustPython always has IEEE 754 floating point numbers")
 
 requires_zlib = unittest.skipUnless(zlib, 'requires zlib')
 
@@ -1005,8 +950,7 @@ if os.name == 'nt':
         else:
             print('WARNING: The filename %r CAN be encoded by the filesystem encoding (%s). '
                   'Unicode filename tests may not be effective'
-                  % (TESTFN_UNENCODABLE, TESTFN_ENCODING),
-                  file=sys.__stderr__)
+                  % (TESTFN_UNENCODABLE, TESTFN_ENCODING))
             TESTFN_UNENCODABLE = None
 # # Mac OS X denies unencodable filenames (invalid utf-8)
 # elif sys.platform != 'darwin':
@@ -1105,18 +1049,7 @@ def temp_dir(path=None, quiet=False):
         # In case the process forks, let only the parent remove the
         # directory. The child has a different process id. (bpo-30028)
         if dir_created and pid == os.getpid():
-            try:
-                rmtree(path)
-            except OSError as exc:
-                # XXX RUSTPYTHON: something something async file removal?
-                #                 also part of the thing with rmtree()
-                #                 throwing PermissionError, I think
-                if os.path.exists(path):
-                    if not quiet:
-                        raise
-                    warnings.warn(f'unable to remove temporary'
-                                  f'directory {path!r}: {exc}',
-                                  RuntimeWarning, stacklevel=3)
+            rmtree(path)
 
 @contextlib.contextmanager
 def change_cwd(path, quiet=False):
@@ -2116,9 +2049,7 @@ def _run_suite(suite):
 
 # By default, don't filter tests
 _match_test_func = None
-
-_accept_test_patterns = None
-_ignore_test_patterns = None
+_match_test_patterns = None
 
 
 def match_test(test):
@@ -2134,45 +2065,18 @@ def _is_full_match_test(pattern):
     # as a full test identifier.
     # Example: 'test.test_os.FileTests.test_access'.
     #
-    # ignore patterns which contain fnmatch patterns: '*', '?', '[...]'
-    # or '[!...]'. For example, ignore 'test_access*'.
+    # Reject patterns which contain fnmatch patterns: '*', '?', '[...]'
+    # or '[!...]'. For example, reject 'test_access*'.
     return ('.' in pattern) and (not re.search(r'[?*\[\]]', pattern))
 
 
-def set_match_tests(accept_patterns=None, ignore_patterns=None):
-    global _match_test_func, _accept_test_patterns, _ignore_test_patterns
+def set_match_tests(patterns):
+    global _match_test_func, _match_test_patterns
 
+    if patterns == _match_test_patterns:
+        # No change: no need to recompile patterns.
+        return
 
-    if accept_patterns is None:
-        accept_patterns = ()
-    if ignore_patterns is None:
-        ignore_patterns = ()
-
-    accept_func = ignore_func = None
-
-    if accept_patterns != _accept_test_patterns:
-        accept_patterns, accept_func = _compile_match_function(accept_patterns)
-    if ignore_patterns != _ignore_test_patterns:
-        ignore_patterns, ignore_func = _compile_match_function(ignore_patterns)
-
-    # Create a copy since patterns can be mutable and so modified later
-    _accept_test_patterns = tuple(accept_patterns)
-    _ignore_test_patterns = tuple(ignore_patterns)
-
-    if accept_func is not None or ignore_func is not None:
-        def match_function(test_id):
-            accept = True
-            ignore = False
-            if accept_func:
-                accept = accept_func(test_id)
-            if ignore_func:
-                ignore = ignore_func(test_id)
-            return accept and not ignore
-
-        _match_test_func = match_function
-
-
-def _compile_match_function(patterns):
     if not patterns:
         func = None
         # set_match_tests(None) behaves as set_match_tests(())
@@ -2200,7 +2104,10 @@ def _compile_match_function(patterns):
 
         func = match_test_regex
 
-    return patterns, func
+    # Create a copy since patterns can be mutable and so modified later
+    _match_test_patterns = tuple(patterns)
+    _match_test_func = func
+
 
 
 def run_unittest(*classes):
@@ -2270,12 +2177,6 @@ def run_doctest(module, verbosity=None, optionflags=0):
 #=======================================================================
 # Support for saving and restoring the imported modules.
 
-def print_warning(msg):
-    # bpo-39983: Print into sys.__stderr__ to display the warning even
-    # when sys.stderr is captured temporarily by a test
-    for line in msg.splitlines():
-        print(f"Warning -- {line}", file=sys.__stderr__, flush=True)
-
 def modules_setup():
     return sys.modules.copy(),
 
@@ -2331,12 +2232,14 @@ def threading_cleanup(*original_values):
             # Display a warning at the first iteration
             environment_altered = True
             dangling_threads = values[1]
-            print_warning(f"threading_cleanup() failed to cleanup "
-                          f"{values[0] - original_values[0]} threads "
-                          f"(count: {values[0]}, "
-                          f"dangling: {len(dangling_threads)})")
+            print("Warning -- threading_cleanup() failed to cleanup "
+                  "%s threads (count: %s, dangling: %s)"
+                  % (values[0] - original_values[0],
+                     values[0], len(dangling_threads)),
+                  file=sys.stderr)
             for thread in dangling_threads:
-                print_warning(f"Dangling thread: {thread!r}")
+                print(f"Dangling thread: {thread!r}", file=sys.stderr)
+            sys.stderr.flush()
 
             # Don't hold references to threads
             dangling_threads = None
@@ -2429,7 +2332,8 @@ def reap_children():
         if pid == 0:
             break
 
-        print_warning(f"reap_children() reaped child process {pid}")
+        print("Warning -- reap_children() reaped child process %s"
+              % pid, file=sys.stderr)
         environment_altered = True
 
 
@@ -2538,8 +2442,7 @@ def strip_python_stderr(stderr):
     This will typically be run on the result of the communicate() method
     of a subprocess.Popen object.
     """
-    # XXX RustPython TODO: bytes regexes
-    # stderr = re.sub(br"\[\d+ refs, \d+ blocks\]\r?\n?", b"", stderr).strip()
+    stderr = re.sub(br"\[\d+ refs, \d+ blocks\]\r?\n?", b"", stderr).strip()
     return stderr
 
 requires_type_collecting = unittest.skipIf(hasattr(sys, 'getcounts'),
@@ -3279,9 +3182,9 @@ def maybe_get_event_loop_policy():
     """Return the global event loop policy if one is set, else return None."""
     return asyncio.events._event_loop_policy
 
-# Helpers for testing hashing.
-NHASHBITS = sys.hash_info.width # number of bits in hash() result
-assert NHASHBITS in (32, 64)
+# # Helpers for testing hashing.
+# NHASHBITS = sys.hash_info.width # number of bits in hash() result
+# assert NHASHBITS in (32, 64)
 
 # Return mean and sdev of number of collisions when tossing nballs balls
 # uniformly at random into nbins bins.  By definition, the number of
@@ -3420,54 +3323,3 @@ class catch_threading_exception:
         del self.exc_value
         del self.exc_traceback
         del self.thread
-
-
-def wait_process(pid, *, exitcode, timeout=None):
-    """
-    Wait until process pid completes and check that the process exit code is
-    exitcode.
-    Raise an AssertionError if the process exit code is not equal to exitcode.
-    If the process runs longer than timeout seconds (SHORT_TIMEOUT by default),
-    kill the process (if signal.SIGKILL is available) and raise an
-    AssertionError. The timeout feature is not available on Windows.
-    """
-    if os.name != "nt":
-        import signal
-
-        if timeout is None:
-            timeout = SHORT_TIMEOUT
-        t0 = time.monotonic()
-        sleep = 0.001
-        max_sleep = 0.1
-        while True:
-            pid2, status = os.waitpid(pid, os.WNOHANG)
-            if pid2 != 0:
-                break
-            # process is still running
-
-            dt = time.monotonic() - t0
-            if dt > SHORT_TIMEOUT:
-                try:
-                    os.kill(pid, signal.SIGKILL)
-                    os.waitpid(pid, 0)
-                except OSError:
-                    # Ignore errors like ChildProcessError or PermissionError
-                    pass
-
-                raise AssertionError(f"process {pid} is still running "
-                                     f"after {dt:.1f} seconds")
-
-            sleep = min(sleep * 2, max_sleep)
-            time.sleep(sleep)
-    else:
-        # Windows implementation
-        pid2, status = os.waitpid(pid, 0)
-
-    exitcode2 = os.waitstatus_to_exitcode(status)
-    if exitcode2 != exitcode:
-        raise AssertionError(f"process {pid} exited with code {exitcode2}, "
-                             f"but exit code {exitcode} is expected")
-
-    # sanity check: it should not fail in practice
-    if pid2 != pid:
-        raise AssertionError(f"pid {pid2} != pid {pid}")

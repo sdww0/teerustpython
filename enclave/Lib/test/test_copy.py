@@ -64,6 +64,8 @@ class TestCopy(unittest.TestCase):
         self.assertIs(y, x)
         self.assertEqual(c, [1])
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_copy_reduce(self):
         class C(object):
             def __reduce__(self):
@@ -328,6 +330,8 @@ class TestCopy(unittest.TestCase):
         self.assertIs(y, x)
         self.assertEqual(c, [1])
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_deepcopy_reduce(self):
         class C(object):
             def __reduce__(self):
@@ -370,6 +374,7 @@ class TestCopy(unittest.TestCase):
         self.assertIsNot(x, y)
         self.assertIsNot(x[0], y[0])
 
+    @unittest.skip("TODO: RUSTPYTHON")
     def test_deepcopy_reflexive_list(self):
         x = []
         x.append(x)
@@ -397,6 +402,7 @@ class TestCopy(unittest.TestCase):
         y = copy.deepcopy(x)
         self.assertIs(x, y)
 
+    @unittest.skip("TODO: RUSTPYTHON")
     def test_deepcopy_reflexive_tuple(self):
         x = ([],)
         x[0].append(x)
@@ -414,6 +420,7 @@ class TestCopy(unittest.TestCase):
         self.assertIsNot(x, y)
         self.assertIsNot(x["foo"], y["foo"])
 
+    @unittest.skip("TODO: RUSTPYTHON")
     def test_deepcopy_reflexive_dict(self):
         x = {}
         x['foo'] = x
@@ -583,6 +590,8 @@ class TestCopy(unittest.TestCase):
         self.assertIsNot(y, x)
         self.assertIs(y.foo, y)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_deepcopy_range(self):
         class I(int):
             pass
@@ -596,6 +605,8 @@ class TestCopy(unittest.TestCase):
 
     # _reconstruct()
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_reconstruct_string(self):
         class C(object):
             def __reduce__(self):
@@ -606,6 +617,8 @@ class TestCopy(unittest.TestCase):
         y = copy.deepcopy(x)
         self.assertIs(y, x)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_reconstruct_nostate(self):
         class C(object):
             def __reduce__(self):
@@ -617,6 +630,8 @@ class TestCopy(unittest.TestCase):
         y = copy.deepcopy(x)
         self.assertIs(y.__class__, x.__class__)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_reconstruct_state(self):
         class C(object):
             def __reduce__(self):
@@ -631,6 +646,8 @@ class TestCopy(unittest.TestCase):
         self.assertEqual(y, x)
         self.assertIsNot(y.foo, x.foo)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_reconstruct_state_setstate(self):
         class C(object):
             def __reduce__(self):
@@ -658,6 +675,8 @@ class TestCopy(unittest.TestCase):
 
     # Additions for Python 2.3 and pickle protocol 2
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_reduce_4tuple(self):
         class C(list):
             def __reduce__(self):
@@ -675,6 +694,8 @@ class TestCopy(unittest.TestCase):
         self.assertIsNot(x, y)
         self.assertIsNot(x[0], y[0])
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_reduce_5tuple(self):
         class C(dict):
             def __reduce__(self):
@@ -709,6 +730,8 @@ class TestCopy(unittest.TestCase):
         self.assertEqual(x.foo, y.foo)
         self.assertIsNot(x.foo, y.foo)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_deepcopy_dict_subclass(self):
         class C(dict):
             def __init__(self, d=None):
@@ -751,6 +774,8 @@ class TestCopy(unittest.TestCase):
         self.assertIsNot(x[0], y[0])
         self.assertIsNot(x.foo, y.foo)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_copy_tuple_subclass(self):
         class C(tuple):
             pass
@@ -759,6 +784,8 @@ class TestCopy(unittest.TestCase):
         y = copy.copy(x)
         self.assertEqual(tuple(y), (1, 2, 3))
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_deepcopy_tuple_subclass(self):
         class C(tuple):
             pass
@@ -882,6 +909,8 @@ class TestCopy(unittest.TestCase):
         del d
         self.assertEqual(len(v), 1)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_deepcopy_bound_method(self):
         class Foo(object):
             def m(self):

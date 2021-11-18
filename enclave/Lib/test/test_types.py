@@ -86,6 +86,8 @@ class TypesTests(unittest.TestCase):
         if float(1) == 1.0 and float(-1) == -1.0 and float(0) == 0.0: pass
         else: self.fail('float() does not work properly')
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_float_to_string(self):
         def test(f, result):
             self.assertEqual(f.__format__('e'), result)
@@ -388,6 +390,7 @@ class TypesTests(unittest.TestCase):
             self.assertEqual(locale.format_string('%g', x, grouping=True), format(x, 'n'))
             self.assertEqual(locale.format_string('%.10g', x, grouping=True), format(x, '.10n'))
 
+    @unittest.expectedFailure
     @run_with_locale('LC_NUMERIC', 'en_US.UTF8')
     def test_int__format__locale(self):
         # test locale support for __format__ code 'n' for integers
@@ -472,7 +475,7 @@ class TypesTests(unittest.TestCase):
 
         # No format code means use g, but must have a decimal
         # and a number after the decimal.  This is tricky, because
-        # a totally empty format specifier means something else.
+        # a totaly empty format specifier means something else.
         # So, just use a sign flag
         test(1e200, '+g', '+1e+200')
         test(1e200, '+', '+1e+200')
@@ -636,13 +639,8 @@ class MappingProxyTests(unittest.TestCase):
         self.assertEqual(attrs, {
              '__contains__',
              '__getitem__',
-             '__class_getitem__',
-             '__ior__',
              '__iter__',
              '__len__',
-             '__or__',
-             '__reversed__',
-             '__ror__',
              'copy',
              'get',
              'items',
@@ -793,14 +791,6 @@ class MappingProxyTests(unittest.TestCase):
 
     # TODO: RUSTPYTHON
     @unittest.expectedFailure
-    def test_reversed(self):
-        d = {'a': 1, 'b': 2, 'foo': 0, 'c': 3, 'd': 4}
-        mp = self.mappingproxy(d)
-        del d['foo']
-        r = reversed(mp)
-        self.assertEqual(list(r), list('dcba'))
-        self.assertRaises(StopIteration, next, r)
-
     def test_copy(self):
         original = {'key1': 27, 'key2': 51, 'key3': 93}
         view = self.mappingproxy(original)
@@ -810,24 +800,6 @@ class MappingProxyTests(unittest.TestCase):
         original['key1'] = 70
         self.assertEqual(view['key1'], 70)
         self.assertEqual(copy['key1'], 27)
-
-    # TODO: RUSTPYTHON
-    @unittest.expectedFailure
-    def test_union(self):
-        mapping = {'a': 0, 'b': 1, 'c': 2}
-        view = self.mappingproxy(mapping)
-        with self.assertRaises(TypeError):
-            view | [('r', 2), ('d', 2)]
-        with self.assertRaises(TypeError):
-            [('r', 2), ('d', 2)] | view
-        with self.assertRaises(TypeError):
-            view |= [('r', 2), ('d', 2)]
-        other = {'c': 3, 'p': 0}
-        self.assertDictEqual(view | other, {'a': 0, 'b': 1, 'c': 3, 'p': 0})
-        self.assertDictEqual(other | view, {'c': 2, 'p': 0, 'a': 0, 'b': 1})
-        self.assertEqual(view, {'a': 0, 'b': 1, 'c': 2})
-        self.assertDictEqual(mapping, {'a': 0, 'b': 1, 'c': 2})
-        self.assertDictEqual(other, {'c': 3, 'p': 0})
 
 
 class ClassCreationTests(unittest.TestCase):
@@ -985,6 +957,8 @@ class ClassCreationTests(unittest.TestCase):
         self.assertIs(ns, expected_ns)
         self.assertEqual(len(kwds), 0)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_bad___prepare__(self):
         # __prepare__() must return a mapping.
         class BadMeta(type):
@@ -1260,6 +1234,8 @@ class SimpleNamespaceTests(unittest.TestCase):
         self.assertEqual(ns1.__dict__, dict(a='spam', b='ham'))
         self.assertEqual(ns2.__dict__, dict(x=1, y=2, w=3, z=4, theta=None))
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_attrdel(self):
         ns1 = types.SimpleNamespace()
         ns2 = types.SimpleNamespace(x=1, y=2, w=3)
@@ -1281,6 +1257,8 @@ class SimpleNamespaceTests(unittest.TestCase):
         del ns1.spam
         self.assertEqual(vars(ns1), {})
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_repr(self):
         ns1 = types.SimpleNamespace(x=1, y=2, w=3)
         ns2 = types.SimpleNamespace()
@@ -1288,9 +1266,11 @@ class SimpleNamespaceTests(unittest.TestCase):
         ns2._y = 5
         name = "namespace"
 
-        self.assertEqual(repr(ns1), "{name}(x=1, y=2, w=3)".format(name=name))
-        self.assertEqual(repr(ns2), "{name}(x='spam', _y=5)".format(name=name))
+        self.assertEqual(repr(ns1), "{name}(w=3, x=1, y=2)".format(name=name))
+        self.assertEqual(repr(ns2), "{name}(_y=5, x='spam')".format(name=name))
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_equal(self):
         ns1 = types.SimpleNamespace(x=1)
         ns2 = types.SimpleNamespace()
@@ -1329,6 +1309,8 @@ class SimpleNamespaceTests(unittest.TestCase):
         self.assertEqual(ns3.spam, ns2)
         self.assertEqual(ns2.spam.spam, ns2)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_recursive_repr(self):
         ns1 = types.SimpleNamespace(c='cookie')
         ns2 = types.SimpleNamespace()
@@ -1338,7 +1320,7 @@ class SimpleNamespaceTests(unittest.TestCase):
         ns3.spam = ns2
         name = "namespace"
         repr1 = "{name}(c='cookie', spam={name}(...))".format(name=name)
-        repr2 = "{name}(spam={name}(x=1, spam={name}(...)))".format(name=name)
+        repr2 = "{name}(spam={name}(spam={name}(...), x=1))".format(name=name)
 
         self.assertEqual(repr(ns1), repr1)
         self.assertEqual(repr(ns2), repr2)

@@ -4,46 +4,35 @@
 //! - [python weakref module](https://docs.python.org/3/library/weakref.html)
 //! - [rust weak struct](https://doc.rust-lang.org/std/rc/struct.Weak.html)
 //!
-pub(crate) use _weakref::make_module;
 
-#[pymodule]
-mod _weakref {
-    use crate::{builtins::PyTypeRef, PyObjectRef, VirtualMachine};
+use crate::pyobject::PyObjectRef;
+use crate::vm::VirtualMachine;
+use std::sync::Arc;
 
-    #[pyattr(name = "ref")]
-    fn ref_(vm: &VirtualMachine) -> PyTypeRef {
-        vm.ctx.types.weakref_type.clone()
-    }
-    #[pyattr]
-    fn proxy(vm: &VirtualMachine) -> PyTypeRef {
-        vm.ctx.types.weakproxy_type.clone()
-    }
-    #[pyattr(name = "ReferenceType")]
-    fn reference_type(vm: &VirtualMachine) -> PyTypeRef {
-        vm.ctx.types.weakref_type.clone()
-    }
-    #[pyattr(name = "ProxyType")]
-    fn proxy_type(vm: &VirtualMachine) -> PyTypeRef {
-        vm.ctx.types.weakproxy_type.clone()
-    }
-    #[pyattr(name = "CallableProxyType")]
-    fn callable_proxy_type(vm: &VirtualMachine) -> PyTypeRef {
-        vm.ctx.types.weakproxy_type.clone()
-    }
+fn weakref_getweakrefcount(obj: PyObjectRef) -> usize {
+    Arc::weak_count(&obj)
+}
 
-    #[pyfunction]
-    fn getweakrefcount(obj: PyObjectRef) -> usize {
-        obj.weak_count()
-    }
+fn weakref_getweakrefs(_obj: PyObjectRef, vm: &VirtualMachine) -> PyObjectRef {
+    // TODO: implement this, may require a different gc
+    vm.ctx.new_list(vec![])
+}
 
-    #[pyfunction]
-    fn getweakrefs(_obj: PyObjectRef) -> Vec<PyObjectRef> {
-        // TODO: implement this, may require a different gc
-        Vec::new()
-    }
+fn weakref_remove_dead_weakref(_obj: PyObjectRef, _key: PyObjectRef) {
+    // TODO
+}
 
-    #[pyfunction]
-    fn _remove_dead_weakref(_obj: PyObjectRef, _key: PyObjectRef) {
-        // TODO
-    }
+pub fn make_module(vm: &VirtualMachine) -> PyObjectRef {
+    let ctx = &vm.ctx;
+
+    py_module!(vm, "_weakref", {
+        "ref" => ctx.weakref_type(),
+        "proxy" => ctx.weakproxy_type(),
+        "getweakrefcount" => ctx.new_function(weakref_getweakrefcount),
+        "getweakrefs" => ctx.new_function(weakref_getweakrefs),
+        "ReferenceType" => ctx.weakref_type(),
+        "ProxyType" => ctx.weakproxy_type(),
+        "CallableProxyType" => ctx.weakproxy_type(),
+        "_remove_dead_weakref" => ctx.new_function(weakref_remove_dead_weakref),
+    })
 }

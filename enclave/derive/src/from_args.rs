@@ -1,8 +1,9 @@
 use crate::util::path_eq;
-use proc_macro2::TokenStream;
-use quote::{quote, ToTokens};
+use crate::Diagnostic;
+use proc_macro2::TokenStream as TokenStream2;
+use quote::quote;
 use syn::{
-    parse_quote, Attribute, Data, DeriveInput, Expr, Field, Ident, Lit, Meta, NestedMeta, Result,
+    parse_quote, Attribute, Data, DeriveInput, Expr, Field, Fields, Ident, Lit, Meta, NestedMeta,
 };
 
 /// The kind of the python parameter, this corresponds to the value of Parameter.kind
@@ -11,31 +12,27 @@ enum ParameterKind {
     PositionalOnly,
     PositionalOrKeyword,
     KeywordOnly,
-    Flatten,
 }
 
 impl ParameterKind {
     fn from_ident(ident: &Ident) -> Option<ParameterKind> {
         match ident.to_string().as_str() {
-            "positional" => Some(ParameterKind::PositionalOnly),
-            "any" => Some(ParameterKind::PositionalOrKeyword),
-            "named" => Some(ParameterKind::KeywordOnly),
-            "flatten" => Some(ParameterKind::Flatten),
+            "positional_only" => Some(ParameterKind::PositionalOnly),
+            "positional_or_keyword" => Some(ParameterKind::PositionalOrKeyword),
+            "keyword_only" => Some(ParameterKind::KeywordOnly),
             _ => None,
         }
     }
 }
 
 struct ArgAttribute {
-    name: Option<String>,
     kind: ParameterKind,
-    default: Option<DefaultValue>,
+    default: Option<Expr>,
+    optional: bool,
 }
-// None == quote!(Default::default())
-type DefaultValue = Option<Expr>;
 
 impl ArgAttribute {
-    fn from_attribute(attr: &Attribute) -> Option<Result<ArgAttribute>> {
+    fn from_attribute(attr: &Attribute) -> Option<Result<ArgAttribute, Diagnostic>> {
         if !attr.path.is_ident("pyarg") {
             return None;
         }
@@ -55,18 +52,22 @@ impl ArgAttribute {
                     err_span!(
                         first_arg,
                         "The first argument to #[pyarg()] must be the parameter type, either \
-                         'positional', 'any', 'named', or 'flatten'."
+                         'positional_only', 'positional_or_keyword', or 'keyword_only'."
                     )
                 })?;
 
                 let mut attribute = ArgAttribute {
-                    name: None,
                     kind,
                     default: None,
+                    optional: false,
                 };
 
                 for arg in iter {
                     attribute.parse_argument(arg)?;
+                }
+
+                if attribute.default.is_some() && attribute.optional {
+                    bail_span!(attr, "Can't set both a default value and optional");
                 }
 
                 Ok(attribute)
@@ -76,38 +77,45 @@ impl ArgAttribute {
         Some(inner())
     }
 
-    fn parse_argument(&mut self, arg: &NestedMeta) -> Result<()> {
-        if let ParameterKind::Flatten = self.kind {
-            bail_span!(arg, "can't put additional arguments on a flatten arg")
-        }
+    fn parse_argument(&mut self, arg: &NestedMeta) -> Result<(), Diagnostic> {
         match arg {
             NestedMeta::Meta(Meta::Path(path)) => {
-                if path_eq(path, "default") || path_eq(path, "optional") {
-                    if self.default.is_none() {
-                        self.default = Some(None);
+                if path_eq(&path, "default") {
+                    if self.default.is_some() {
+                        bail_span!(path, "Default already set");
                     }
+                    let expr = parse_quote!(Default::default());
+                    self.default = Some(expr);
+                } else if path_eq(&path, "optional") {
+                    self.optional = true;
                 } else {
                     bail_span!(path, "Unrecognised pyarg attribute");
                 }
             }
             NestedMeta::Meta(Meta::NameValue(name_value)) => {
                 if path_eq(&name_value.path, "default") {
-                    if matches!(self.default, Some(Some(_))) {
+                    if self.default.is_some() {
                         bail_span!(name_value, "Default already set");
                     }
 
                     match name_value.lit {
-                        Lit::Str(ref val) => self.default = Some(Some(val.parse()?)),
+                        Lit::Str(ref val) => {
+                            let expr = val.parse::<Expr>().map_err(|_| {
+                                err_span!(val, "Expected a valid expression for default argument")
+                            })?;
+                            self.default = Some(expr);
+                        }
                         _ => bail_span!(name_value, "Expected string value for default argument"),
                     }
-                } else if path_eq(&name_value.path, "name") {
-                    if self.name.is_some() {
-                        bail_span!(name_value, "already have a name")
-                    }
-
-                    match &name_value.lit {
-                        Lit::Str(val) => self.name = Some(val.value()),
-                        _ => bail_span!(name_value, "Expected string value for name argument"),
+                } else if path_eq(&name_value.path, "optional") {
+                    match name_value.lit {
+                        Lit::Bool(ref val) => {
+                            self.optional = val.value;
+                        }
+                        _ => bail_span!(
+                            name_value.lit,
+                            "Expected boolean value for optional argument"
+                        ),
                     }
                 } else {
                     bail_span!(name_value, "Unrecognised pyarg attribute");
@@ -120,17 +128,17 @@ impl ArgAttribute {
     }
 }
 
-fn generate_field((i, field): (usize, &Field)) -> Result<TokenStream> {
+fn generate_field(field: &Field) -> Result<TokenStream2, Diagnostic> {
     let mut pyarg_attrs = field
         .attrs
         .iter()
         .filter_map(ArgAttribute::from_attribute)
-        .collect::<std::result::Result<Vec<_>, _>>()?;
+        .collect::<Result<Vec<_>, _>>()?;
     let attr = if pyarg_attrs.is_empty() {
         ArgAttribute {
-            name: None,
             kind: ParameterKind::PositionalOrKeyword,
             default: None,
+            optional: false,
         }
     } else if pyarg_attrs.len() == 1 {
         pyarg_attrs.remove(0)
@@ -138,34 +146,25 @@ fn generate_field((i, field): (usize, &Field)) -> Result<TokenStream> {
         bail_span!(field, "Multiple pyarg attributes on field");
     };
 
-    let name = field.ident.as_ref();
-    let namestring = name.map(Ident::to_string);
-    if matches!(&namestring, Some(s) if s.starts_with("_phantom")) {
-        return Ok(quote! {
-            #name: ::std::marker::PhantomData,
-        });
+    let name = &field.ident;
+    if let Some(name) = name {
+        if name.to_string().starts_with("_phantom") {
+            return Ok(quote! {
+                #name: std::marker::PhantomData,
+            });
+        }
     }
-    let fieldname = match name {
-        Some(id) => id.to_token_stream(),
-        None => syn::Index::from(i).into_token_stream(),
-    };
-    if let ParameterKind::Flatten = attr.kind {
-        return Ok(quote! {
-            #fieldname: ::rustpython_vm::function::FromArgs::from_args(vm, args)?,
-        });
-    }
-    let pyname = attr
-        .name
-        .or(namestring)
-        .ok_or_else(|| err_span!(field, "field in tuple struct must have name attribute"))?;
     let middle = quote! {
-        .map(|x| ::rustpython_vm::TryFromObject::try_from_object(vm, x)).transpose()?
+        .map(|x| ::rustpython_vm::pyobject::TryFromObject::try_from_object(vm, x)).transpose()?
     };
     let ending = if let Some(default) = attr.default {
-        let default = default.unwrap_or_else(|| parse_quote!(::std::default::Default::default()));
         quote! {
-            .map(::rustpython_vm::function::FromArgOptional::from_inner)
             .unwrap_or_else(|| #default)
+        }
+    } else if attr.optional {
+        quote! {
+            .map(::rustpython_vm::function::OptionalArg::Present)
+            .unwrap_or(::rustpython_vm::function::OptionalArg::Missing)
         }
     } else {
         let err = match attr.kind {
@@ -173,9 +172,8 @@ fn generate_field((i, field): (usize, &Field)) -> Result<TokenStream> {
                 ::rustpython_vm::function::ArgumentError::TooFewArgs
             },
             ParameterKind::KeywordOnly => quote! {
-                ::rustpython_vm::function::ArgumentError::RequiredKeywordArgument(#pyname.to_owned())
+                ::rustpython_vm::function::ArgumentError::RequiredKeywordArgument(tringify!(#name))
             },
-            ParameterKind::Flatten => unreachable!(),
         };
         quote! {
             .ok_or_else(|| #err)?
@@ -185,32 +183,34 @@ fn generate_field((i, field): (usize, &Field)) -> Result<TokenStream> {
     let file_output = match attr.kind {
         ParameterKind::PositionalOnly => {
             quote! {
-                #fieldname: args.take_positional()#middle #ending,
+                #name: args.take_positional()#middle#ending,
             }
         }
         ParameterKind::PositionalOrKeyword => {
             quote! {
-                #fieldname: args.take_positional_keyword(#pyname)#middle #ending,
+                #name: args.take_positional_keyword(stringify!(#name))#middle#ending,
             }
         }
         ParameterKind::KeywordOnly => {
             quote! {
-                #fieldname: args.take_keyword(#pyname)#middle #ending,
+                #name: args.take_keyword(stringify!(#name))#middle#ending,
             }
         }
-        ParameterKind::Flatten => unreachable!(),
     };
     Ok(file_output)
 }
 
-pub fn impl_from_args(input: DeriveInput) -> Result<TokenStream> {
+pub fn impl_from_args(input: DeriveInput) -> Result<TokenStream2, Diagnostic> {
     let fields = match input.data {
-        Data::Struct(syn::DataStruct { fields, .. }) => fields
+        Data::Struct(syn::DataStruct {
+            fields: Fields::Named(fields),
+            ..
+        }) => fields
+            .named
             .iter()
-            .enumerate()
             .map(generate_field)
-            .collect::<Result<TokenStream>>()?,
-        _ => bail_span!(input, "FromArgs input must be a struct"),
+            .collect::<Result<TokenStream2, Diagnostic>>()?,
+        _ => bail_span!(input, "FromArgs input must be a struct with named fields"),
     };
 
     let name = input.ident;
@@ -219,8 +219,8 @@ pub fn impl_from_args(input: DeriveInput) -> Result<TokenStream> {
         impl #impl_generics ::rustpython_vm::function::FromArgs for #name #ty_generics #where_clause {
             fn from_args(
                 vm: &::rustpython_vm::VirtualMachine,
-                args: &mut ::rustpython_vm::function::FuncArgs
-            ) -> ::std::result::Result<Self, ::rustpython_vm::function::ArgumentError> {
+                args: &mut ::rustpython_vm::function::PyFuncArgs
+            ) -> Result<Self, ::rustpython_vm::function::ArgumentError> {
                 Ok(#name { #fields })
             }
         }

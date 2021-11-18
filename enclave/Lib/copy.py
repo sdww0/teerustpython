@@ -75,20 +75,24 @@ def copy(x):
     if copier:
         return copier(x)
 
-    if issubclass(cls, type):
+    try:
+        issc = issubclass(cls, type)
+    except TypeError: # cls is not a class
+        issc = False
+    if issc:
         # treat it as a regular class:
         return _copy_immutable(x)
 
     copier = getattr(cls, "__copy__", None)
-    if copier is not None:
+    if copier:
         return copier(x)
 
     reductor = dispatch_table.get(cls)
-    if reductor is not None:
+    if reductor:
         rv = reductor(x)
     else:
         reductor = getattr(x, "__reduce_ex__", None)
-        if reductor is not None:
+        if reductor:
             rv = reductor(4)
         else:
             reductor = getattr(x, "__reduce__", None)
@@ -107,7 +111,7 @@ _copy_dispatch = d = {}
 def _copy_immutable(x):
     return x
 for t in (type(None), int, float, bool, complex, str, tuple,
-          bytes, frozenset, type, range, slice, property,
+          bytes, frozenset, type, range, slice,
           types.BuiltinFunctionType, type(Ellipsis), type(NotImplemented),
           types.FunctionType, weakref.ref):
     d[t] = _copy_immutable
@@ -142,14 +146,18 @@ def deepcopy(x, memo=None, _nil=[]):
     cls = type(x)
 
     copier = _deepcopy_dispatch.get(cls)
-    if copier is not None:
+    if copier:
         y = copier(x, memo)
     else:
-        if issubclass(cls, type):
+        try:
+            issc = issubclass(cls, type)
+        except TypeError: # cls is not a class (old Boost; see SF #502085)
+            issc = 0
+        if issc:
             y = _deepcopy_atomic(x, memo)
         else:
             copier = getattr(x, "__deepcopy__", None)
-            if copier is not None:
+            if copier:
                 y = copier(memo)
             else:
                 reductor = dispatch_table.get(cls)
@@ -157,7 +165,7 @@ def deepcopy(x, memo=None, _nil=[]):
                     rv = reductor(x)
                 else:
                     reductor = getattr(x, "__reduce_ex__", None)
-                    if reductor is not None:
+                    if reductor:
                         rv = reductor(4)
                     else:
                         reductor = getattr(x, "__reduce__", None)
@@ -190,12 +198,14 @@ d[bool] = _deepcopy_atomic
 d[complex] = _deepcopy_atomic
 d[bytes] = _deepcopy_atomic
 d[str] = _deepcopy_atomic
-d[types.CodeType] = _deepcopy_atomic
+try:
+    d[types.CodeType] = _deepcopy_atomic
+except AttributeError:
+    pass
 d[type] = _deepcopy_atomic
 d[types.BuiltinFunctionType] = _deepcopy_atomic
 d[types.FunctionType] = _deepcopy_atomic
 d[weakref.ref] = _deepcopy_atomic
-d[property] = _deepcopy_atomic
 
 def _deepcopy_list(x, memo, deepcopy=deepcopy):
     y = []

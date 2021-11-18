@@ -1,136 +1,157 @@
-#[cfg(feature = "rustpython-ast")]
+use crate::pyobject::PyObjectRef;
+use crate::vm::VirtualMachine;
+use std::collections::HashMap;
+
+pub mod array;
+#[cfg(feature = "rustpython-parser")]
 pub(crate) mod ast;
-mod atexit;
-pub mod builtins;
-mod codecs;
+mod binascii;
 mod collections;
-pub mod errno;
+mod csv;
+mod dis;
+mod errno;
 mod functools;
+mod hashlib;
 mod imp;
 pub mod io;
 mod itertools;
+mod json;
+#[cfg(feature = "rustpython-parser")]
+mod keyword;
 mod marshal;
+mod math;
 mod operator;
-pub(crate) mod pystruct;
-// TODO: maybe make this an extension module, if we ever get those
-// mod re;
-mod sre;
+mod platform;
+mod pystruct;
+mod random;
+mod re;
+#[cfg(not(target_arch = "wasm32"))]
+pub mod socket;
 mod string;
 #[cfg(feature = "rustpython-compiler")]
 mod symtable;
-mod sysconfigdata;
-#[cfg(feature = "threading")]
+#[cfg(not(target_arch = "wasm32"))]
 mod thread;
-pub mod time;
+mod time_module;
+#[cfg(feature = "rustpython-parser")]
+mod tokenize;
+mod unicodedata;
 mod warnings;
 mod weakref;
 
 #[cfg(any(not(target_arch = "wasm32"), target_os = "wasi"))]
 #[macro_use]
-pub mod os;
-#[cfg(windows)]
-pub mod nt;
-#[cfg(unix)]
-pub mod posix;
-#[cfg(any(not(target_arch = "wasm32"), target_os = "wasi"))]
-#[cfg(not(any(unix, windows)))]
-#[path = "posix_compat.rs"]
-pub mod posix;
+mod os;
 
+#[cfg(not(target_arch = "wasm32"))]
+mod faulthandler;
 #[cfg(windows)]
-pub(crate) mod msvcrt;
+mod msvcrt;
+#[cfg(not(target_arch = "wasm32"))]
+mod multiprocessing;
 #[cfg(all(unix, not(any(target_os = "android", target_os = "redox"))))]
 mod pwd;
 #[cfg(not(target_arch = "wasm32"))]
-pub(crate) mod signal;
-pub mod sys;
+mod select;
+#[cfg(not(target_arch = "wasm32"))]
+pub mod signal;
+#[cfg(all(not(target_arch = "wasm32"), feature = "ssl"))]
+mod ssl;
+#[cfg(not(target_arch = "wasm32"))]
+mod subprocess;
 #[cfg(windows)]
 mod winapi;
 #[cfg(windows)]
 mod winreg;
+#[cfg(not(any(target_arch = "wasm32", target_os = "redox")))]
+mod zlib;
 
-use crate::vm::VirtualMachine;
-use crate::PyObjectRef;
-use std::borrow::Cow;
-use std::collections::HashMap;
+pub type StdlibInitFunc = Box<dyn Fn(&VirtualMachine) -> PyObjectRef + Send + Sync>;
 
-pub type StdlibInitFunc = Box<py_dyn_fn!(dyn Fn(&VirtualMachine) -> PyObjectRef)>;
+pub fn get_module_inits() -> HashMap<String, StdlibInitFunc> {
+    #[allow(unused_mut)]
+    let mut modules = hashmap! {
+        "array".to_owned() => Box::new(array::make_module) as StdlibInitFunc,
+        "binascii".to_owned() => Box::new(binascii::make_module),
+        "_collections".to_owned() => Box::new(collections::make_module),
+        "_csv".to_owned() => Box::new(csv::make_module),
+        "dis".to_owned() => Box::new(dis::make_module),
+        "errno".to_owned() => Box::new(errno::make_module),
+        "_functools".to_owned() => Box::new(functools::make_module),
+        "hashlib".to_owned() => Box::new(hashlib::make_module),
+        "itertools".to_owned() => Box::new(itertools::make_module),
+        "_io".to_owned() => Box::new(io::make_module),
+        "_json".to_owned() => Box::new(json::make_module),
+        "marshal".to_owned() => Box::new(marshal::make_module),
+        "math".to_owned() => Box::new(math::make_module),
+        "_operator".to_owned() => Box::new(operator::make_module),
+        "_platform".to_owned() => Box::new(platform::make_module),
+        "regex_crate".to_owned() => Box::new(re::make_module),
+        "_random".to_owned() => Box::new(random::make_module),
+        "_string".to_owned() => Box::new(string::make_module),
+        "_struct".to_owned() => Box::new(pystruct::make_module),
+        "time".to_owned() => Box::new(time_module::make_module),
+        "_weakref".to_owned() => Box::new(weakref::make_module),
+        "_imp".to_owned() => Box::new(imp::make_module),
+        "unicodedata".to_owned() => Box::new(unicodedata::make_module),
+        "_warnings".to_owned() => Box::new(warnings::make_module),
+    };
 
-pub type StdlibMap = HashMap<Cow<'static, str>, StdlibInitFunc, ahash::RandomState>;
-
-pub fn get_module_inits() -> StdlibMap {
-    macro_rules! modules {
-        {
-            $(
-                #[cfg($cfg:meta)]
-                { $( $key:expr => $val:expr),* $(,)? }
-            )*
-        } => {{
-            let modules = [
-                $(
-                    $(#[cfg($cfg)] (Cow::<'static, str>::from($key), Box::new($val) as StdlibInitFunc),)*
-                )*
-            ];
-            modules.into_iter().collect()
-        }};
+    // Insert parser related modules:
+    #[cfg(feature = "rustpython-parser")]
+    {
+        modules.insert(
+            "_ast".to_owned(),
+            Box::new(ast::make_module) as StdlibInitFunc,
+        );
+        modules.insert("keyword".to_owned(), Box::new(keyword::make_module));
+        modules.insert("tokenize".to_owned(), Box::new(tokenize::make_module));
     }
-    modules! {
-        #[cfg(all())]
-        {
-            "atexit" => atexit::make_module,
-            "_codecs" => codecs::make_module,
-            "_collections" => collections::make_module,
-            "errno" => errno::make_module,
-            "_functools" => functools::make_module,
-            "itertools" => itertools::make_module,
-            "_io" => io::make_module,
-            "marshal" => marshal::make_module,
-            "_operator" => operator::make_module,
-            "_sre" => sre::make_module,
-            "_string" => string::make_module,
-            "_struct" => pystruct::make_module,
-            "time" => time::make_module,
-            "_weakref" => weakref::make_module,
-            "_imp" => imp::make_module,
-            "_warnings" => warnings::make_module,
-            sys::sysconfigdata_name() => sysconfigdata::make_module,
-        }
-        // parser related modules:
-        #[cfg(feature = "rustpython-ast")]
-        {
-            "_ast" => ast::make_module,
-        }
-        // compiler related modules:
-        #[cfg(feature = "rustpython-compiler")]
-        {
-            "symtable" => symtable::make_module,
-        }
-        #[cfg(any(unix, target_os = "wasi"))]
-        {
-            "posix" => posix::make_module,
-            // "fcntl" => fcntl::make_module,
-        }
-        // disable some modules on WASM
-        #[cfg(not(target_arch = "wasm32"))]
-        {
-            "_signal" => signal::make_module,
-        }
-        #[cfg(all(feature = "threading", not(target_arch = "wasm32")))]
-        {
-            "_thread" => thread::make_module,
-        }
-        // Unix-only
-        #[cfg(all(unix, not(any(target_os = "android", target_os = "redox"))))]
-        {
-            "pwd" => pwd::make_module,
-        }
-        // Windows-only
-        #[cfg(windows)]
-        {
-            "nt" => nt::make_module,
-            "msvcrt" => msvcrt::make_module,
-            "_winapi" => winapi::make_module,
-            "winreg" => winreg::make_module,
-        }
+
+    // Insert compiler related modules:
+    #[cfg(feature = "rustpython-compiler")]
+    {
+        modules.insert("symtable".to_owned(), Box::new(symtable::make_module));
     }
+
+    #[cfg(any(unix, windows, target_os = "wasi"))]
+    modules.insert(os::MODULE_NAME.to_owned(), Box::new(os::make_module));
+
+    // disable some modules on WASM
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        modules.insert("_socket".to_owned(), Box::new(socket::make_module));
+        modules.insert(
+            "_multiprocessing".to_owned(),
+            Box::new(multiprocessing::make_module),
+        );
+        modules.insert("signal".to_owned(), Box::new(signal::make_module));
+        modules.insert("select".to_owned(), Box::new(select::make_module));
+        #[cfg(feature = "ssl")]
+        modules.insert("_ssl".to_owned(), Box::new(ssl::make_module));
+        modules.insert("_subprocess".to_owned(), Box::new(subprocess::make_module));
+        modules.insert("_thread".to_owned(), Box::new(thread::make_module));
+        #[cfg(not(target_os = "redox"))]
+        modules.insert("zlib".to_owned(), Box::new(zlib::make_module));
+        modules.insert(
+            "faulthandler".to_owned(),
+            Box::new(faulthandler::make_module),
+        );
+    }
+
+    // Unix-only
+    #[cfg(all(unix, not(any(target_os = "android", target_os = "redox"))))]
+    {
+        modules.insert("pwd".to_owned(), Box::new(pwd::make_module));
+    }
+
+    // Windows-only
+    #[cfg(windows)]
+    {
+        modules.insert("msvcrt".to_owned(), Box::new(msvcrt::make_module));
+        modules.insert("_winapi".to_owned(), Box::new(winapi::make_module));
+        modules.insert("winreg".to_owned(), Box::new(winreg::make_module));
+    }
+
+    modules
 }

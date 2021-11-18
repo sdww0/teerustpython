@@ -3,19 +3,23 @@ use num_traits::sign::Signed;
 use serde::de::{DeserializeSeed, Visitor};
 use serde::ser::{Serialize, SerializeMap, SerializeSeq};
 
-use crate::builtins::{dict::PyDictRef, float, int, list::PyList, pybool, tuple::PyTuple, PyStr};
-use crate::{ItemProtocol, PyObject, PyObjectRef, TypeProtocol, VirtualMachine};
+use crate::obj::{
+    objbool, objdict::PyDictRef, objfloat, objint, objlist::PyList, objstr, objtuple::PyTuple,
+    objtype,
+};
+use crate::pyobject::{IdProtocol, ItemProtocol, PyObjectRef, TypeProtocol};
+use crate::VirtualMachine;
 
 #[inline]
 pub fn serialize<S>(
     vm: &VirtualMachine,
-    pyobject: &PyObject,
+    pyobject: &PyObjectRef,
     serializer: S,
 ) -> Result<S::Ok, S::Error>
 where
     S: serde::Serializer,
 {
-    PyObjectSerializer { pyobject, vm }.serialize(serializer)
+    PyObjectSerializer { vm, pyobject }.serialize(serializer)
 }
 
 #[inline]
@@ -32,13 +36,13 @@ where
 // We need to have a VM available to serialise a PyObject based on its subclass, so we implement
 // PyObject serialisation via a proxy object which holds a reference to a VM
 pub struct PyObjectSerializer<'s> {
-    pyobject: &'s PyObject,
+    pyobject: &'s PyObjectRef,
     vm: &'s VirtualMachine,
 }
 
 impl<'s> PyObjectSerializer<'s> {
     pub fn new(vm: &'s VirtualMachine, pyobject: &'s PyObjectRef) -> Self {
-        PyObjectSerializer { pyobject, vm }
+        PyObjectSerializer { vm, pyobject }
     }
 
     fn clone_with_object(&self, pyobject: &'s PyObjectRef) -> PyObjectSerializer {
@@ -62,14 +66,14 @@ impl<'s> serde::Serialize for PyObjectSerializer<'s> {
                 }
                 seq.end()
             };
-        if let Some(s) = self.pyobject.payload::<PyStr>() {
-            serializer.serialize_str(s.as_ref())
-        } else if self.pyobject.isinstance(&self.vm.ctx.types.float_type) {
-            serializer.serialize_f64(float::get_value(self.pyobject))
-        } else if self.pyobject.isinstance(&self.vm.ctx.types.bool_type) {
-            serializer.serialize_bool(pybool::get_value(self.pyobject))
-        } else if self.pyobject.isinstance(&self.vm.ctx.types.int_type) {
-            let v = int::get_value(self.pyobject);
+        if objtype::isinstance(self.pyobject, &self.vm.ctx.str_type()) {
+            serializer.serialize_str(objstr::borrow_value(&self.pyobject))
+        } else if objtype::isinstance(self.pyobject, &self.vm.ctx.float_type()) {
+            serializer.serialize_f64(objfloat::get_value(self.pyobject))
+        } else if objtype::isinstance(self.pyobject, &self.vm.ctx.bool_type()) {
+            serializer.serialize_bool(objbool::get_value(self.pyobject))
+        } else if objtype::isinstance(self.pyobject, &self.vm.ctx.int_type()) {
+            let v = objint::get_value(self.pyobject);
             let int_too_large = || serde::ser::Error::custom("int too large to serialize");
             // TODO: serialize BigInt when it does not fit into i64
             // BigInt implements serialization to a tuple of sign and a list of u32s,
@@ -81,22 +85,22 @@ impl<'s> serde::Serialize for PyObjectSerializer<'s> {
                 serializer.serialize_i64(v.to_i64().ok_or_else(int_too_large)?)
             }
         } else if let Some(list) = self.pyobject.payload_if_subclass::<PyList>(self.vm) {
-            serialize_seq_elements(serializer, &list.borrow_vec())
+            serialize_seq_elements(serializer, &list.borrow_elements())
         } else if let Some(tuple) = self.pyobject.payload_if_subclass::<PyTuple>(self.vm) {
             serialize_seq_elements(serializer, tuple.as_slice())
-        } else if self.pyobject.isinstance(&self.vm.ctx.types.dict_type) {
-            let dict: PyDictRef = self.pyobject.to_owned().downcast().unwrap();
+        } else if objtype::isinstance(self.pyobject, &self.vm.ctx.dict_type()) {
+            let dict: PyDictRef = self.pyobject.clone().downcast().unwrap();
             let pairs: Vec<_> = dict.into_iter().collect();
             let mut map = serializer.serialize_map(Some(pairs.len()))?;
             for (key, e) in pairs.iter() {
-                map.serialize_entry(&self.clone_with_object(key), &self.clone_with_object(e))?;
+                map.serialize_entry(&self.clone_with_object(key), &self.clone_with_object(&e))?;
             }
             map.end()
-        } else if self.vm.is_none(self.pyobject) {
+        } else if self.pyobject.is(&self.vm.get_none()) {
             serializer.serialize_none()
         } else {
             Err(serde::ser::Error::custom(format!(
-                "Object of type '{}' is not serializable",
+                "Object of type '{:?}' is not serializable",
                 self.pyobject.class()
             )))
         }
@@ -138,7 +142,7 @@ impl<'de> Visitor<'de> for PyObjectDeserializer<'de> {
     where
         E: serde::de::Error,
     {
-        Ok(self.vm.ctx.new_bool(value).into())
+        Ok(self.vm.ctx.new_bool(value))
     }
 
     // Other signed integers delegate to this method by default, it’s the only one needed
@@ -146,7 +150,7 @@ impl<'de> Visitor<'de> for PyObjectDeserializer<'de> {
     where
         E: serde::de::Error,
     {
-        Ok(self.vm.ctx.new_int(value).into())
+        Ok(self.vm.ctx.new_int(value))
     }
 
     // Other unsigned integers delegate to this method by default, it’s the only one needed
@@ -154,14 +158,14 @@ impl<'de> Visitor<'de> for PyObjectDeserializer<'de> {
     where
         E: serde::de::Error,
     {
-        Ok(self.vm.ctx.new_int(value).into())
+        Ok(self.vm.ctx.new_int(value))
     }
 
     fn visit_f64<E>(self, value: f64) -> Result<Self::Value, E>
     where
         E: serde::de::Error,
     {
-        Ok(self.vm.ctx.new_float(value).into())
+        Ok(self.vm.ctx.new_float(value))
     }
 
     fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
@@ -176,14 +180,14 @@ impl<'de> Visitor<'de> for PyObjectDeserializer<'de> {
     where
         E: serde::de::Error,
     {
-        Ok(self.vm.ctx.new_str(value).into())
+        Ok(self.vm.ctx.new_str(value))
     }
 
     fn visit_unit<E>(self) -> Result<Self::Value, E>
     where
         E: serde::de::Error,
     {
-        Ok(self.vm.ctx.none())
+        Ok(self.vm.get_none())
     }
 
     fn visit_seq<A>(self, mut access: A) -> Result<Self::Value, A::Error>
@@ -194,7 +198,7 @@ impl<'de> Visitor<'de> for PyObjectDeserializer<'de> {
         while let Some(value) = access.next_element_seed(self.clone())? {
             seq.push(value);
         }
-        Ok(self.vm.ctx.new_list(seq).into())
+        Ok(self.vm.ctx.new_list(seq))
     }
 
     fn visit_map<M>(self, mut access: M) -> Result<Self::Value, M::Error>
@@ -205,8 +209,8 @@ impl<'de> Visitor<'de> for PyObjectDeserializer<'de> {
         // Although JSON keys must be strings, implementation accepts any keys
         // and can be reused by other deserializers without such limit
         while let Some((key_obj, value)) = access.next_entry_seed(self.clone(), self.clone())? {
-            dict.set_item(key_obj, value, self.vm).unwrap();
+            dict.set_item(&key_obj, value, self.vm).unwrap();
         }
-        Ok(dict.into())
+        Ok(dict.into_object())
     }
 }

@@ -32,6 +32,8 @@ class ModuleTests(unittest.TestCase):
             pass
         self.assertEqual(foo.__doc__, ModuleType.__doc__)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_uninitialized_missing_getattr(self):
         # Issue 8297
         # test the text in the AttributeError of an uninitialized module
@@ -80,6 +82,8 @@ class ModuleTests(unittest.TestCase):
                           "__loader__": None, "__package__": None,
                           "__spec__": None})
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_reinit(self):
         # Reinitialization should not replace the __dict__
         foo = ModuleType("foo", "foodoc\u1234")
@@ -129,8 +133,7 @@ a = A(destroyed)"""
         gc_collect()
         self.assertIs(wr(), None)
 
-    # TODO: RUSTPYTHON
-    @unittest.expectedFailure
+    @unittest.skip("TODO: RUSTPYTHON")
     def test_module_getattr(self):
         import test.good_getattr as gga
         from test.good_getattr import test
@@ -143,8 +146,7 @@ a = A(destroyed)"""
         self.assertEqual(gga.whatever, "There is whatever")
         del sys.modules['test.good_getattr']
 
-    # TODO: RUSTPYTHON
-    @unittest.expectedFailure
+    @unittest.skip("TODO: RUSTPYTHON")
     def test_module_getattr_errors(self):
         import test.bad_getattr as bga
         from test import bad_getattr2
@@ -158,15 +160,13 @@ a = A(destroyed)"""
         if 'test.bad_getattr2' in sys.modules:
             del sys.modules['test.bad_getattr2']
 
-    # TODO: RUSTPYTHON
-    @unittest.expectedFailure
+    @unittest.skip("TODO: RUSTPYTHON")
     def test_module_dir(self):
         import test.good_getattr as gga
         self.assertEqual(dir(gga), ['a', 'b', 'c'])
         del sys.modules['test.good_getattr']
 
-    # TODO: RUSTPYTHON
-    @unittest.expectedFailure
+    @unittest.skip("TODO: RUSTPYTHON")
     def test_module_dir_errors(self):
         import test.bad_getattr as bga
         from test import bad_getattr2
@@ -178,8 +178,7 @@ a = A(destroyed)"""
         if 'test.bad_getattr2' in sys.modules:
             del sys.modules['test.bad_getattr2']
 
-    # TODO: RUSTPYTHON
-    @unittest.expectedFailure
+    @unittest.skip("TODO: RUSTPYTHON")
     def test_module_getattr_tricky(self):
         from test import bad_getattr3
         # these lookups should not crash

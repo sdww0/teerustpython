@@ -1,24 +1,14 @@
 /* Several function to retrieve version information.
  */
 
-use crate::PyStructSequence;
-use chrono::prelude::DateTime;
-use chrono::Local;
-use std::time::{Duration, UNIX_EPOCH};
-
-// = 3.9.0alpha
 const MAJOR: usize = 3;
-const MINOR: usize = 9;
+const MINOR: usize = 5;
 const MICRO: usize = 0;
 const RELEASELEVEL: &str = "alpha";
-const RELEASELEVEL_N: usize = 0xA;
 const SERIAL: usize = 0;
 
-pub const VERSION_HEX: usize =
-    (MAJOR << 24) | (MINOR << 16) | (MICRO << 8) | (RELEASELEVEL_N << 4) | SERIAL;
-
-#[pyclass(module = "sys", name = "version_info")]
-#[derive(Default, Debug, PyStructSequence)]
+#[pystruct_sequence(name = "version_info")]
+#[derive(Default, Debug)]
 pub struct VersionInfo {
     major: usize,
     minor: usize,
@@ -26,6 +16,10 @@ pub struct VersionInfo {
     releaselevel: &'static str,
     serial: usize,
 }
+extern crate chrono;
+use chrono::prelude::DateTime;
+use chrono::Local;
+use std::time::{Duration, UNIX_EPOCH};
 
 pub fn get_version() -> String {
     format!(
@@ -36,22 +30,13 @@ pub fn get_version() -> String {
     )
 }
 
-#[pyimpl(with(PyStructSequence))]
-impl VersionInfo {
-    pub const VERSION: VersionInfo = VersionInfo {
+pub fn get_version_info() -> VersionInfo {
+    VersionInfo {
         major: MAJOR,
         minor: MINOR,
         micro: MICRO,
         releaselevel: RELEASELEVEL,
         serial: SERIAL,
-    };
-    #[pyslot]
-    fn slot_new(
-        _cls: crate::builtins::pytype::PyTypeRef,
-        _args: crate::function::FuncArgs,
-        vm: &crate::VirtualMachine,
-    ) -> crate::PyResult {
-        Err(vm.new_type_error("cannot create 'sys.version_info' instances".to_owned()))
     }
 }
 
@@ -60,7 +45,8 @@ pub fn get_version_number() -> String {
 }
 
 pub fn get_compiler() -> String {
-    format!("rustc {}", env!("RUSTC_VERSION"))
+    let rustc_version = rustc_version_runtime::version_meta();
+    format!("rustc {}", rustc_version.semver)
 }
 
 pub fn get_build_info() -> String {

@@ -18,7 +18,6 @@ import sys
 import threading
 import array
 import queue
-import types
 
 from time import time as _time
 from traceback import format_exc
@@ -1078,8 +1077,6 @@ class ValueProxy(BaseProxy):
     def set(self, value):
         return self._callmethod('set', (value,))
     value = property(get, set)
-
-    __class_getitem__ = classmethod(types.GenericAlias)
 
 
 BaseListProxy = MakeProxyType('BaseListProxy', (

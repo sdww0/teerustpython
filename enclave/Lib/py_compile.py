@@ -3,7 +3,6 @@
 This module has intimate knowledge of the format of .pyc files.
 """
 
-import enum
 import importlib._bootstrap_external
 import importlib.machinery
 import importlib.util
@@ -12,7 +11,7 @@ import os.path
 import sys
 import traceback
 
-__all__ = ["compile", "main", "PyCompileError", "PycInvalidationMode"]
+__all__ = ["compile", "main", "PyCompileError"]
 
 
 class PyCompileError(Exception):
@@ -63,21 +62,7 @@ class PyCompileError(Exception):
         return self.msg
 
 
-class PycInvalidationMode(enum.Enum):
-    TIMESTAMP = 1
-    CHECKED_HASH = 2
-    UNCHECKED_HASH = 3
-
-
-def _get_default_invalidation_mode():
-    if os.environ.get('SOURCE_DATE_EPOCH'):
-        return PycInvalidationMode.CHECKED_HASH
-    else:
-        return PycInvalidationMode.TIMESTAMP
-
-
-def compile(file, cfile=None, dfile=None, doraise=False, optimize=-1,
-            invalidation_mode=None):
+def compile(file, cfile=None, dfile=None, doraise=False, optimize=-1):
     """Byte-compile one Python source file to Python bytecode.
 
     :param file: The source file name.
@@ -94,7 +79,6 @@ def compile(file, cfile=None, dfile=None, doraise=False, optimize=-1,
     :param optimize: The optimization level for the compiler.  Valid values
         are -1, 0, 1 and 2.  A value of -1 means to use the optimization
         level of the current interpreter, as given by -O command line options.
-    :param invalidation_mode:
 
     :return: Path to the resulting byte compiled file.
 
@@ -119,8 +103,6 @@ def compile(file, cfile=None, dfile=None, doraise=False, optimize=-1,
     the resulting file would be regular and thus not the same type of file as
     it was previously.
     """
-    if invalidation_mode is None:
-        invalidation_mode = _get_default_invalidation_mode()
     if cfile is None:
         if optimize >= 0:
             optimization = optimize if optimize >= 1 else ''
@@ -154,17 +136,9 @@ def compile(file, cfile=None, dfile=None, doraise=False, optimize=-1,
             os.makedirs(dirname)
     except FileExistsError:
         pass
-    if invalidation_mode == PycInvalidationMode.TIMESTAMP:
-        source_stats = loader.path_stats(file)
-        bytecode = importlib._bootstrap_external._code_to_timestamp_pyc(
+    source_stats = loader.path_stats(file)
+    bytecode = importlib._bootstrap_external._code_to_bytecode(
             code, source_stats['mtime'], source_stats['size'])
-    else:
-        source_hash = importlib.util.source_hash(source_bytes)
-        bytecode = importlib._bootstrap_external._code_to_hash_pyc(
-            code,
-            source_hash,
-            (invalidation_mode == PycInvalidationMode.CHECKED_HASH),
-        )
     mode = importlib._bootstrap_external._calc_mode(file)
     importlib._bootstrap_external._write_atomic(cfile, bytecode, mode)
     return cfile

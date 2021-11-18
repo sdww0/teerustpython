@@ -13,9 +13,9 @@ import sys
 import warnings
 
 import array
-from array import _array_reconstructor as array_reconstructor
+# from array import _array_reconstructor as array_reconstructor  # XXX: RUSTPYTHON
 
-sizeof_wchar = array.array('u').itemsize
+# sizeof_wchar = array.array('u').itemsize  # XXX: RUSTPYTHON
 
 
 class ArraySubclass(array.array):
@@ -35,6 +35,8 @@ class MiscTest(unittest.TestCase):
         self.assertRaises(TypeError, array.array, 'xx')
         self.assertRaises(ValueError, array.array, 'x')
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_empty(self):
         # Exercise code for handling zero-length arrays
         a = array.array('B')
@@ -76,6 +78,8 @@ UTF32_BE = 21
 
 class ArrayReconstructorTest(unittest.TestCase):
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_error(self):
         self.assertRaises(TypeError, array_reconstructor,
                           "", "b", 0, b"")
@@ -94,6 +98,8 @@ class ArrayReconstructorTest(unittest.TestCase):
         self.assertRaises(ValueError, array_reconstructor,
                           array.array, "d", 16, b"a")
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_numbers(self):
         testcases = (
             (['B', 'H', 'I', 'L'], UNSIGNED_INT8, '=BBBB',
@@ -164,8 +170,8 @@ class ArrayReconstructorTest(unittest.TestCase):
         testcases = (
             (UTF16_LE, "UTF-16-LE"),
             (UTF16_BE, "UTF-16-BE"),
-            (UTF32_LE, "UTF-32-LE"), # TODO: RUSTPYTHON
-            (UTF32_BE, "UTF-32-BE")  # TODO: RUSTPYTHON
+            (UTF32_LE, "UTF-32-LE"),
+            (UTF32_BE, "UTF-32-BE")
         )
         for testcase in testcases:
             mformat_code, encoding = testcase
@@ -216,6 +222,8 @@ class BaseTest:
         self.assertIsInstance(bi[1], int)
         self.assertEqual(bi[1], len(a))
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_byteswap(self):
         if self.typecode == 'u':
             example = '\U00100100'
@@ -233,6 +241,8 @@ class BaseTest:
             b.byteswap()
             self.assertEqual(a, b)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_copy(self):
         import copy
         a = array.array(self.typecode, self.example)
@@ -240,6 +250,8 @@ class BaseTest:
         self.assertNotEqual(id(a), id(b))
         self.assertEqual(a, b)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_deepcopy(self):
         import copy
         a = array.array(self.typecode, self.example)
@@ -247,6 +259,8 @@ class BaseTest:
         self.assertNotEqual(id(a), id(b))
         self.assertEqual(a, b)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_reduce_ex(self):
         a = array.array(self.typecode, self.example)
         for protocol in range(3):
@@ -254,6 +268,8 @@ class BaseTest:
         for protocol in range(3, pickle.HIGHEST_PROTOCOL + 1):
             self.assertIs(a.__reduce_ex__(protocol)[0], array_reconstructor)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_pickle(self):
         for protocol in range(pickle.HIGHEST_PROTOCOL + 1):
             a = array.array(self.typecode, self.example)
@@ -269,6 +285,8 @@ class BaseTest:
             self.assertEqual(a.x, b.x)
             self.assertEqual(type(a), type(b))
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_pickle_for_empty_array(self):
         for protocol in range(pickle.HIGHEST_PROTOCOL + 1):
             a = array.array(self.typecode)
@@ -368,6 +386,8 @@ class BaseTest:
             array.array(self.typecode, self.example + self.example[:1])
         )
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_tofromfile(self):
         a = array.array(self.typecode, 2*self.example)
         self.assertRaises(TypeError, a.tofile)
@@ -390,6 +410,8 @@ class BaseTest:
                 f.close()
             support.unlink(support.TESTFN)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_fromfile_ioerror(self):
         # Issue #5395: Check if fromfile raises a proper OSError
         # instead of EOFError.
@@ -401,6 +423,8 @@ class BaseTest:
             f.close()
             support.unlink(support.TESTFN)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_filewrite(self):
         a = array.array(self.typecode, 2*self.example)
         f = open(support.TESTFN, 'wb')
@@ -420,6 +444,8 @@ class BaseTest:
                 f.close()
             support.unlink(support.TESTFN)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_tofromlist(self):
         a = array.array(self.typecode, 2*self.example)
         b = array.array(self.typecode)
@@ -452,6 +478,7 @@ class BaseTest:
                 nb_warnings += 1
         self.assertEqual(len(r), nb_warnings)
 
+    @unittest.skip("TODO: RUSTPYTHON")
     def test_tofrombytes(self):
         a = array.array(self.typecode, 2*self.example)
         b = array.array(self.typecode)
@@ -470,6 +497,8 @@ class BaseTest:
         b = array.array(self.typecode, a)
         self.assertEqual(a, b)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_repr(self):
         a = array.array(self.typecode, 2*self.example)
         self.assertEqual(a, eval(repr(a), {"array": array.array}))
@@ -481,6 +510,8 @@ class BaseTest:
         a = array.array(self.typecode, 2*self.example)
         str(a)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_cmp(self):
         a = array.array(self.typecode, self.example)
         self.assertIs(a == 42, False)
@@ -517,6 +548,8 @@ class BaseTest:
         self.assertIs(a > ab, False)
         self.assertIs(a >= ab, False)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_add(self):
         a = array.array(self.typecode, self.example) \
             + array.array(self.typecode, self.example[::-1])
@@ -530,6 +563,8 @@ class BaseTest:
 
         self.assertRaises(TypeError, a.__add__, "bad")
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_iadd(self):
         a = array.array(self.typecode, self.example[::-1])
         b = a
@@ -551,6 +586,8 @@ class BaseTest:
 
         self.assertRaises(TypeError, a.__iadd__, "bad")
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_mul(self):
         a = 5*array.array(self.typecode, self.example)
         self.assertEqual(
@@ -584,6 +621,8 @@ class BaseTest:
 
         self.assertRaises(TypeError, a.__mul__, "bad")
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_imul(self):
         a = array.array(self.typecode, self.example)
         b = a
@@ -664,6 +703,8 @@ class BaseTest:
             -len(self.example)-1, self.example[0]
         )
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_delitem(self):
         a = array.array(self.typecode, self.example)
         del a[0]
@@ -698,6 +739,8 @@ class BaseTest:
         self.assertRaises(IndexError, a.__delitem__, len(self.example))
         self.assertRaises(IndexError, a.__delitem__, -len(self.example)-1)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_getslice(self):
         a = array.array(self.typecode, self.example)
         self.assertEqual(a[:], a)
@@ -748,6 +791,8 @@ class BaseTest:
             array.array(self.typecode)
         )
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_extended_getslice(self):
         # Test extended slicing by comparing with list slicing
         # (Assumes list conversion works correctly, too)
@@ -760,6 +805,8 @@ class BaseTest:
                     self.assertEqual(list(a[start:stop:step]),
                                      list(a)[start:stop:step])
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_setslice(self):
         a = array.array(self.typecode, self.example)
         a[:1] = a
@@ -849,6 +896,8 @@ class BaseTest:
         self.assertRaises(TypeError, a.__setitem__, slice(0, 0), b)
         self.assertRaises(TypeError, a.__setitem__, slice(0, 1), b)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_extended_set_del_slice(self):
         indices = (0, None, 1, 3, 19, 100, sys.maxsize, -1, -2, -31, -100)
         for start in indices:
@@ -869,6 +918,8 @@ class BaseTest:
                     del a[start:stop:step]
                     self.assertEqual(a, array.array(self.typecode, L))
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_index(self):
         example = 2*self.example
         a = array.array(self.typecode, example)
@@ -878,6 +929,8 @@ class BaseTest:
         self.assertRaises(ValueError, a.index, None)
         self.assertRaises(ValueError, a.index, self.outside)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_count(self):
         example = 2*self.example
         a = array.array(self.typecode, example)
@@ -887,6 +940,8 @@ class BaseTest:
         self.assertEqual(a.count(self.outside), 0)
         self.assertEqual(a.count(None), 0)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_remove(self):
         for x in self.example:
             example = 2*self.example
@@ -937,6 +992,7 @@ class BaseTest:
             array.array(self.typecode, self.example[::-1])
         )
 
+    @unittest.skip("TODO: RUSTPYTHON")
     def test_extend(self):
         a = array.array(self.typecode, self.example)
         self.assertRaises(TypeError, a.extend)
@@ -993,6 +1049,8 @@ class BaseTest:
         l.append(l)
         gc.collect()
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_buffer(self):
         a = array.array(self.typecode, self.example)
         m = memoryview(a)
@@ -1053,6 +1111,8 @@ class BaseTest:
         # SF bug #1486663 -- this used to erroneously raise a TypeError
         ArraySubclassWithKwargs('b', newarg=1)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_create_from_bytes(self):
         # XXX This test probably needs to be moved in a subclass or
         # generalized to use self.typecode.
@@ -1072,6 +1132,8 @@ class BaseTest:
         basesize = support.calcvobjsize('Pn2Pi')
         support.check_sizeof(self, a, basesize)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_initialize_with_unicode(self):
         if self.typecode != 'u':
             with self.assertRaises(TypeError) as cm:
@@ -1100,11 +1162,14 @@ class BaseTest:
 
 class StringTest(BaseTest):
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_setitem(self):
         super().test_setitem()
         a = array.array(self.typecode, self.example)
         self.assertRaises(TypeError, a.__setitem__, 0, self.example[:2])
 
+@unittest.skip("TODO: RUSTPYTHON")
 class UnicodeTest(StringTest, unittest.TestCase):
     typecode = 'u'
     example = '\x01\u263a\x00\ufeff'
@@ -1112,105 +1177,6 @@ class UnicodeTest(StringTest, unittest.TestCase):
     biggerexample = '\x01\u263a\x01\ufeff'
     outside = str('\x33')
     minitemsize = 2
-
-    def test_add(self):
-        super().test_add()
-
-    def test_buffer(self):
-        super().test_buffer()
-
-    def test_buffer_info(self):
-        super().test_buffer_info()
-
-    def test_byteswap(self):
-        super().test_byteswap()
-
-    def test_cmp(self):
-        super().test_cmp()
-
-    def test_constructor(self):
-        super().test_constructor()
-
-    def test_constructor_with_iterable_argument(self):
-        super().test_constructor_with_iterable_argument()
-
-    def test_copy(self):
-        super().test_copy()
-
-    def test_count(self):
-        super().test_count()
-
-    def test_coveritertraverse(self):
-        super().test_coveritertraverse()
-
-    def test_deepcopy(self):
-        super().test_deepcopy()
-
-    def test_delitem(self):
-        super().test_delitem()
-
-    def test_exhausted_iterator(self):
-        super().test_exhausted_iterator()
-
-    def test_extend(self):
-        super().test_extend()
-
-    def test_extended_getslice(self):
-        super().test_extended_getslice()
-
-    def test_extended_set_del_slice(self):
-        super().test_extended_set_del_slice()
-
-    def test_fromarray(self):
-        super().test_fromarray()
-
-    def test_getitem(self):
-        super().test_getitem()
-
-    def test_getslice(self):
-        super().test_getslice()
-
-    def test_iadd(self):
-        super().test_iadd()
-
-    def test_imul(self):
-        super().test_imul()
-
-    def test_index(self):
-        super().test_index()
-
-    def test_insert(self):
-        super().test_insert()
-
-    def test_len(self):
-        super().test_len()
-
-    def test_mul(self):
-        super().test_mul()
-
-    def test_pop(self):
-        super().test_pop()
-
-    def test_remove(self):
-        super().test_remove()
-
-    def test_repr(self):
-        super().test_repr()
-
-    def test_reverse(self):
-        super().test_reverse()
-
-    def test_setslice(self):
-        super().test_setslice()
-
-    def test_str(self):
-        super().test_str()
-
-    def test_tofrombytes(self):
-        super().test_tofrombytes()
-
-    def test_tofromlist(self):
-        super().test_tofromlist()
 
     def test_unicode(self):
         self.assertRaises(TypeError, array.array, 'b', 'foo')
@@ -1246,6 +1212,8 @@ class UnicodeTest(StringTest, unittest.TestCase):
 
 class NumberTest(BaseTest):
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_extslice(self):
         a = array.array(self.typecode, range(5))
         self.assertEqual(a[::], a)
@@ -1260,6 +1228,8 @@ class NumberTest(BaseTest):
         self.assertEqual(a[1000:2000:2], array.array(self.typecode, []))
         self.assertEqual(a[-1000:-2000:-2], array.array(self.typecode, []))
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_delslice(self):
         a = array.array(self.typecode, range(5))
         del a[::2]
@@ -1277,6 +1247,8 @@ class NumberTest(BaseTest):
         a = array.array(self.typecode, range(10))
         del a[9::1<<333]
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_assignment(self):
         a = array.array(self.typecode, range(10))
         a[::2] = array.array(self.typecode, [42]*5)
@@ -1371,6 +1343,8 @@ class SignedNumberTest(IntegerNumberTest):
     biggerexample = [-1, 0, 1, 43, 0x7f]
     outside = 23
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_overflow(self):
         a = array.array(self.typecode)
         lower = -1 * int(pow(2, a.itemsize * 8 - 1))
@@ -1384,6 +1358,8 @@ class UnsignedNumberTest(IntegerNumberTest):
     biggerexample = [0, 1, 17, 23, 43, 0xff]
     outside = 0xaa
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_overflow(self):
         a = array.array(self.typecode)
         lower = 0
@@ -1458,6 +1434,8 @@ class FPTest(NumberTest):
     def assertEntryEqual(self, entry1, entry2):
         self.assertAlmostEqual(entry1, entry2)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_nan(self):
         a = array.array(self.typecode, [float('nan')])
         b = array.array(self.typecode, [float('nan')])
@@ -1468,6 +1446,8 @@ class FPTest(NumberTest):
         self.assertIs(a < b, False)
         self.assertIs(a <= b, False)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_byteswap(self):
         a = array.array(self.typecode, self.example)
         self.assertRaises(TypeError, a.byteswap, 42)
@@ -1484,10 +1464,12 @@ class FPTest(NumberTest):
             b.byteswap()
             self.assertEqual(a, b)
 
+@unittest.skip("TODO: RUSTPYTHON")
 class FloatTest(FPTest, unittest.TestCase):
     typecode = 'f'
     minitemsize = 4
 
+@unittest.skip("TODO: RUSTPYTHON")
 class DoubleTest(FPTest, unittest.TestCase):
     typecode = 'd'
     minitemsize = 8
@@ -1510,6 +1492,7 @@ class DoubleTest(FPTest, unittest.TestCase):
             self.fail("Array of size > maxsize created - MemoryError expected")
 
 
+@unittest.skip("TODO: RUSTPYTHON")
 class LargeArrayTest(unittest.TestCase):
     typecode = 'b'
 

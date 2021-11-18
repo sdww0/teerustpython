@@ -1,106 +1,77 @@
 /*
  * Import mechanics
  */
-#[cfg(feature = "rustpython-compiler")]
-use crate::compile;
-use crate::{
-    builtins::{code, code::CodeObject, list, traceback::PyTraceback, PyBaseExceptionRef},
-    scope::Scope,
-    version::get_git_revision,
-    vm::{InitParameter, VirtualMachine},
-    ItemProtocol, PyObjectRef, PyRef, PyResult, PyValue, TryFromObject, TypeProtocol,
-};
 use rand::Rng;
 
-pub(crate) fn init_importlib(
-    vm: &mut VirtualMachine,
-    initialize_parameter: InitParameter,
-) -> PyResult<()> {
-    use crate::vm::thread::enter_vm;
+use crate::bytecode::CodeObject;
+use crate::exceptions::PyBaseExceptionRef;
+use crate::obj::objtraceback::{PyTraceback, PyTracebackRef};
+use crate::obj::{objcode, objlist, objtype};
+use crate::pyobject::{ItemProtocol, PyResult, PyValue, TryFromObject};
+use crate::scope::Scope;
+use crate::version::get_git_revision;
+use crate::vm::{InitParameter, VirtualMachine};
+#[cfg(feature = "rustpython-compiler")]
+use rustpython_compiler::compile;
+
+pub fn init_importlib(vm: &mut VirtualMachine, initialize_parameter: InitParameter) -> PyResult {
     flame_guard!("init importlib");
+    let importlib = import_frozen(vm, "_frozen_importlib")?;
+    let impmod = import_builtin(vm, "_imp")?;
+    let install = vm.get_attribute(importlib.clone(), "_install")?;
+    vm.invoke(&install, vec![vm.sys_module.clone(), impmod])?;
+    vm.import_func = vm.get_attribute(importlib.clone(), "__import__")?;
 
-    // importlib_bootstrap needs these and it inlines checks to sys.modules before calling into
-    // import machinery, so this should bring some speedup
-    #[cfg(all(feature = "threading", not(target_os = "wasi")))]
-    import_builtin(vm, "_thread")?;
-    import_builtin(vm, "_warnings")?;
-    import_builtin(vm, "_weakref")?;
-
-    let importlib = enter_vm(vm, || {
-        let importlib = import_frozen(vm, "_frozen_importlib")?;
-        let impmod = import_builtin(vm, "_imp")?;
-        let install = importlib.clone().get_attr("_install", vm)?;
-        vm.invoke(&install, (vm.sys_module.clone(), impmod))?;
-        Ok(importlib)
-    })?;
-    vm.import_func = importlib.clone().get_attr("__import__", vm)?;
-
-    if initialize_parameter == InitParameter::External && cfg!(feature = "rustpython-compiler") {
-        enter_vm(vm, || {
+    match initialize_parameter {
+        InitParameter::InitializeExternal if cfg!(feature = "rustpython-compiler") => {
             flame_guard!("install_external");
-
-            // same deal as imports above
-            #[cfg(any(not(target_arch = "wasm32"), target_os = "wasi"))]
-            import_builtin(vm, crate::stdlib::os::MODULE_NAME)?;
-            #[cfg(windows)]
-            import_builtin(vm, "winreg")?;
-            import_builtin(vm, "_io")?;
-            import_builtin(vm, "marshal")?;
-
-            let install_external = importlib.get_attr("_install_external_importers", vm)?;
-            vm.invoke(&install_external, ())?;
+            let install_external =
+                vm.get_attribute(importlib.clone(), "_install_external_importers")?;
+            vm.invoke(&install_external, vec![])?;
             // Set pyc magic number to commit hash. Should be changed when bytecode will be more stable.
-            let importlib_external = vm.import("_frozen_importlib_external", None, 0)?;
+            let importlib_external = vm.import("_frozen_importlib_external", &[], 0)?;
             let mut magic = get_git_revision().into_bytes();
             magic.truncate(4);
             if magic.len() != 4 {
                 magic = rand::thread_rng().gen::<[u8; 4]>().to_vec();
             }
-            let magic: PyObjectRef = vm.ctx.new_bytes(magic).into();
-            importlib_external.set_attr("MAGIC_NUMBER", magic, vm)?;
+            vm.set_attr(&importlib_external, "MAGIC_NUMBER", vm.ctx.new_bytes(magic))?;
             let zipimport_res = (|| -> PyResult<()> {
-                let zipimport = vm.import("zipimport", None, 0)?;
-                let zipimporter = zipimport.get_attr("zipimporter", vm)?;
-                let path_hooks = vm.sys_module.clone().get_attr("path_hooks", vm)?;
-                let path_hooks = list::PyListRef::try_from_object(vm, path_hooks)?;
+                let zipimport = vm.import("zipimport", &[], 0)?;
+                let zipimporter = vm.get_attribute(zipimport, "zipimporter")?;
+                let path_hooks = vm.get_attribute(vm.sys_module.clone(), "path_hooks")?;
+                let path_hooks = objlist::PyListRef::try_from_object(vm, path_hooks)?;
                 path_hooks.insert(0, zipimporter);
                 Ok(())
             })();
             if zipimport_res.is_err() {
-                warn!("couldn't init zipimport")
+                eprintln!("couldn't init zipimport")
             }
-            Ok(())
-        })?
+        }
+        InitParameter::NoInitialize => {
+            panic!("Import library initialize should be InitializeInternal or InitializeExternal");
+        }
+        _ => {}
     }
-    Ok(())
+    Ok(vm.get_none())
 }
 
 pub fn import_frozen(vm: &VirtualMachine, module_name: &str) -> PyResult {
     vm.state
         .frozen
         .get(module_name)
-        .ok_or_else(|| {
-            vm.new_import_error(
-                format!("Cannot import frozen module {}", module_name),
-                module_name,
-            )
-        })
+        .ok_or_else(|| vm.new_import_error(format!("Cannot import frozen module {}", module_name)))
         .and_then(|frozen| import_codeobj(vm, module_name, frozen.code.clone(), false))
 }
 
 pub fn import_builtin(vm: &VirtualMachine, module_name: &str) -> PyResult {
     vm.state
-        .module_inits
+        .stdlib_inits
         .get(module_name)
-        .ok_or_else(|| {
-            vm.new_import_error(
-                format!("Cannot import builtin module {}", module_name),
-                module_name,
-            )
-        })
+        .ok_or_else(|| vm.new_import_error(format!("Cannot import bultin module {}", module_name)))
         .and_then(|make_module_func| {
             let module = make_module_func(vm);
-            let sys_modules = vm.sys_module.clone().get_attr("modules", vm)?;
+            let sys_modules = vm.get_attribute(vm.sys_module.clone(), "modules")?;
             sys_modules.set_item(module_name, module.clone(), vm)?;
             Ok(module)
         })
@@ -115,7 +86,7 @@ pub fn import_file(
 ) -> PyResult {
     let code_obj = compile::compile(&content, compile::Mode::Exec, file_path, vm.compile_opts())
         .map_err(|err| vm.new_syntax_error(&err))?;
-    import_codeobj(vm, module_name, vm.map_codeobj(code_obj), true)
+    import_codeobj(vm, module_name, code_obj, true)
 }
 
 pub fn import_codeobj(
@@ -125,19 +96,19 @@ pub fn import_codeobj(
     set_file_attr: bool,
 ) -> PyResult {
     let attrs = vm.ctx.new_dict();
-    attrs.set_item("__name__", vm.ctx.new_str(module_name).into(), vm)?;
+    attrs.set_item("__name__", vm.new_str(module_name.to_owned()), vm)?;
     if set_file_attr {
-        attrs.set_item("__file__", code_obj.source_path.as_object().to_owned(), vm)?;
+        attrs.set_item("__file__", vm.new_str(code_obj.source_path.to_owned()), vm)?;
     }
-    let module = vm.new_module(module_name, attrs.clone(), None);
+    let module = vm.new_module(module_name, attrs.clone());
 
     // Store module in cache to prevent infinite loop with mutual importing libs:
-    let sys_modules = vm.sys_module.clone().get_attr("modules", vm)?;
+    let sys_modules = vm.get_attribute(vm.sys_module.clone(), "modules")?;
     sys_modules.set_item(module_name, module.clone(), vm)?;
 
     // Execute main code in module:
     vm.run_code_obj(
-        code::PyCode::new(code_obj).into_ref(vm),
+        objcode::PyCode::new(code_obj).into_ref(vm),
         Scope::with_builtins(None, attrs, vm),
     )?;
     Ok(module)
@@ -145,21 +116,21 @@ pub fn import_codeobj(
 
 fn remove_importlib_frames_inner(
     vm: &VirtualMachine,
-    tb: Option<PyRef<PyTraceback>>,
+    tb: Option<PyTracebackRef>,
     always_trim: bool,
-) -> (Option<PyRef<PyTraceback>>, bool) {
+) -> (Option<PyTracebackRef>, bool) {
     let traceback = if let Some(tb) = tb {
         tb
     } else {
         return (None, false);
     };
 
-    let file_name = traceback.frame.code.source_path.as_str();
+    let file_name = &traceback.frame.code.source_path;
 
     let (inner_tb, mut now_in_importlib) =
         remove_importlib_frames_inner(vm, traceback.next.clone(), always_trim);
     if file_name == "_frozen_importlib" || file_name == "_frozen_importlib_external" {
-        if traceback.frame.code.obj_name.as_str() == "_call_with_frames_removed" {
+        if traceback.frame.code.obj_name == "_call_with_frames_removed" {
             now_in_importlib = true;
         }
         if always_trim || now_in_importlib {
@@ -189,7 +160,7 @@ pub fn remove_importlib_frames(
     vm: &VirtualMachine,
     exc: &PyBaseExceptionRef,
 ) -> PyBaseExceptionRef {
-    let always_trim = exc.isinstance(&vm.ctx.exceptions.import_error);
+    let always_trim = objtype::isinstance(exc, &vm.ctx.exceptions.import_error);
 
     if let Some(tb) = exc.traceback() {
         let trimmed_tb = remove_importlib_frames_inner(vm, Some(tb), always_trim).0;

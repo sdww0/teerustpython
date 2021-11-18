@@ -53,8 +53,7 @@ _HEAPTYPE = 1<<9
 
 def _reduce_ex(self, proto):
     assert proto < 2
-    cls = self.__class__
-    for base in cls.__mro__:
+    for base in self.__class__.__mro__:
         if hasattr(base, '__flags__') and not base.__flags__ & _HEAPTYPE:
             break
     else:
@@ -62,18 +61,16 @@ def _reduce_ex(self, proto):
     if base is object:
         state = None
     else:
-        if base is cls:
-            raise TypeError(f"cannot pickle {cls.__name__!r} object")
+        if base is self.__class__:
+            raise TypeError("can't pickle %s objects" % base.__name__)
         state = base(self)
-    args = (cls, base, state)
+    args = (self.__class__, base, state)
     try:
         getstate = self.__getstate__
     except AttributeError:
         if getattr(self, "__slots__", None):
-            raise TypeError(f"cannot pickle {cls.__name__!r} object: "
-                            f"a class that defines __slots__ without "
-                            f"defining __getstate__ cannot be pickled "
-                            f"with protocol {proto}") from None
+            raise TypeError("a class that defines __slots__ without "
+                            "defining __getstate__ cannot be pickled")
         try:
             dict = self.__dict__
         except AttributeError:

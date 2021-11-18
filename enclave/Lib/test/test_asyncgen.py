@@ -179,6 +179,7 @@ class AsyncGenTest(unittest.TestCase):
         else:
             self.fail('StopAsyncIteration was not raised')
 
+    @unittest.skip("TODO: RUSTPYTHON")
     def test_async_gen_exception_03(self):
         async def gen():
             await awaitable()
@@ -228,6 +229,7 @@ class AsyncGenTest(unittest.TestCase):
                                     'async generator.*StopIteration'):
             to_list(gen())
 
+    @unittest.skip("TODO: RUSTPYTHON")
     def test_async_gen_exception_07(self):
         def sync_gen():
             try:
@@ -251,6 +253,7 @@ class AsyncGenTest(unittest.TestCase):
 
         self.compare_generators(sync_gen(), async_gen())
 
+    @unittest.skip("TODO: RUSTPYTHON")
     def test_async_gen_exception_08(self):
         def sync_gen():
             try:
@@ -276,6 +279,7 @@ class AsyncGenTest(unittest.TestCase):
 
         self.compare_generators(sync_gen(), async_gen())
 
+    @unittest.skip("TODO: RUSTPYTHON")
     def test_async_gen_exception_09(self):
         def sync_gen():
             try:
@@ -739,6 +743,8 @@ class AsyncGenAsyncioTest(unittest.TestCase):
         self.loop.run_until_complete(run())
         self.assertEqual(DONE, 10)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_async_gen_asyncio_aclose_12(self):
         DONE = 0
 
@@ -840,6 +846,8 @@ class AsyncGenAsyncioTest(unittest.TestCase):
             self.loop.run_until_complete(run())
         self.assertEqual(DONE, 1)
 
+    # TODO: RUSTPYTHON
+    @unittest.expectedFailure
     def test_async_gen_asyncio_asend_03(self):
         DONE = 0
 
@@ -927,6 +935,7 @@ class AsyncGenAsyncioTest(unittest.TestCase):
         self.loop.run_until_complete(run())
         self.assertEqual(DONE, 1)
 
+    @unittest.skip("TODO: RUSTPYTHON")
     def test_async_gen_asyncio_athrow_02(self):
         DONE = 0
 
@@ -1045,6 +1054,7 @@ class AsyncGenAsyncioTest(unittest.TestCase):
 
         self.loop.run_until_complete(run())
 
+    @unittest.skip("TODO: RUSTPYTHON")
     def test_async_gen_asyncio_shutdown_01(self):
         finalized = 0
 

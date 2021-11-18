@@ -2,31 +2,26 @@ use std::iter;
 use std::mem;
 use std::str;
 
-use crate::ast::{Constant, ConversionFlag, Expr, ExprKind, Location};
-use crate::error::{FStringError, FStringErrorType, ParseError};
+use crate::ast::{ConversionFlag, StringGroup};
+use crate::error::{FStringError, FStringErrorType};
+use crate::location::Location;
 use crate::parser::parse_expression;
 
 use self::FStringErrorType::*;
+use self::StringGroup::*;
 
 struct FStringParser<'a> {
     chars: iter::Peekable<str::Chars<'a>>,
-    str_location: Location,
 }
 
 impl<'a> FStringParser<'a> {
-    fn new(source: &'a str, str_location: Location) -> Self {
+    fn new(source: &'a str) -> Self {
         Self {
             chars: source.chars().peekable(),
-            str_location,
         }
     }
 
-    #[inline]
-    fn expr(&self, node: ExprKind) -> Expr {
-        Expr::new(self.str_location, node)
-    }
-
-    fn parse_formatted_value(&mut self) -> Result<Vec<Expr>, FStringErrorType> {
+    fn parse_formatted_value(&mut self) -> Result<StringGroup, FStringErrorType> {
         let mut expression = String::new();
         let mut spec = None;
         let mut delims = Vec::new();
@@ -86,7 +81,8 @@ impl<'a> FStringParser<'a> {
 
                 // match a python 3.8 self documenting expression
                 // format '{' PYTHON_EXPRESSION '=' FORMAT_SPECIFIER? '}'
-                '=' if self.chars.peek() != Some(&'=') && delims.is_empty() => {
+                '=' if self.chars.peek() != Some(&'=') => {
+                    // check for delims empty?
                     pred_expression_text = expression.to_string(); // safe expression before = to print it
                 }
 
@@ -120,23 +116,20 @@ impl<'a> FStringParser<'a> {
                     if in_nested {
                         return Err(UnclosedLbrace);
                     }
-                    spec = Some(if nested {
-                        Box::new(
-                            self.expr(ExprKind::FormattedValue {
-                                value: Box::new(
-                                    parse_fstring_expr(&spec_expression)
-                                        .map_err(|e| InvalidExpression(Box::new(e.error)))?,
-                                ),
-                                conversion: None,
-                                format_spec: None,
-                            }),
-                        )
-                    } else {
-                        Box::new(self.expr(ExprKind::Constant {
-                            value: spec_expression.to_owned().into(),
-                            kind: None,
+                    if nested {
+                        spec = Some(Box::new(FormattedValue {
+                            value: Box::new(
+                                parse_expression(spec_expression.trim())
+                                    .map_err(|e| InvalidExpression(Box::new(e.error)))?,
+                            ),
+                            conversion: None,
+                            spec: None,
                         }))
-                    })
+                    } else {
+                        spec = Some(Box::new(Constant {
+                            value: spec_expression.to_owned(),
+                        }))
+                    }
                 }
                 '(' | '{' | '[' => {
                     expression.push(ch);
@@ -164,40 +157,39 @@ impl<'a> FStringParser<'a> {
                     if expression.is_empty() {
                         return Err(EmptyExpression);
                     }
-                    let ret = if pred_expression_text.is_empty() {
-                        vec![self.expr(ExprKind::FormattedValue {
+                    if pred_expression_text.is_empty() {
+                        return Ok(FormattedValue {
                             value: Box::new(
-                                parse_fstring_expr(&expression)
+                                parse_expression(expression.trim())
                                     .map_err(|e| InvalidExpression(Box::new(e.error)))?,
                             ),
                             conversion,
-                            format_spec: spec,
-                        })]
+                            spec,
+                        });
                     } else {
-                        vec![
-                            self.expr(ExprKind::Constant {
-                                value: Constant::Str(pred_expression_text + "="),
-                                kind: None,
-                            }),
-                            self.expr(ExprKind::Constant {
-                                value: trailing_seq.into(),
-                                kind: None,
-                            }),
-                            self.expr(ExprKind::FormattedValue {
-                                value: Box::new(
-                                    parse_fstring_expr(&expression)
-                                        .map_err(|e| InvalidExpression(Box::new(e.error)))?,
-                                ),
-                                conversion,
-                                format_spec: spec,
-                            }),
-                        ]
-                    };
-                    return Ok(ret);
+                        return Ok(Joined {
+                            values: vec![
+                                Constant {
+                                    value: pred_expression_text + "=",
+                                },
+                                Constant {
+                                    value: trailing_seq,
+                                },
+                                FormattedValue {
+                                    value: Box::new(
+                                        parse_expression(expression.trim())
+                                            .map_err(|e| InvalidExpression(Box::new(e.error)))?,
+                                    ),
+                                    conversion,
+                                    spec,
+                                },
+                            ],
+                        });
+                    }
                 }
                 '"' | '\'' => {
                     expression.push(ch);
-                    for next in &mut self.chars {
+                    while let Some(next) = self.chars.next() {
                         expression.push(next);
                         if next == ch {
                             break;
@@ -215,7 +207,7 @@ impl<'a> FStringParser<'a> {
         Err(UnclosedLbrace)
     }
 
-    fn parse(mut self) -> Result<Expr, FStringErrorType> {
+    fn parse(mut self) -> Result<StringGroup, FStringErrorType> {
         let mut content = String::new();
         let mut values = vec![];
 
@@ -227,13 +219,12 @@ impl<'a> FStringParser<'a> {
                         content.push('{');
                     } else {
                         if !content.is_empty() {
-                            values.push(self.expr(ExprKind::Constant {
-                                value: mem::take(&mut content).into(),
-                                kind: None,
-                            }));
+                            values.push(Constant {
+                                value: mem::replace(&mut content, String::new()),
+                            });
                         }
 
-                        values.extend(self.parse_formatted_value()?);
+                        values.push(self.parse_formatted_value()?);
                     }
                 }
                 '}' => {
@@ -251,88 +242,143 @@ impl<'a> FStringParser<'a> {
         }
 
         if !content.is_empty() {
-            values.push(self.expr(ExprKind::Constant {
-                value: content.into(),
-                kind: None,
-            }))
+            values.push(Constant { value: content })
         }
 
-        Ok(self.expr(ExprKind::JoinedStr { values }))
+        Ok(match values.len() {
+            0 => Constant {
+                value: String::new(),
+            },
+            1 => values.into_iter().next().unwrap(),
+            _ => Joined { values },
+        })
     }
 }
 
-fn parse_fstring_expr(source: &str) -> Result<Expr, ParseError> {
-    let fstring_body = format!("({})", source);
-    parse_expression(&fstring_body)
+/// Parse an f-string into a string group.
+fn parse_fstring(source: &str) -> Result<StringGroup, FStringErrorType> {
+    FStringParser::new(source).parse()
 }
 
 /// Parse an fstring from a string, located at a certain position in the sourcecode.
 /// In case of errors, we will get the location and the error returned.
-pub fn parse_located_fstring(source: &str, location: Location) -> Result<Expr, FStringError> {
-    FStringParser::new(source, location)
-        .parse()
-        .map_err(|error| FStringError { error, location })
+pub fn parse_located_fstring(
+    source: &str,
+    location: Location,
+) -> Result<StringGroup, FStringError> {
+    parse_fstring(source).map_err(|error| FStringError { error, location })
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::ast;
+
     use super::*;
 
-    fn parse_fstring(source: &str) -> Result<Expr, FStringErrorType> {
-        FStringParser::new(source, Location::default()).parse()
+    fn mk_ident(name: &str, row: usize, col: usize) -> ast::Expression {
+        ast::Expression {
+            location: ast::Location::new(row, col),
+            node: ast::ExpressionType::Identifier {
+                name: name.to_owned(),
+            },
+        }
     }
 
     #[test]
     fn test_parse_fstring() {
-        let source = "{a}{ b }{{foo}}";
+        let source = String::from("{a}{ b }{{foo}}");
         let parse_ast = parse_fstring(&source).unwrap();
 
-        insta::assert_debug_snapshot!(parse_ast);
+        assert_eq!(
+            parse_ast,
+            Joined {
+                values: vec![
+                    FormattedValue {
+                        value: Box::new(mk_ident("a", 1, 1)),
+                        conversion: None,
+                        spec: None,
+                    },
+                    FormattedValue {
+                        value: Box::new(mk_ident("b", 1, 1)),
+                        conversion: None,
+                        spec: None,
+                    },
+                    Constant {
+                        value: "{foo}".to_owned()
+                    }
+                ]
+            }
+        );
     }
 
     #[test]
     fn test_parse_fstring_nested_spec() {
-        let source = "{foo:{spec}}";
+        let source = String::from("{foo:{spec}}");
         let parse_ast = parse_fstring(&source).unwrap();
 
-        insta::assert_debug_snapshot!(parse_ast);
+        assert_eq!(
+            parse_ast,
+            FormattedValue {
+                value: Box::new(mk_ident("foo", 1, 1)),
+                conversion: None,
+                spec: Some(Box::new(FormattedValue {
+                    value: Box::new(mk_ident("spec", 1, 1)),
+                    conversion: None,
+                    spec: None,
+                })),
+            }
+        );
     }
 
     #[test]
     fn test_parse_fstring_not_nested_spec() {
-        let source = "{foo:spec}";
+        let source = String::from("{foo:spec}");
         let parse_ast = parse_fstring(&source).unwrap();
 
-        insta::assert_debug_snapshot!(parse_ast);
+        assert_eq!(
+            parse_ast,
+            FormattedValue {
+                value: Box::new(mk_ident("foo", 1, 1)),
+                conversion: None,
+                spec: Some(Box::new(Constant {
+                    value: "spec".to_owned(),
+                })),
+            }
+        );
     }
 
     #[test]
     fn test_parse_empty_fstring() {
-        insta::assert_debug_snapshot!(parse_fstring("").unwrap());
+        assert_eq!(
+            parse_fstring(""),
+            Ok(Constant {
+                value: String::new(),
+            }),
+        );
     }
 
     #[test]
     fn test_fstring_parse_selfdocumenting_base() {
-        let src = "{user=}";
-        let parse_ast = parse_fstring(&src).unwrap();
+        let src = String::from("{user=}");
+        let parse_ast = parse_fstring(&src);
 
-        insta::assert_debug_snapshot!(parse_ast);
+        assert!(parse_ast.is_ok());
     }
 
     #[test]
     fn test_fstring_parse_selfdocumenting_base_more() {
-        let src = "mix {user=} with text and {second=}";
-        let parse_ast = parse_fstring(&src).unwrap();
+        let src = String::from("mix {user=} with text and {second=}");
+        let parse_ast = parse_fstring(&src);
 
-        insta::assert_debug_snapshot!(parse_ast);
+        assert!(parse_ast.is_ok());
     }
 
     #[test]
     fn test_fstring_parse_selfdocumenting_format() {
-        let src = "{user=:>10}";
-        let parse_ast = parse_fstring(&src).unwrap();
+        let src = String::from("{user=:>10}");
+        let parse_ast = parse_fstring(&src);
 
-        insta::assert_debug_snapshot!(parse_ast);
+        assert!(parse_ast.is_ok());
     }
 
     #[test]
@@ -362,36 +408,29 @@ mod tests {
 
     #[test]
     fn test_parse_fstring_not_equals() {
-        let source = "{1 != 2}";
-        let parse_ast = parse_fstring(&source).unwrap();
-        insta::assert_debug_snapshot!(parse_ast);
+        let source = String::from("{1 != 2}");
+        let parse_ast = parse_fstring(&source);
+        assert!(parse_ast.is_ok());
     }
 
     #[test]
     fn test_parse_fstring_equals() {
-        let source = "{42 == 42}";
-        let parse_ast = parse_fstring(&source).unwrap();
-        insta::assert_debug_snapshot!(parse_ast);
+        let source = String::from("{42 == 42}");
+        let parse_ast = parse_fstring(&source);
+        assert!(parse_ast.is_ok());
     }
 
     #[test]
     fn test_parse_fstring_selfdoc_prec_space() {
-        let source = "{x   =}";
-        let parse_ast = parse_fstring(&source).unwrap();
-        insta::assert_debug_snapshot!(parse_ast);
+        let source = String::from("{x   =}");
+        let parse_ast = parse_fstring(&source);
+        assert!(parse_ast.is_ok());
     }
 
     #[test]
     fn test_parse_fstring_selfdoc_trailing_space() {
-        let source = "{x=   }";
-        let parse_ast = parse_fstring(&source).unwrap();
-        insta::assert_debug_snapshot!(parse_ast);
-    }
-
-    #[test]
-    fn test_parse_fstring_yield_expr() {
-        let source = "{yield}";
-        let parse_ast = parse_fstring(&source).unwrap();
-        insta::assert_debug_snapshot!(parse_ast);
+        let source = String::from("{x=   }");
+        let parse_ast = parse_fstring(&source);
+        assert!(parse_ast.is_ok());
     }
 }

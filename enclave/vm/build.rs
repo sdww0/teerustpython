@@ -1,7 +1,3 @@
-use itertools::Itertools;
-use std::env;
-use std::io::prelude::*;
-use std::path::PathBuf;
 use std::process::Command;
 
 fn main() {
@@ -12,25 +8,6 @@ fn main() {
     );
     println!("cargo:rustc-env=RUSTPYTHON_GIT_TAG={}", git_tag());
     println!("cargo:rustc-env=RUSTPYTHON_GIT_BRANCH={}", git_branch());
-    println!(
-        "cargo:rustc-env=RUSTC_VERSION={}",
-        rustc_version::version().unwrap()
-    );
-
-    println!(
-        "cargo:rustc-env=RUSTPYTHON_TARGET_TRIPLE={}",
-        env::var("TARGET").unwrap()
-    );
-
-    let mut env_path = PathBuf::from(env::var_os("OUT_DIR").unwrap());
-    env_path.push("env_vars.rs");
-    let mut f = std::fs::File::create(env_path).unwrap();
-    write!(
-        f,
-        "sysvars! {{ {} }}",
-        std::env::vars_os().format_with(", ", |(k, v), f| f(&format_args!("{:?} => {:?}", k, v)))
-    )
-    .unwrap();
 }
 
 fn git_hash() -> String {

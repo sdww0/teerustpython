@@ -206,7 +206,6 @@ class LongTest(unittest.TestCase):
 
 
 
-    @unittest.skip("TODO: RUSTPYTHON, thread 'main' panicked at 'Cannot subtract b from a because b is larger than a.'")
     def test_karatsuba(self):
         digits = list(range(1, 5)) + list(range(KARATSUBA_CUTOFF,
                                                 KARATSUBA_CUTOFF + 10))
@@ -314,6 +313,7 @@ class LongTest(unittest.TestCase):
             with self.subTest(got=got):
                 self.assertEqual(int(got, 0), x)
 
+    @unittest.skip # TODO: RUSTPYTHON
     def test_format(self):
         for x in special:
             self.check_format_1(x)
@@ -378,10 +378,12 @@ class LongTest(unittest.TestCase):
         # See bpo-34087
         self.assertRaises(ValueError, int, '\u3053\u3093\u306b\u3061\u306f')
 
+    @unittest.expectedFailure # TODO: RUSTPYTHON
     def test_long_a(self):
         self.assertRaises(ValueError, int, '-012395', 0)
 
 
+    @unittest.expectedFailure # TODO: RUSTPYTHON
     def test_conversion(self):
 
         class JustLong:
@@ -415,9 +417,8 @@ class LongTest(unittest.TestCase):
                "Got {}, expected {}.".format(n, actual, expected))
         self.assertEqual(actual, expected, msg)
 
-    # TODO: RUSTPYTHON
-    @unittest.expectedFailure
     #@support.requires_IEEE_754
+    @unittest.skip # TODO: RUSTPYTHON
     def test_float_conversion(self):
 
         exact_values = [0, 1, 2,
@@ -829,9 +830,8 @@ class LongTest(unittest.TestCase):
         self.assertEqual(expected, got, "Incorrectly rounded division {}/{}: "
                          "expected {}, got {}".format(a, b, expected, got))
 
-    # TODO: RUSTPYTHON
-    @unittest.expectedFailure
     #@support.requires_IEEE_754
+    @unittest.skip
     def test_correctly_rounded_true_division(self):
         # more stringent tests than those above, checking that the
         # result of true division of ints is always correctly rounded.
@@ -933,6 +933,7 @@ class LongTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             42 >> -(1 << 1000)
 
+    @unittest.expectedFailure # TODO: RUSTPYTHON
     def test_lshift_of_zero(self):
         self.assertEqual(0 << 0, 0)
         self.assertEqual(0 << 10, 0)
@@ -975,6 +976,7 @@ class LongTest(unittest.TestCase):
         self.assertIs(a + b, 1)
         self.assertIs(c - a, 1)
 
+    @unittest.expectedFailure
     def test_small_ints(self):
         for i in range(-5, 257):
             self.assertIs(i, i + 0)

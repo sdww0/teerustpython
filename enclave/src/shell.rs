@@ -1,12 +1,14 @@
 mod helper;
 
+use rustpython_compiler::{compile, error::CompileError, error::CompileErrorType};
 use rustpython_parser::error::{LexicalErrorType, ParseErrorType};
 use rustpython_vm::readline::{Readline, ReadlineResult};
 use rustpython_vm::{
-    builtins::PyBaseExceptionRef,
-    compile::{self, CompileError, CompileErrorType},
+    exceptions::{print_exception, PyBaseExceptionRef},
+    obj::objtype,
+    pyobject::PyResult,
     scope::Scope,
-    PyResult, TypeProtocol, VirtualMachine,
+    VirtualMachine,
 };
 
 enum ShellExecResult {
@@ -22,11 +24,11 @@ fn shell_exec(vm: &VirtualMachine, source: &str, scope: Scope) -> ShellExecResul
             Err(err) => ShellExecResult::PyErr(err),
         },
         Err(CompileError {
-            error: CompileErrorType::Parse(ParseErrorType::Lexical(LexicalErrorType::Eof)),
+            error: CompileErrorType::Parse(ParseErrorType::Lexical(LexicalErrorType::EOF)),
             ..
-        })
-        | Err(CompileError {
-            error: CompileErrorType::Parse(ParseErrorType::Eof),
+        }) => ShellExecResult::Continue,
+        Err(CompileError {
+            error: CompileErrorType::Parse(ParseErrorType::EOF),
             ..
         }) => ShellExecResult::Continue,
         Err(err) => ShellExecResult::PyErr(vm.new_syntax_error(&err)),
@@ -34,7 +36,7 @@ fn shell_exec(vm: &VirtualMachine, source: &str, scope: Scope) -> ShellExecResul
 }
 
 pub fn run_shell(vm: &VirtualMachine, scope: Scope) -> PyResult<()> {
-    let mut repl = Readline::new(helper::ShellHelper::new(vm, scope.globals.clone()));
+    let mut repl = Readline::new(helper::ShellHelper::new(vm, scope.clone()));
     let mut full_input = String::new();
 
     // Retrieve a `history_path_str` dependent on the OS
@@ -56,10 +58,8 @@ pub fn run_shell(vm: &VirtualMachine, scope: Scope) -> PyResult<()> {
     loop {
         let prompt_name = if continuing { "ps2" } else { "ps1" };
         let prompt = vm
-            .sys_module
-            .clone()
-            .get_attr(prompt_name, vm)
-            .and_then(|prompt| prompt.str(vm));
+            .get_attribute(vm.sys_module.clone(), prompt_name)
+            .and_then(|prompt| vm.to_str(&prompt));
         let prompt = match prompt {
             Ok(ref s) => s.as_str(),
             Err(_) => "",
@@ -77,7 +77,7 @@ pub fn run_shell(vm: &VirtualMachine, scope: Scope) -> PyResult<()> {
                 } else {
                     full_input.push_str(&line);
                 }
-                full_input.push('\n');
+                full_input.push_str("\n");
 
                 if continuing {
                     if stop_continuing {
@@ -109,7 +109,7 @@ pub fn run_shell(vm: &VirtualMachine, scope: Scope) -> PyResult<()> {
                     vm.new_exception_empty(vm.ctx.exceptions.keyboard_interrupt.clone());
                 Err(keyboard_interrupt)
             }
-            ReadlineResult::Eof => {
+            ReadlineResult::EOF => {
                 break;
             }
             ReadlineResult::EncodingError => {
@@ -120,18 +120,18 @@ pub fn run_shell(vm: &VirtualMachine, scope: Scope) -> PyResult<()> {
                 eprintln!("Readline error: {:?}", err);
                 break;
             }
-            ReadlineResult::Io(err) => {
+            ReadlineResult::IO(err) => {
                 eprintln!("IO error: {:?}", err);
                 break;
             }
         };
 
         if let Err(exc) = result {
-            if exc.isinstance(&vm.ctx.exceptions.system_exit) {
+            if objtype::isinstance(&exc, &vm.ctx.exceptions.system_exit) {
                 repl.save_history(&repl_history_path).unwrap();
                 return Err(exc);
             }
-            vm.print_exception(exc);
+            print_exception(vm, &exc);
         }
     }
     repl.save_history(&repl_history_path).unwrap();

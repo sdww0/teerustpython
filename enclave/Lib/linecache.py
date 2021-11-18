@@ -7,10 +7,7 @@ that name.
 
 import functools
 import sys
-try:
-    import os
-except ImportError:
-    import _dummy_os as os
+import os
 import tokenize
 
 __all__ = ["getline", "clearcache", "checkcache"]
@@ -76,10 +73,10 @@ def checkcache(filename=None):
         try:
             stat = os.stat(fullname)
         except OSError:
-            cache.pop(filename, None)
+            del cache[filename]
             continue
         if size != stat.st_size or mtime != stat.st_mtime:
-            cache.pop(filename, None)
+            del cache[filename]
 
 
 def updatecache(filename, module_globals=None):
@@ -89,7 +86,7 @@ def updatecache(filename, module_globals=None):
 
     if filename in cache:
         if len(cache[filename]) != 1:
-            cache.pop(filename, None)
+            del cache[filename]
     if not filename or (filename.startswith('<') and filename.endswith('>')):
         return []
 
@@ -136,8 +133,11 @@ def updatecache(filename, module_globals=None):
         else:
             return []
     try:
-        with tokenize.open(fullname) as fp:
-            lines = fp.readlines()
+        # TODO: Change this back 
+        # with tokenize.open(fullname) as fp:
+        #    lines = fp.readlines()
+        with open(fullname, "r") as fp:
+            lines = fp.read().split("\n")
     except OSError:
         return []
     if lines and not lines[-1].endswith('\n'):

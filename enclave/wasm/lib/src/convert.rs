@@ -1,16 +1,45 @@
-use crate::js_module;
-use crate::vm_class::{stored_vm_from_wasm, WASMVirtualMachine};
+use generational_arena::Arena;
+use std::cell::RefCell;
+
 use js_sys::{Array, ArrayBuffer, Object, Promise, Reflect, SyntaxError, Uint8Array};
-use rustpython_parser::error::ParseErrorType;
-use rustpython_vm::{
-    builtins::PyBaseExceptionRef,
-    compile::{CompileError, CompileErrorType},
-    exceptions,
-    function::{ArgBytesLike, FuncArgs},
-    py_serde, ItemProtocol, PyObjectRef, PyResult, PyValue, TryFromBorrowedObject, TypeProtocol,
-    VirtualMachine,
-};
 use wasm_bindgen::{closure::Closure, prelude::*, JsCast};
+
+use rustpython_compiler::error::{CompileError, CompileErrorType};
+use rustpython_parser::error::ParseErrorType;
+use rustpython_vm::exceptions::PyBaseExceptionRef;
+use rustpython_vm::function::PyFuncArgs;
+use rustpython_vm::obj::{objbyteinner::PyBytesLike, objtype};
+use rustpython_vm::pyobject::{ItemProtocol, PyObjectRef, PyResult, PyValue, TryFromObject};
+use rustpython_vm::VirtualMachine;
+use rustpython_vm::{exceptions, py_serde};
+
+use crate::browser_module;
+use crate::vm_class::{stored_vm_from_wasm, WASMVirtualMachine};
+
+// Currently WASM do not support multithreading. We should change this once it is enabled.
+thread_local!(static JS_HANDLES: RefCell<Arena<JsValue>> = RefCell::new(Arena::new()));
+
+pub struct JsHandle(generational_arena::Index);
+impl JsHandle {
+    pub fn new(js: JsValue) -> Self {
+        let idx = JS_HANDLES.with(|arena| arena.borrow_mut().insert(js));
+        JsHandle(idx)
+    }
+    pub fn get(&self) -> JsValue {
+        JS_HANDLES.with(|arena| {
+            arena
+                .borrow()
+                .get(self.0)
+                .expect("index was removed")
+                .clone()
+        })
+    }
+}
+impl Drop for JsHandle {
+    fn drop(&mut self) {
+        JS_HANDLES.with(|arena| arena.borrow_mut().remove(self.0));
+    }
+}
 
 #[wasm_bindgen(inline_js = r"
 export class PyError extends Error {
@@ -32,25 +61,10 @@ extern "C" {
 }
 
 pub fn py_err_to_js_err(vm: &VirtualMachine, py_err: &PyBaseExceptionRef) -> JsValue {
-    let jserr = vm.try_class("_js", "JSError").ok();
-    let js_arg = if jserr.map_or(false, |jserr| py_err.isinstance(&jserr)) {
-        py_err.get_arg(0)
-    } else {
-        None
-    };
-    let js_arg = js_arg
-        .as_ref()
-        .and_then(|x| x.payload::<js_module::PyJsValue>());
-    match js_arg {
-        Some(val) => val.value.clone(),
-        None => {
-            let res =
-                serde_wasm_bindgen::to_value(&exceptions::SerializeException::new(vm, py_err));
-            match res {
-                Ok(err_info) => PyError::new(err_info).into(),
-                Err(e) => e.into(),
-            }
-        }
+    let res = serde_wasm_bindgen::to_value(&exceptions::SerializeException::new(vm, py_err));
+    match res {
+        Ok(err_info) => PyError::new(err_info).into(),
+        Err(e) => e.into(),
     }
 }
 
@@ -80,32 +94,29 @@ pub fn js_err_to_py_err(vm: &VirtualMachine, js_err: &JsValue) -> PyBaseExceptio
 
 pub fn py_to_js(vm: &VirtualMachine, py_obj: PyObjectRef) -> JsValue {
     if let Some(ref wasm_id) = vm.wasm_id {
-        if py_obj.isinstance(&vm.ctx.types.function_type) {
+        if objtype::isinstance(&py_obj, &vm.ctx.function_type()) {
             let wasm_vm = WASMVirtualMachine {
                 id: wasm_id.clone(),
             };
             let weak_py_obj = wasm_vm.push_held_rc(py_obj).unwrap();
 
-            let closure = move |args: Option<Box<[JsValue]>>,
-                                kwargs: Option<Object>|
-                  -> Result<JsValue, JsValue> {
-                let py_obj = match wasm_vm.assert_valid() {
-                    Ok(_) => weak_py_obj
-                        .upgrade()
-                        .expect("weak_py_obj to be valid if VM is valid"),
-                    Err(err) => {
-                        return Err(err);
-                    }
-                };
-                stored_vm_from_wasm(&wasm_vm).interp.enter(move |vm| {
-                    let args = match args {
-                        Some(args) => Vec::from(args)
-                            .into_iter()
-                            .map(|arg| js_to_py(vm, arg))
-                            .collect::<Vec<_>>(),
-                        None => Vec::new(),
+            let closure =
+                move |args: Option<Array>, kwargs: Option<Object>| -> Result<JsValue, JsValue> {
+                    let py_obj = match wasm_vm.assert_valid() {
+                        Ok(_) => weak_py_obj
+                            .upgrade()
+                            .expect("weak_py_obj to be valid if VM is valid"),
+                        Err(err) => {
+                            return Err(err);
+                        }
                     };
-                    let mut py_func_args = FuncArgs::from(args);
+                    let vm = &stored_vm_from_wasm(&wasm_vm).vm;
+                    let mut py_func_args = PyFuncArgs::default();
+                    if let Some(ref args) = args {
+                        for arg in args.values() {
+                            py_func_args.args.push(js_to_py(vm, arg?));
+                        }
+                    }
                     if let Some(ref kwargs) = kwargs {
                         for pair in object_entries(kwargs) {
                             let (key, val) = pair?;
@@ -116,12 +127,9 @@ pub fn py_to_js(vm: &VirtualMachine, py_obj: PyObjectRef) -> JsValue {
                     }
                     let result = vm.invoke(&py_obj, py_func_args);
                     pyresult_to_jsresult(vm, result)
-                })
-            };
+                };
             let closure = Closure::wrap(Box::new(closure)
-                as Box<
-                    dyn FnMut(Option<Box<[JsValue]>>, Option<Object>) -> Result<JsValue, JsValue>,
-                >);
+                as Box<dyn FnMut(Option<Array>, Option<Object>) -> Result<JsValue, JsValue>>);
             let func = closure.as_ref().clone();
 
             // stores pretty much nothing, it's fine to leak this because if it gets dropped
@@ -132,13 +140,13 @@ pub fn py_to_js(vm: &VirtualMachine, py_obj: PyObjectRef) -> JsValue {
         }
     }
     // the browser module might not be injected
-    if vm.try_class("_js", "Promise").is_ok() {
-        if let Some(py_prom) = py_obj.payload::<js_module::PyPromise>() {
-            return py_prom.as_js(vm).into();
+    if vm.try_class("browser", "Promise").is_ok() {
+        if let Some(py_prom) = py_obj.payload::<browser_module::PyPromise>() {
+            return py_prom.value().into();
         }
     }
 
-    if let Ok(bytes) = ArgBytesLike::try_from_borrowed_object(vm, &py_obj) {
+    if let Ok(bytes) = PyBytesLike::try_from_object(vm, py_obj.clone()) {
         bytes.with_ref(|bytes| unsafe {
             // `Uint8Array::view` is an `unsafe fn` because it provides
             // a direct view into the WASM linear memory; if you were to allocate
@@ -174,9 +182,9 @@ pub fn js_to_py(vm: &VirtualMachine, js_val: JsValue) -> PyObjectRef {
         if let Some(promise) = js_val.dyn_ref::<Promise>() {
             // the browser module might not be injected
             if vm.try_class("browser", "Promise").is_ok() {
-                return js_module::PyPromise::new(promise.clone())
+                return browser_module::PyPromise::new(promise.clone())
                     .into_ref(vm)
-                    .into();
+                    .into_object();
             }
         }
         if Array::is_array(&js_val) {
@@ -186,7 +194,7 @@ pub fn js_to_py(vm: &VirtualMachine, js_val: JsValue) -> PyObjectRef {
                 .into_iter()
                 .map(|val| js_to_py(vm, val.expect("Iteration over array failed")))
                 .collect();
-            vm.ctx.new_list(elems).into()
+            vm.ctx.new_list(elems)
         } else if ArrayBuffer::is_view(&js_val) || js_val.is_instance_of::<ArrayBuffer>() {
             // unchecked_ref because if it's not an ArrayByffer it could either be a TypedArray
             // or a DataView, but they all have a `buffer` property
@@ -198,51 +206,43 @@ pub fn js_to_py(vm: &VirtualMachine, js_val: JsValue) -> PyObjectRef {
             );
             let mut vec = vec![0; u8_array.length() as usize];
             u8_array.copy_to(&mut vec);
-            vm.ctx.new_bytes(vec).into()
+            vm.ctx.new_bytes(vec)
         } else {
             let dict = vm.ctx.new_dict();
             for pair in object_entries(&Object::from(js_val)) {
                 let (key, val) = pair.expect("iteration over object to not fail");
                 let py_val = js_to_py(vm, val);
-                dict.set_item(
-                    String::from(js_sys::JsString::from(key)).as_str(),
-                    py_val,
-                    vm,
-                )
-                .unwrap();
+                dict.set_item(&String::from(js_sys::JsString::from(key)), py_val, vm)
+                    .unwrap();
             }
-            dict.into()
+            dict.into_object()
         }
     } else if js_val.is_function() {
-        let func = js_sys::Function::from(js_val);
+        let js_handle = JsHandle::new(js_val);
         vm.ctx
-            .new_function(
-                String::from(func.name()),
-                move |args: FuncArgs, vm: &VirtualMachine| -> PyResult {
-                    let this = Object::new();
-                    for (k, v) in args.kwargs {
-                        Reflect::set(&this, &k.into(), &py_to_js(vm, v))
-                            .expect("property to be settable");
-                    }
-                    let js_args = args
-                        .args
-                        .into_iter()
-                        .map(|v| py_to_js(vm, v))
-                        .collect::<Array>();
-                    func.apply(&this, &js_args)
-                        .map(|val| js_to_py(vm, val))
-                        .map_err(|err| js_err_to_py_err(vm, &err))
-                },
-            )
-            .into()
+            .new_method(move |vm: &VirtualMachine, args: PyFuncArgs| -> PyResult {
+                let this = Object::new();
+                for (k, v) in args.kwargs {
+                    Reflect::set(&this, &k.into(), &py_to_js(vm, v))
+                        .expect("property to be settable");
+                }
+                let js_args = Array::new();
+                for v in args.args {
+                    js_args.push(&py_to_js(vm, v));
+                }
+                let func = js_sys::Function::from(js_handle.get());
+                func.apply(&this, &js_args)
+                    .map(|val| js_to_py(vm, val))
+                    .map_err(|err| js_err_to_py_err(vm, &err))
+            })
     } else if let Some(err) = js_val.dyn_ref::<js_sys::Error>() {
-        js_err_to_py_err(vm, err).into()
+        js_err_to_py_err(vm, err).into_object()
     } else if js_val.is_undefined() {
         // Because `JSON.stringify(undefined)` returns undefined
-        vm.ctx.none()
+        vm.get_none()
     } else {
         py_serde::deserialize(vm, serde_wasm_bindgen::Deserializer::from(js_val))
-            .unwrap_or_else(|_| vm.ctx.none())
+            .unwrap_or_else(|_| vm.get_none())
     }
 }
 
@@ -254,16 +254,19 @@ pub fn syntax_err(err: CompileError) -> SyntaxError {
         &"col".into(),
         &(err.location.column() as u32).into(),
     );
-    let can_continue = matches!(&err.error, CompileErrorType::Parse(ParseErrorType::Eof));
+    let can_continue = match &err.error {
+        CompileErrorType::Parse(ParseErrorType::EOF) => true,
+        _ => false,
+    };
     let _ = Reflect::set(&js_err, &"canContinue".into(), &can_continue.into());
     js_err
 }
 
 pub trait PyResultExt<T> {
-    fn into_js(self, vm: &VirtualMachine) -> Result<T, JsValue>;
+    fn to_js(self, vm: &VirtualMachine) -> Result<T, JsValue>;
 }
 impl<T> PyResultExt<T> for PyResult<T> {
-    fn into_js(self, vm: &VirtualMachine) -> Result<T, JsValue> {
+    fn to_js(self, vm: &VirtualMachine) -> Result<T, JsValue> {
         self.map_err(|err| py_err_to_js_err(vm, &err))
     }
 }

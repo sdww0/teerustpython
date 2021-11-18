@@ -57,7 +57,6 @@ Compile():
 """
 
 import __future__
-import warnings
 
 _features = [getattr(__future__, fname)
              for fname in __future__.all_feature_names]
@@ -65,7 +64,6 @@ _features = [getattr(__future__, fname)
 __all__ = ["compile_command", "Compile", "CommandCompiler"]
 
 PyCF_DONT_IMPLY_DEDENT = 0x200          # Matches pythonrun.h
-
 
 def _maybe_compile(compiler, source, filename, symbol):
     # Check for source consisting of only blank lines and comments
@@ -82,36 +80,26 @@ def _maybe_compile(compiler, source, filename, symbol):
 
     try:
         code = compiler(source, filename, symbol)
-    except SyntaxError:
+    except SyntaxError as err:
         pass
 
-    # Catch syntax warnings after the first compile
-    # to emit warnings (SyntaxWarning, DeprecationWarning) at most once.
-    with warnings.catch_warnings():
-        warnings.simplefilter("error")
-
-        try:
-            code1 = compiler(source + "\n", filename, symbol)
-        except SyntaxError as e:
-            err1 = e
-
-        try:
-            code2 = compiler(source + "\n\n", filename, symbol)
-        except SyntaxError as e:
-            err2 = e
+    try:
+        code1 = compiler(source + "\n", filename, symbol)
+    except SyntaxError as e:
+        err1 = e
 
     try:
-        if code:
-            return code
-        if not code1 and repr(err1) == repr(err2):
-            raise err1
-    finally:
-        err1 = err2 = None
+        code2 = compiler(source + "\n\n", filename, symbol)
+    except SyntaxError as e:
+        err2 = e
 
+    if code:
+        return code
+    if not code1 and repr(err1) == repr(err2):
+        raise err1
 
 def _compile(source, filename, symbol):
     return compile(source, filename, symbol, PyCF_DONT_IMPLY_DEDENT)
-
 
 def compile_command(source, filename="<input>", symbol="single"):
     r"""Compile a command and determine whether it is incomplete.
@@ -121,8 +109,7 @@ def compile_command(source, filename="<input>", symbol="single"):
     source -- the source string; may contain \n characters
     filename -- optional filename from which source was read; default
                 "<input>"
-    symbol -- optional grammar start symbol; "single" (default), "exec"
-              or "eval"
+    symbol -- optional grammar start symbol; "single" (default) or "eval"
 
     Return value / exceptions raised:
 
@@ -134,23 +121,20 @@ def compile_command(source, filename="<input>", symbol="single"):
     """
     return _maybe_compile(_compile, source, filename, symbol)
 
-
 class Compile:
     """Instances of this class behave much like the built-in compile
     function, but if one is used to compile text containing a future
     statement, it "remembers" and compiles all subsequent program texts
     with the statement in force."""
-
     def __init__(self):
         self.flags = PyCF_DONT_IMPLY_DEDENT
 
     def __call__(self, source, filename, symbol):
-        codeob = compile(source, filename, symbol, self.flags, True)
+        codeob = compile(source, filename, symbol, self.flags, 1)
         for feature in _features:
             if codeob.co_flags & feature.compiler_flag:
                 self.flags |= feature.compiler_flag
         return codeob
-
 
 class CommandCompiler:
     """Instances of this class have __call__ methods identical in
