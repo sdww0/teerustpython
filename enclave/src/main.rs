@@ -1,10 +1,10 @@
 #[macro_use]
-extern crate clap;
+// extern crate clap;
 extern crate env_logger;
 #[macro_use]
 extern crate log;
 
-use clap::{App, AppSettings, Arg, ArgMatches};
+// use clap::{App, AppSettings, Arg, ArgMatches};
 use rustpython_compiler::compile;
 use rustpython_vm::{
     exceptions::print_exception,
@@ -27,9 +27,9 @@ fn main() {
     #[cfg(feature = "flame-it")]
     let main_guard = flame::start_guard("RustPython main");
     env_logger::init();
-    let app = App::new("RustPython");
-    let matches = parse_arguments(app);
-    let mut settings = create_settings(&matches);
+    // let app = App::new("RustPython");
+    // let matches = parse_arguments(app);
+    let mut settings = create_settings(/*&matches*/);
 
     // We only include the standard library bytecode in WASI when initializing
     if cfg!(target_os = "wasi") {
@@ -38,15 +38,15 @@ fn main() {
 
     let vm = VirtualMachine::new(settings);
 
-    let res = run_rustpython(&vm, &matches);
+    let res = run_rustpython(&vm/*, &matches*/);
 
-    #[cfg(feature = "flame-it")]
-    {
-        main_guard.end();
-        if let Err(e) = write_profile(&matches) {
-            error!("Error writing profile information: {}", e);
-        }
-    }
+    // #[cfg(feature = "flame-it")]
+    // {
+    //     main_guard.end();
+    //     if let Err(e) = write_profile(&matches) {
+    //         error!("Error writing profile information: {}", e);
+    //     }
+    // }
 
     // See if any exception leaked out:
     if let Err(err) = res {
@@ -81,107 +81,107 @@ fn main() {
     }
 }
 
-fn parse_arguments<'a>(app: App<'a, '_>) -> ArgMatches<'a> {
-    let app = app
-        .setting(AppSettings::TrailingVarArg)
-        .version(crate_version!())
-        .author(crate_authors!())
-        .about("Rust implementation of the Python language")
-        .usage("rustpython [OPTIONS] [-c CMD | -m MODULE | FILE] [PYARGS]...")
-        .arg(
-            Arg::with_name("script")
-                .required(false)
-                .allow_hyphen_values(true)
-                .multiple(true)
-                .value_name("script, args")
-                .min_values(1),
-        )
-        .arg(
-            Arg::with_name("c")
-                .short("c")
-                .takes_value(true)
-                .allow_hyphen_values(true)
-                .multiple(true)
-                .value_name("cmd, args")
-                .min_values(1)
-                .help("run the given string as a program"),
-        )
-        .arg(
-            Arg::with_name("m")
-                .short("m")
-                .takes_value(true)
-                .allow_hyphen_values(true)
-                .multiple(true)
-                .value_name("module, args")
-                .min_values(1)
-                .help("run library module as script"),
-        )
-        .arg(
-            Arg::with_name("optimize")
-                .short("O")
-                .multiple(true)
-                .help("Optimize. Set __debug__ to false. Remove debug statements."),
-        )
-        .arg(
-            Arg::with_name("verbose")
-                .short("v")
-                .multiple(true)
-                .help("Give the verbosity (can be applied multiple times)"),
-        )
-        .arg(Arg::with_name("debug").short("d").help("Debug the parser."))
-        .arg(
-            Arg::with_name("quiet")
-                .short("q")
-                .help("Be quiet at startup."),
-        )
-        .arg(
-            Arg::with_name("inspect")
-                .short("i")
-                .help("Inspect interactively after running the script."),
-        )
-        .arg(
-            Arg::with_name("no-user-site")
-                .short("s")
-                .help("don't add user site directory to sys.path."),
-        )
-        .arg(
-            Arg::with_name("no-site")
-                .short("S")
-                .help("don't imply 'import site' on initialization"),
-        )
-        .arg(
-            Arg::with_name("dont-write-bytecode")
-                .short("B")
-                .help("don't write .pyc files on import"),
-        )
-        .arg(
-            Arg::with_name("ignore-environment")
-                .short("E")
-                .help("Ignore environment variables PYTHON* such as PYTHONPATH"),
-        );
-    #[cfg(feature = "flame-it")]
-    let app = app
-        .arg(
-            Arg::with_name("profile_output")
-                .long("profile-output")
-                .takes_value(true)
-                .help("the file to output the profiling information to"),
-        )
-        .arg(
-            Arg::with_name("profile_format")
-                .long("profile-format")
-                .takes_value(true)
-                .help("the profile format to output the profiling information in"),
-        );
-    app.get_matches()
-}
+// fn parse_arguments<'a>(app: App<'a, '_>) -> ArgMatches<'a> {
+//     let app = app
+//         .setting(AppSettings::TrailingVarArg)
+//         .version(crate_version!())
+//         .author(crate_authors!())
+//         .about("Rust implementation of the Python language")
+//         .usage("rustpython [OPTIONS] [-c CMD | -m MODULE | FILE] [PYARGS]...")
+//         .arg(
+//             Arg::with_name("script")
+//                 .required(false)
+//                 .allow_hyphen_values(true)
+//                 .multiple(true)
+//                 .value_name("script, args")
+//                 .min_values(1),
+//         )
+//         .arg(
+//             Arg::with_name("c")
+//                 .short("c")
+//                 .takes_value(true)
+//                 .allow_hyphen_values(true)
+//                 .multiple(true)
+//                 .value_name("cmd, args")
+//                 .min_values(1)
+//                 .help("run the given string as a program"),
+//         )
+//         .arg(
+//             Arg::with_name("m")
+//                 .short("m")
+//                 .takes_value(true)
+//                 .allow_hyphen_values(true)
+//                 .multiple(true)
+//                 .value_name("module, args")
+//                 .min_values(1)
+//                 .help("run library module as script"),
+//         )
+//         .arg(
+//             Arg::with_name("optimize")
+//                 .short("O")
+//                 .multiple(true)
+//                 .help("Optimize. Set __debug__ to false. Remove debug statements."),
+//         )
+//         .arg(
+//             Arg::with_name("verbose")
+//                 .short("v")
+//                 .multiple(true)
+//                 .help("Give the verbosity (can be applied multiple times)"),
+//         )
+//         .arg(Arg::with_name("debug").short("d").help("Debug the parser."))
+//         .arg(
+//             Arg::with_name("quiet")
+//                 .short("q")
+//                 .help("Be quiet at startup."),
+//         )
+//         .arg(
+//             Arg::with_name("inspect")
+//                 .short("i")
+//                 .help("Inspect interactively after running the script."),
+//         )
+//         .arg(
+//             Arg::with_name("no-user-site")
+//                 .short("s")
+//                 .help("don't add user site directory to sys.path."),
+//         )
+//         .arg(
+//             Arg::with_name("no-site")
+//                 .short("S")
+//                 .help("don't imply 'import site' on initialization"),
+//         )
+//         .arg(
+//             Arg::with_name("dont-write-bytecode")
+//                 .short("B")
+//                 .help("don't write .pyc files on import"),
+//         )
+//         .arg(
+//             Arg::with_name("ignore-environment")
+//                 .short("E")
+//                 .help("Ignore environment variables PYTHON* such as PYTHONPATH"),
+//         );
+//     #[cfg(feature = "flame-it")]
+//     let app = app
+//         .arg(
+//             Arg::with_name("profile_output")
+//                 .long("profile-output")
+//                 .takes_value(true)
+//                 .help("the file to output the profiling information to"),
+//         )
+//         .arg(
+//             Arg::with_name("profile_format")
+//                 .long("profile-format")
+//                 .takes_value(true)
+//                 .help("the profile format to output the profiling information in"),
+//         );
+//     app.get_matches()
+// }
 
 /// Create settings by examining command line arguments and environment
 /// variables.
-fn create_settings(matches: &ArgMatches) -> PySettings {
-    let ignore_environment = matches.is_present("ignore-environment");
+fn create_settings(/*matches: &ArgMatches*/) -> PySettings {
+    // let ignore_environment = matches.is_present("ignore-environment");
     let mut settings: PySettings = Default::default();
-    settings.ignore_environment = ignore_environment;
+     settings.ignore_environment = true;//ignore_environment;
 
     // add the current directory to sys.path
     settings.path_list.push("".to_owned());
@@ -201,65 +201,65 @@ fn create_settings(matches: &ArgMatches) -> PySettings {
         settings.path_list.extend(get_paths("PYTHONPATH"));
     }
 
-    // Now process command line flags:
-    if matches.is_present("debug") || (!ignore_environment && env::var_os("PYTHONDEBUG").is_some())
-    {
-        settings.debug = true;
-    }
+    // // Now process command line flags:
+    // if matches.is_present("debug") || (!ignore_environment && env::var_os("PYTHONDEBUG").is_some())
+    // {
+    //     settings.debug = true;
+    // }
 
-    if matches.is_present("inspect")
-        || (!ignore_environment && env::var_os("PYTHONINSPECT").is_some())
-    {
-        settings.inspect = true;
-    }
+    // if matches.is_present("inspect")
+    //     || (!ignore_environment && env::var_os("PYTHONINSPECT").is_some())
+    // {
+    //     settings.inspect = true;
+    // }
 
-    if matches.is_present("optimize") {
-        settings.optimize = matches.occurrences_of("optimize").try_into().unwrap();
-    } else if !ignore_environment {
-        if let Ok(value) = get_env_var_value("PYTHONOPTIMIZE") {
-            settings.optimize = value;
-        }
-    }
+    // if matches.is_present("optimize") {
+    //     settings.optimize = matches.occurrences_of("optimize").try_into().unwrap();
+    // } else if !ignore_environment {
+    //     if let Ok(value) = get_env_var_value("PYTHONOPTIMIZE") {
+    //         settings.optimize = value;
+    //     }
+    // }
 
-    if matches.is_present("verbose") {
-        settings.verbose = matches.occurrences_of("verbose").try_into().unwrap();
-    } else if !ignore_environment {
-        if let Ok(value) = get_env_var_value("PYTHONVERBOSE") {
-            settings.verbose = value;
-        }
-    }
+    // if matches.is_present("verbose") {
+    //     settings.verbose = matches.occurrences_of("verbose").try_into().unwrap();
+    // } else if !ignore_environment {
+    //     if let Ok(value) = get_env_var_value("PYTHONVERBOSE") {
+    //         settings.verbose = value;
+    //     }
+    // }
 
-    settings.no_site = matches.is_present("no-site");
+    // settings.no_site = matches.is_present("no-site");
 
-    if matches.is_present("no-user-site")
-        || (!ignore_environment && env::var_os("PYTHONNOUSERSITE").is_some())
-    {
-        settings.no_user_site = true;
-    }
+    // if matches.is_present("no-user-site")
+    //     || (!ignore_environment && env::var_os("PYTHONNOUSERSITE").is_some())
+    // {
+    //     settings.no_user_site = true;
+    // }
 
-    if matches.is_present("quiet") {
-        settings.quiet = true;
-    }
+    // if matches.is_present("quiet") {
+    //     settings.quiet = true;
+    // }
 
-    if matches.is_present("dont-write-bytecode")
-        || (!ignore_environment && env::var_os("PYTHONDONTWRITEBYTECODE").is_some())
-    {
-        settings.dont_write_bytecode = true;
-    }
+    // if matches.is_present("dont-write-bytecode")
+    //     || (!ignore_environment && env::var_os("PYTHONDONTWRITEBYTECODE").is_some())
+    // {
+    //     settings.dont_write_bytecode = true;
+    // }
 
-    let argv = if let Some(script) = matches.values_of("script") {
-        script.map(ToOwned::to_owned).collect()
-    } else if let Some(module) = matches.values_of("m") {
-        std::iter::once("PLACEHOLDER".to_owned())
-            .chain(module.skip(1).map(ToOwned::to_owned))
-            .collect()
-    } else if let Some(cmd) = matches.values_of("c") {
-        std::iter::once("-c".to_owned())
-            .chain(cmd.skip(1).map(ToOwned::to_owned))
-            .collect()
-    } else {
-        vec!["".to_owned()]
-    };
+    // let argv = if let Some(script) = matches.values_of("script") {
+    //     script.map(ToOwned::to_owned).collect()
+    // } else if let Some(module) = matches.values_of("m") {
+    //     std::iter::once("PLACEHOLDER".to_owned())
+    //         .chain(module.skip(1).map(ToOwned::to_owned))
+    //         .collect()
+    // } else if let Some(cmd) = matches.values_of("c") {
+    //     std::iter::once("-c".to_owned())
+    //         .chain(cmd.skip(1).map(ToOwned::to_owned))
+    //         .collect()
+    // } else {
+    //     vec!["".to_owned()]
+    // };
 
     settings.argv = argv;
 
@@ -292,53 +292,53 @@ fn get_paths(env_variable_name: &str) -> impl Iterator<Item = String> + '_ {
         })
 }
 
-#[cfg(feature = "flame-it")]
-fn write_profile(matches: &ArgMatches) -> Result<(), Box<dyn std::error::Error>> {
-    use std::{fs, io};
+// #[cfg(feature = "flame-it")]
+// fn write_profile(matches: &ArgMatches) -> Result<(), Box<dyn std::error::Error>> {
+//     use std::{fs, io};
 
-    enum ProfileFormat {
-        Html,
-        Text,
-        Speedscope,
-    }
+//     enum ProfileFormat {
+//         Html,
+//         Text,
+//         Speedscope,
+//     }
 
-    let profile_output = matches.value_of_os("profile_output");
+//     let profile_output = matches.value_of_os("profile_output");
 
-    let profile_format = match matches.value_of("profile_format") {
-        Some("html") => ProfileFormat::Html,
-        Some("text") => ProfileFormat::Text,
-        None if profile_output == Some("-".as_ref()) => ProfileFormat::Text,
-        Some("speedscope") | None => ProfileFormat::Speedscope,
-        Some(other) => {
-            error!("Unknown profile format {}", other);
-            process::exit(1);
-        }
-    };
+//     let profile_format = match matches.value_of("profile_format") {
+//         Some("html") => ProfileFormat::Html,
+//         Some("text") => ProfileFormat::Text,
+//         None if profile_output == Some("-".as_ref()) => ProfileFormat::Text,
+//         Some("speedscope") | None => ProfileFormat::Speedscope,
+//         Some(other) => {
+//             error!("Unknown profile format {}", other);
+//             process::exit(1);
+//         }
+//     };
 
-    let profile_output = profile_output.unwrap_or_else(|| match profile_format {
-        ProfileFormat::Html => "flame-graph.html".as_ref(),
-        ProfileFormat::Text => "flame.txt".as_ref(),
-        ProfileFormat::Speedscope => "flamescope.json".as_ref(),
-    });
+//     let profile_output = profile_output.unwrap_or_else(|| match profile_format {
+//         ProfileFormat::Html => "flame-graph.html".as_ref(),
+//         ProfileFormat::Text => "flame.txt".as_ref(),
+//         ProfileFormat::Speedscope => "flamescope.json".as_ref(),
+//     });
 
-    let profile_output: Box<dyn io::Write> = if profile_output == "-" {
-        Box::new(io::stdout())
-    } else {
-        Box::new(fs::File::create(profile_output)?)
-    };
+//     let profile_output: Box<dyn io::Write> = if profile_output == "-" {
+//         Box::new(io::stdout())
+//     } else {
+//         Box::new(fs::File::create(profile_output)?)
+//     };
 
-    let profile_output = io::BufWriter::new(profile_output);
+//     let profile_output = io::BufWriter::new(profile_output);
 
-    match profile_format {
-        ProfileFormat::Html => flame::dump_html(profile_output)?,
-        ProfileFormat::Text => flame::dump_text_to_writer(profile_output)?,
-        ProfileFormat::Speedscope => flamescope::dump(profile_output)?,
-    }
+//     match profile_format {
+//         ProfileFormat::Html => flame::dump_html(profile_output)?,
+//         ProfileFormat::Text => flame::dump_text_to_writer(profile_output)?,
+//         ProfileFormat::Speedscope => flamescope::dump(profile_output)?,
+//     }
 
-    Ok(())
-}
+//     Ok(())
+// }
 
-fn run_rustpython(vm: &VirtualMachine, matches: &ArgMatches) -> PyResult<()> {
+fn run_rustpython(vm: &VirtualMachine/*, matches: &ArgMatches*/) -> PyResult<()> {
     let scope = vm.new_scope_with_builtins();
     let main_module = vm.new_module("__main__", scope.globals.clone());
 
@@ -355,22 +355,22 @@ fn run_rustpython(vm: &VirtualMachine, matches: &ArgMatches) -> PyResult<()> {
     }
 
     // Figure out if a -c option was given:
-    if let Some(command) = matches.value_of("c") {
-        run_command(&vm, scope, command.to_owned())?;
-    } else if let Some(module) = matches.value_of("m") {
-        run_module(&vm, module)?;
-    } else if let Some(filename) = matches.value_of("script") {
-        run_script(&vm, scope.clone(), filename)?;
-        if matches.is_present("inspect") {
-            shell::run_shell(&vm, scope)?;
-        }
-    } else {
+    // if let Some(command) = matches.value_of("c") {
+    //     run_command(&vm, scope, command.to_owned())?;
+    // } else if let Some(module) = matches.value_of("m") {
+    //     run_module(&vm, module)?;
+    // } else if let Some(filename) = matches.value_of("script") {
+    //     run_script(&vm, scope.clone(), filename)?;
+    //     if matches.is_present("inspect") {
+    //         shell::run_shell(&vm, scope)?;
+    //     }
+    // } else {
         println!(
             "Welcome to the magnificent Rust Python {} interpreter \u{1f631} \u{1f596}",
             crate_version!()
         );
         shell::run_shell(&vm, scope)?;
-    }
+    // }
 
     Ok(())
 }

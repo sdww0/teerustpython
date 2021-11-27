@@ -9,10 +9,12 @@ license = "MIT"
 
 
 [dependencies]
-bincode =  "1.1"
-bitflags = "1.1"
-lz4-compress = "0.1.1"
-num-bigint = { version = "0.2", features = ["serde"] }
-num-complex = { version = "0.2", features = ["serde"] }
-serde = { version = "1.0", features = ["derive"] }
-itertools = "0.8"
+sgx_tstd                       = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
+bincode          = { git = "https://github.com/mesalock-linux/bincode-sgx" }
+bitflags = {path = "/root/sgx/teerustpython/already/bitflags-1.2.1"}
+#lz4-compress = "0.1.1"
+lzzzz = {path = "/root/sgx/teerustpython/already/lzzzz-master"}
+num-bigint = {  git = "https://github.com/mesalock-linux/num-bigint-sgx", features = ["serde"] }
+num-complex = { path = "/root/sgx/teerustpython/already/num-complex", features = ["serde"] }
+serde = { git = "https://github.com/mesalock-linux/serde-sgx", features = ["derive"] }
+itertools      = { path = "/root/sgx/teerustpython/already/itertools-master", default-features=false}

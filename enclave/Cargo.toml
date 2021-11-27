@@ -15,7 +15,7 @@ name = "bench"
 path = "./benchmarks/bench.rs"
 
 [features]
-flame-it = ["rustpython-vm/flame-it", "flame", "flamescope"]
+#flame-it = ["rustpython-vm/flame-it", "flame", "flamescope"]
 freeze-stdlib = ["rustpython-vm/freeze-stdlib"]
 
 ssl = ["rustpython-vm/ssl"]
@@ -23,7 +23,7 @@ ssl = ["rustpython-vm/ssl"]
 [dependencies]
 log = "0.4"
 env_logger = "0.7"
-clap = "2.33"
+#clap = "2.33"
 rustpython-compiler = {path = "compiler", version = "0.1.1"}
 rustpython-parser = {path = "parser", version = "0.1.1"}
 rustpython-vm = {path = "vm", version = "0.1.1"}

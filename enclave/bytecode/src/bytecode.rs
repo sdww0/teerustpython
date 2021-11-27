@@ -8,7 +8,12 @@ use num_complex::Complex64;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 use std::fmt;
-
+use std::vec::Vec;
+use std::vec;
+use std::string::String;
+use std::boxed::Box;
+use std::format;
+use lzzzz::lz4;
 /// Sourcecode location.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct Location {
@@ -408,14 +413,17 @@ impl CodeObject {
 
     /// Load a code object from bytes
     pub fn from_bytes(data: &[u8]) -> Result<Self, Box<dyn std::error::Error>> {
-        let data = lz4_compress::decompress(data)?;
+        let mut decomp = vec![0; data.len()];
+        lz4::decompress(&data,&mut decomp)?;
         bincode::deserialize::<Self>(&data).map_err(|e| e.into())
     }
 
     /// Serialize this bytecode to bytes.
     pub fn to_bytes(&self) -> Vec<u8> {
         let data = bincode::serialize(&self).expect("Code object must be serializable");
-        lz4_compress::compress(&data)
+        let mut comp = Vec::new();
+        lz4::compress_to_vec(&data,&mut comp,lz4::ACC_LEVEL_DEFAULT);
+        comp
     }
 
     pub fn get_constants(&self) -> impl Iterator<Item = &Constant> {
