@@ -1,0 +1,39 @@
+[package]
+
+name = "unicode_names2"
+version = "0.4.0"
+authors = ["Huon Wilson <dbau.pp@gmail.com>",
+           "Kang Seonghoon <public+rust@mearie.org>",
+           "Valentin Lorentz <progval+git@progval.net>",]
+
+homepage = "https://github.com/ProgVal/unicode_names2"
+repository = "https://github.com/ProgVal/unicode_names2"
+documentation = "https://docs.rs/unicode_names2/"
+license = "MIT/Apache-2.0"
+keywords = ["text", "unicode"]
+readme = "README.md"
+description = """
+Map characters to and from their name given in the Unicode standard.
+This goes to great lengths to be as efficient as possible in both time
+and space, with the full bidirectional tables weighing barely 500 KB
+but still offering O(1)* look-up in both directions. (*more precisely,
+O(length of name).)
+"""
+
+exclude = [
+        "data/*",
+        "generator/*",
+]
+
+[features]
+default = []
+
+unstable = []
+no_std = []
+
+[dev-dependencies.unicode_names2_macros]
+path = "unicode_names2_macros"
+version = ">=0.3, <0.5"
+
+[dev-dependencies]
+rand = "0.5.1"
