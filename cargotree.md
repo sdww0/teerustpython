@@ -8,7 +8,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 ├── clap v2.33.0
 │   ├── ansi_term v0.11.0
 │   ├── atty v0.2.14
-│   │   └── libc v0.2.71
 │   ├── bitflags v1.2.1
 │   ├── strsim v0.8.0
 │   ├── textwrap v0.11.0
