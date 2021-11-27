@@ -2,37 +2,18 @@
 # Already done
 
 [dependencies]
-rand_core = { path = "/root/sgx/already/rand_core" }
+rand_core = { path = "/root/sgx/teerustpython/already/rand_core" }
 
 
-mt19937  = { path = "/root/sgx/already/mt19937" }
-atty = {path = "/root/sgx/already/atty"}
-ansi_term = {path = "/root/sgx/already/ansi_term"}
+mt19937  = { path = "/root/sgx/teerustpython/already/mt19937" }
+atty = {path = "/root/sgx/teerustpython/already/atty"}
+ansi_term = {path = "/root/sgx/teerustpython/already/ansi_term"}
 
-xxx = {path = "/root/sgx/already/xxx"}
-xxx = {path = "/root/sgx/already/xxx"}
-xxx = {path = "/root/sgx/already/xxx"}
-xxx = {path = "/root/sgx/already/xxx"}
-xxx = {path = "/root/sgx/already/xxx"}
-xxx = {path = "/root/sgx/already/xxx"}
-xxx = {path = "/root/sgx/already/xxx"}
-xxx = {path = "/root/sgx/already/xxx"}
-xxx = {path = "/root/sgx/already/xxx"}
-xxx = {path = "/root/sgx/already/xxx"}
-xxx = {path = "/root/sgx/already/xxx"}
-xxx = {path = "/root/sgx/already/xxx"}
-xxx = {path = "/root/sgx/already/xxx"}
-xxx = {path = "/root/sgx/already/xxx"}
-xxx = {path = "/root/sgx/already/xxx"}
-xxx = {path = "/root/sgx/already/xxx"}
-xxx = {path = "/root/sgx/already/xxx"}
-xxx = {path = "/root/sgx/already/xxx"}
-xxx = {path = "/root/sgx/already/xxx"}
-xxx = {path = "/root/sgx/already/xxx"}
-xxx = {path = "/root/sgx/already/xxx"}
-xxx = {path = "/root/sgx/already/xxx"}
-xxx = {path = "/root/sgx/already/xxx"}
-
-
-
-
+xxx = {path = "/root/sgx/teerustpython/already/xxx"}
+xxx = {path = "/root/sgx/teerustpython/already/xxx"}
+xxx = {path = "/root/sgx/teerustpython/already/xxx"}
+xxx = {path = "/root/sgx/teerustpython/already/xxx"}
+xxx = {path = "/root/sgx/teerustpython/already/xxx"}
+xxx = {path = "/root/sgx/teerustpython/already/xxx"}
+xxx = {path = "/root/sgx/teerustpython/already/xxx"}
+xxx = {path = "/root/sgx/teerustpython/already/xxx"}
