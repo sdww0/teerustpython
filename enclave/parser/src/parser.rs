@@ -6,7 +6,9 @@
 //! expression.
 
 use std::iter;
-
+use std::string::String;
+use std::vec::Vec;
+use std::vec;
 use crate::ast;
 use crate::error::ParseError;
 use crate::lexer;

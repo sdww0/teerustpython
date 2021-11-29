@@ -1,3 +1,6 @@
+#![no_std]
+extern crate sgx_tstd as std;
+
 #[macro_use]
 // extern crate clap;
 extern crate env_logger;

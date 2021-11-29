@@ -2,7 +2,9 @@
 //! Loosely based on token.h from CPython source:
 use num_bigint::BigInt;
 use std::fmt::{self, Write};
-
+use std::string::String;
+use std::vec::Vec;
+use std::vec;
 /// Python source code can be tokenized in a sequence of these tokens.
 #[derive(Clone, Debug, PartialEq)]
 pub enum Tok {

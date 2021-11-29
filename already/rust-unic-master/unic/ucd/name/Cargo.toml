@@ -1,0 +1,23 @@
+[package]
+name = "unic-ucd-name"
+version = "0.9.0"
+edition = "2018"
+authors = ["The UNIC Project Developers"]
+repository = "https://github.com/open-i18n/rust-unic/"
+license = "MIT/Apache-2.0"
+description = "UNIC — Unicode Character Database — Name"
+keywords = ["text", "unicode", "character-property", "name"]
+categories = ["internationalization", "text-processing", "parsing", "rendering"]
+
+# No tests/benches that depends on /data/
+exclude = []
+
+[dependencies]
+unic-ucd-version = { path = "../version/", version = "0.9.0" }
+unic-ucd-hangul = { path = "../hangul/", version = "0.9.0" }
+unic-char-property = { path = "../../char/property/", version = "0.9.0" }
+
+[badges]
+maintenance = { status = "actively-developed" }
+is-it-maintained-issue-resolution = { repository = "open-i18n/rust-unic" }
+is-it-maintained-open-issues = { repository = "open-i18n/rust-unic" }

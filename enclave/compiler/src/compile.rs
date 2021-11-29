@@ -13,6 +13,12 @@ use crate::symboltable::{
     make_symbol_table, statements_to_symbol_table, Symbol, SymbolScope, SymbolTable,
 };
 use itertools::Itertools;
+use std::borrow::ToOwned;
+use std::string::String;
+use std::boxed::Box;
+use std::vec::Vec;
+use std::vec;
+use std::format;
 use num_complex::Complex64;
 use rustpython_bytecode::bytecode::{self, CallType, CodeObject, Instruction, Label};
 use rustpython_parser::{ast, parser};

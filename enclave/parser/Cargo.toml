@@ -12,10 +12,11 @@ edition = "2018"
 lalrpop="0.17"
 
 [dependencies]
-lalrpop-util="0.17"
-log="0.4.1"
-num-bigint = "0.2"
-num-traits = "0.2"
-unic-emoji-char = "0.9"
-unic-ucd-ident  = "0.9"
-unicode_names2 = "0.4"
+sgx_tstd                       = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
+lalrpop-util= {path="/root/sgx/teerustpython/already/lalrpop-0.17.2/lalrpop-util"}
+log              = { git = "https://github.com/mesalock-linux/log-sgx" }
+num-bigint       = { git = "https://github.com/mesalock-linux/num-bigint-sgx" }
+num-traits       = { git = "https://github.com/mesalock-linux/num-traits-sgx" }
+unic-emoji-char = {path="/root/sgx/teerustpython/already/rust-unic-master/unic/emoji/char"}
+unic-ucd-ident  = {path="/root/sgx/teerustpython/already/rust-unic-master/unic/ucd/ident"}
+unicode_names2 = {path="/root/sgx/teerustpython/already/unicode_names2-0.4.0"}

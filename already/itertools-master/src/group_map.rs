@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 use std::hash::Hash;
 use std::iter::Iterator;
-
+use std::vec::Vec;
 /// Return a `HashMap` of keys mapped to a list of their corresponding values.
 ///
 /// See [`.into_group_map()`](crate::Itertools::into_group_map)

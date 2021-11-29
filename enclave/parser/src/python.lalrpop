@@ -4,13 +4,17 @@
 // See also: https://greentreesnakes.readthedocs.io/en/latest/nodes.html#keyword
 
 use std::iter::FromIterator;
-
+use crate::std::string::ToString;
 use crate::ast;
 use crate::fstring::parse_located_fstring;
 use crate::function::{parse_args, parse_params};
 use crate::error::LexicalError;
 use crate::lexer;
 use crate::location;
+use std::string::String;
+use std::vec::Vec;
+use std::vec;
+use std::boxed::Box;
 
 use num_bigint::BigInt;
 

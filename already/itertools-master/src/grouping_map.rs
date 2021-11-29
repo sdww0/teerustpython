@@ -6,7 +6,7 @@ use std::cmp::Ordering;
 use std::hash::Hash;
 use std::iter::Iterator;
 use std::ops::{Add, Mul};
-
+use std::vec::Vec;
 /// A wrapper to allow for an easy [`into_grouping_map_by`](crate::Itertools::into_grouping_map_by)
 #[derive(Clone, Debug)]
 pub struct MapForGrouping<I, F>(I, F);

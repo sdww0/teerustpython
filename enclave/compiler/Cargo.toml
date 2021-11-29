@@ -8,10 +8,11 @@ license = "MIT"
 edition = "2018"
 
 [dependencies]
-indexmap = "1.0"
-itertools = "0.8.0"
-rustpython-bytecode = { path = "../bytecode", version = "0.1.1" }
-rustpython-parser = { path = "../parser", version = "0.1.1" }
-num-complex = { version = "0.2", features = ["serde"] }
-log = "0.4"
-arrayvec = "0.5"
+indexmap = {path = "/root/sgx/teerustpython/already/indexmap"}
+itertools = {path = "/root/sgx/teerustpython/already/itertools-master"}
+rustpython-bytecode = { path = "../bytecode", version = "0.1.2" }
+rustpython-parser = { path = "../parser", version = "0.1.2" }
+num-complex = { path = "/root/sgx/teerustpython/already/num-complex", features = ["serde"] }
+log              = { git = "https://github.com/mesalock-linux/log-sgx" }
+arrayvec = {path = "/root/sgx/teerustpython/already/arrayvec"}
+sgx_tstd                       = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }

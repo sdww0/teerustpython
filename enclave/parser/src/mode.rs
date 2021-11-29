@@ -3,7 +3,9 @@ pub enum Mode {
     Program,
     Statement,
 }
-
+use std::string::String;
+use std::vec::Vec;
+use std::vec;
 impl std::str::FromStr for Mode {
     type Err = ModeParseError;
     fn from_str(s: &str) -> Result<Self, ModeParseError> {

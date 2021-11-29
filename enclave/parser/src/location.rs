@@ -1,7 +1,10 @@
 //! Datatypes to support source location information.
 
 use std::fmt;
-
+use std::string::String;
+use std::vec::Vec;
+use std::vec;
+use std::format;
 /// A location somewhere in the sourcecode.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct Location {

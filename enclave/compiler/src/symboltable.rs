@@ -12,7 +12,11 @@ use indexmap::map::IndexMap;
 use rustpython_parser::ast;
 use rustpython_parser::location::Location;
 use std::fmt;
-
+use std::vec::Vec;
+use std::string::String;
+use std::format;
+use std::vec;
+use crate::std::borrow::ToOwned;
 pub fn make_symbol_table(program: &ast::Program) -> Result<SymbolTable, SymbolTableError> {
     let mut builder: SymbolTableBuilder = Default::default();
     builder.prepare();

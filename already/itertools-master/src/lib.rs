@@ -71,8 +71,6 @@ use std::cmp::Ordering;
 use std::fmt;
 #[cfg(feature = "use_std")]
 use std::collections::HashSet;
-#[cfg(feature = "use_std")]
-use std::hash::Hash;
 #[cfg(feature = "use_alloc")]
 use std::fmt::Write;
 #[cfg(feature = "use_alloc")]

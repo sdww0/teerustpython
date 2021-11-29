@@ -6,53 +6,10 @@
 rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 ├── cfg-if v0.1.10
 ├── dirs-next v1.0.1
-│   ├── cfg-if v0.1.10
-│   └── dirs-sys-next v0.1.0
-│       └── libc v0.2.71
 ├── env_logger v0.7.1
 ├── log v0.4.8 (*)
 ├── num-traits v0.2.11
-│   [build-dependencies]
-│   └── autocfg v1.0.0
 ├── rustpython-compiler v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave/compiler)
-│   ├── arrayvec v0.5.1
-│   ├── indexmap v1.3.2
-│   │   [build-dependencies]
-│   │   └── autocfg v1.0.0
-│   ├── itertools v0.8.2
-│   │   └── either v1.5.3
-│   ├── log v0.4.8 (*)
-│   ├── num-complex v0.2.4
-│   │   ├── num-traits v0.2.11 (*)
-│   │   └── serde v1.0.106
-│   │   [build-dependencies]
-│   │   └── autocfg v1.0.0
-│   ├── rustpython-bytecode v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave/bytecode)
-│   │   ├── bincode v1.2.1
-│   │   ├── bitflags v1.2.1
-│   │   ├── itertools v0.8.2 (*)
-│   │   ├── lz4-compress v0.1.1(change to lzzzz)
-│   │   ├── num-bigint v0.2.6
-│   │   ├── num-complex v0.2.4 (*)
-│   │   └── serde v1.0.106 (*)
-│   └── rustpython-parser v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave/parser)
-│       ├── lalrpop-util v0.17.2
-│       ├── log v0.4.8 (*)
-│       ├── num-bigint v0.2.6 (*)
-│       ├── num-traits v0.2.11 (*)
-│       ├── unic-emoji-char v0.9.0
-│       │   ├── unic-char-property v0.9.0
-│       │   │   └── unic-char-range v0.9.0
-│       │   ├── unic-char-range v0.9.0
-│       │   └── unic-ucd-version v0.9.0
-│       │       └── unic-common v0.9.0
-│       ├── unic-ucd-ident v0.9.0
-│       │   ├── unic-char-property v0.9.0 (*)
-│       │   ├── unic-char-range v0.9.0
-│       │   └── unic-ucd-version v0.9.0 (*)
-│       └── unicode_names2 v0.4.0
-│       [build-dependencies]
-│       └── lalrpop v0.17.2
 ├── rustpython-parser v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave/parser) (*)
 ├── rustpython-vm v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave/vm)
 │   ├── adler32 v1.0.4
@@ -272,10 +229,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │   └── utf8parse v0.2.0
 │   ├── serde v1.0.106 (*)
 │   ├── sha-1 v0.8.2
-│   │   ├── block-buffer v0.7.3 (*)
-│   │   ├── digest v0.8.1 (*)
-│   │   ├── fake-simd v0.1.2
-│   │   └── opaque-debug v0.2.3
 │   ├── sha2 v0.8.1 (*)
 │   ├── sha3 v0.8.2
 │   │   ├── block-buffer v0.7.3 (*)

@@ -14,7 +14,12 @@ use std::collections::HashMap;
 use std::str::FromStr;
 use unic_emoji_char::is_emoji_presentation;
 use unic_ucd_ident::{is_xid_continue, is_xid_start};
-
+use std::string::String;
+use std::vec::Vec;
+use std::vec;
+use crate::std::borrow::ToOwned;
+use crate::std::string::ToString;
+use std::format;
 #[derive(Clone, Copy, PartialEq, Debug, Default)]
 struct IndentationLevel {
     tabs: usize,

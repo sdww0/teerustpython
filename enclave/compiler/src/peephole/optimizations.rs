@@ -1,5 +1,5 @@
 use rustpython_bytecode::bytecode::{self, Instruction};
-
+use std::vec;
 use super::{InstructionMetadata, OptimizationBuffer};
 
 macro_rules! metas {

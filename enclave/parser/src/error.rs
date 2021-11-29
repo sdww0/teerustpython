@@ -4,10 +4,12 @@ use lalrpop_util::ParseError as LalrpopError;
 
 use crate::location::Location;
 use crate::token::Tok;
-
+use std::string::String;
+use std::vec::Vec;
+use std::vec;
 use std::error::Error;
 use std::fmt;
-
+use std::boxed::Box;
 /// Represents an error during lexical scanning.
 #[derive(Debug, PartialEq)]
 pub struct LexicalError {

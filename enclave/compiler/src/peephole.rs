@@ -1,7 +1,8 @@
 use crate::output_stream::OutputStream;
 use arrayvec::ArrayVec;
 use rustpython_bytecode::bytecode::{CodeObject, Instruction, Label, Location};
-
+use std::string::String;
+use std::vec::Vec;
 pub mod optimizations;
 
 const PEEPHOLE_BUFFER_SIZE: usize = 20;

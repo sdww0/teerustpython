@@ -1,0 +1,28 @@
+[package]
+
+name = "term"
+version = "0.5.0"
+authors = ["The Rust Project Developers", "Steven Allen"]
+license = "MIT/Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/Stebalien/term"
+homepage = "https://github.com/Stebalien/term"
+documentation = "https://stebalien.github.io/doc/term/term/"
+description = """
+A terminal formatting library
+"""
+categories = ["command-line-interface"]
+
+[badges]
+travis-ci = { repository = "Stebalien/term" }
+appveyor = { repository = "Stebalien/term" }
+
+[dependencies]
+byteorder = {path = "/root/sgx/teerustpython/already/byteorder-1.2.1"}
+sgx_tstd                       = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
+
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3", features = ["wincon", "handleapi", "fileapi"] }
+
+[features]
+default=[]

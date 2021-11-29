@@ -17,7 +17,11 @@
 
 #![doc(html_logo_url = "https://raw.githubusercontent.com/RustPython/RustPython/master/logo.png")]
 #![doc(html_root_url = "https://docs.rs/rustpython-parser/")]
-
+#![no_std]
+extern crate sgx_tstd as std;
+use std::string::String;
+use std::vec::Vec;
+use std::vec;
 #[macro_use]
 extern crate log;
 use lalrpop_util::lalrpop_mod;

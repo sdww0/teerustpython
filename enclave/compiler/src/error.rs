@@ -4,7 +4,10 @@ use rustpython_parser::token::Tok;
 
 use std::error::Error;
 use std::fmt;
-
+use std::borrow::ToOwned;
+use std::string::ToString;
+use std::string::String;
+use std::format;
 #[derive(Debug)]
 pub struct CompileError {
     pub statement: Option<String>,

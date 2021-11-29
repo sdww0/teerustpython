@@ -1,7 +1,12 @@
 use std::iter;
 use std::mem;
 use std::str;
-
+use std::string::String;
+use std::vec::Vec;
+use std::vec;
+use std::boxed::Box;
+use crate::std::string::ToString;
+use crate::std::borrow::ToOwned;
 use crate::ast::{ConversionFlag, StringGroup};
 use crate::error::{FStringError, FStringErrorType};
 use crate::location::Location;
