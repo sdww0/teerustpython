@@ -1,7 +1,10 @@
 use super::Diagnostic;
 use std::collections::HashMap;
 use syn::{Attribute, AttributeArgs, Ident, Lit, Meta, NestedMeta, Path};
-
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
+use std::format;
 pub fn path_eq(path: &Path, s: &str) -> bool {
     path.get_ident().map_or(false, |id| id == s)
 }

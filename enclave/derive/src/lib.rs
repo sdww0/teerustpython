@@ -1,7 +1,8 @@
 #![recursion_limit = "128"]
 #![doc(html_logo_url = "https://raw.githubusercontent.com/RustPython/RustPython/master/logo.png")]
 #![doc(html_root_url = "https://docs.rs/rustpython-derive/")]
-
+#![no_std]
+extern crate sgx_tstd as std;
 extern crate proc_macro;
 
 #[macro_use]

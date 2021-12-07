@@ -9,8 +9,7 @@
 // except according to those terms.
 //
 // Original authors: alexchrichton, bluss
-#![no_std]
-extern crate sgx_tstd as std;
+
 use std::ptr;
 
 // UTF-8 ranges and tags for encoding characters

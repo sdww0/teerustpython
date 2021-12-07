@@ -1,5 +1,4 @@
-#![no_std]
-extern crate sgx_tstd as std;
+
 
 use crate::array::Array;
 use std::mem::MaybeUninit as StdMaybeUninit;

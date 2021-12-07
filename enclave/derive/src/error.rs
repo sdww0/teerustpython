@@ -30,7 +30,8 @@
 use proc_macro2::*;
 use quote::{ToTokens, TokenStreamExt};
 use syn::parse::Error;
-
+use std::string::String;
+use std::vec::Vec;
 macro_rules! err_span {
     ($span:expr, $($msg:tt)*) => (
         $crate::Diagnostic::spanned_error(&$span, format!($($msg)*))

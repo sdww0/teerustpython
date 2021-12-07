@@ -1,5 +1,4 @@
-#![no_std]
-extern crate sgx_tstd as std;
+
 use std::fmt;
 #[cfg(feature="std")]
 use std::any::Any;

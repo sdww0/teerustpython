@@ -21,11 +21,15 @@ use rustpython_bytecode::bytecode::{CodeObject, FrozenModule};
 use rustpython_compiler::compile;
 use std::collections::HashMap;
 use std::env;
-use std::fs;
+use std::untrusted::fs;
 use std::path::{Path, PathBuf};
 use syn::parse::{Parse, ParseStream, Result as ParseResult};
 use syn::{self, parse2, Lit, LitByteStr, LitStr, Meta, Token};
-
+use std::string::String;
+use std::borrow::ToOwned;
+use std::untrusted::path::PathEx;
+use std::vec::Vec;
+use std::format;
 static CARGO_MANIFEST_DIR: Lazy<PathBuf> = Lazy::new(|| {
     PathBuf::from(env::var_os("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR is not present"))
 });

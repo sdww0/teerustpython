@@ -7,7 +7,12 @@ use syn::{
     parse_quote, spanned::Spanned, Attribute, AttributeArgs, Ident, Index, Item, Lit, Meta,
     NestedMeta,
 };
-
+use std::string::String;
+use std::string::ToString;
+use std::borrow::ToOwned;
+use std::vec::Vec;
+use std::format;
+use std::vec;
 fn meta_to_vec(meta: Meta) -> Result<Vec<NestedMeta>, Meta> {
     match meta {
         Meta::Path(_) => Ok(Vec::new()),

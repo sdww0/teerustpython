@@ -1,5 +1,4 @@
-#![no_std]
-extern crate sgx_tstd as std;
+
 use std::borrow::Borrow;
 use std::cmp;
 use std::fmt;

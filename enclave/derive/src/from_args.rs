@@ -5,7 +5,9 @@ use quote::quote;
 use syn::{
     parse_quote, Attribute, Data, DeriveInput, Expr, Field, Fields, Ident, Lit, Meta, NestedMeta,
 };
-
+use std::vec::Vec;
+use std::string::ToString;
+use std::format;
 /// The kind of the python parameter, this corresponds to the value of Parameter.kind
 /// (https://docs.python.org/3/library/inspect.html#inspect.Parameter.kind)
 enum ParameterKind {

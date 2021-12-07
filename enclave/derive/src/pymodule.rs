@@ -4,7 +4,12 @@ use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, quote_spanned, ToTokens};
 use std::collections::HashSet;
 use syn::{parse_quote, spanned::Spanned, Attribute, AttributeArgs, Ident, Item, Meta, NestedMeta};
-
+use std::vec::Vec;
+use std::string::String;
+use std::string::ToString;
+use std::borrow::ToOwned;
+use std::vec;
+use std::format;
 fn meta_to_vec(meta: Meta) -> Result<Vec<NestedMeta>, Meta> {
     match meta {
         Meta::Path(_) => Ok(Vec::new()),
