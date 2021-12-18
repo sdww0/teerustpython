@@ -224,10 +224,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   ├── unic-bidi v0.9.0
 │   ├── unic-char-property v0.9.0 (*)
 │   ├── unic-normal v0.9.0
-│   ├── unic-ucd-age v0.9.0
-│   ├── unic-ucd-category v0.9.0
-│   ├── unic-ucd-ident v0.9.0 (*)
-│   ├── unicode-casing v0.1.0
 └── rustyline v6.1.0 (*)
 [dev-dependencies]
 └── cpython v0.2.1
