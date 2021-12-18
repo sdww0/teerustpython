@@ -1,0 +1,41 @@
+[package]
+name = "lzzzz"
+version = "0.8.0"
+authors = ["picoHz <picoHz@outlook.com>"]
+edition = "2018"
+description = "Full-featured liblz4 binding for Rust."
+keywords = ["lz4", "lz4f", "lz4-hc", "compression", "decompression"]
+categories = ["compression", "api-bindings"]
+repository = "https://github.com/picoHz/lzzzz"
+homepage = "https://github.com/picoHz/lzzzz"
+documentation = "https://docs.rs/lzzzz"
+license = "MIT"
+readme = "README.md"
+include = ["src/**/*", "build.rs", "vendor/liblz4/*", "Cargo.toml"]
+
+[dependencies]
+sgx_tstd                       = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
+
+
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[dev-dependencies]
+assert_fs = "1.0.0"
+base64 = "0.13.0"
+bytes = "0.6.0"
+lazy_static = "1.4.0"
+rand = { version = "0.7.3", features = ["small_rng"] }
+rayon = "1.5.0"
+static_assertions = "1.1.0"
+criterion = "0.3.3"
+
+[build-dependencies]
+cc = { version = "1.0.65", features = ["parallel"] }
+
+[[bench]]
+name = "lzzzz"
+harness = false
+path = "benches/lzzzz.rs"
