@@ -229,7 +229,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   ├── unic-ucd-ident v0.9.0 (*)
 │   ├── unicode-casing v0.1.0
 │   ├── unicode_names2 v0.4.0
-│   └── volatile v0.2.6
 └── rustyline v6.1.0 (*)
 [dev-dependencies]
 └── cpython v0.2.1
