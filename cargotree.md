@@ -28,13 +28,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │   │   └── subtle v1.0.0
 │   │   ├── digest v0.8.1 (*)
 │   │   └── opaque-debug v0.2.3
-│   ├── bstr v0.2.12
-│   │   ├── lazy_static v1.4.0
-│   │   ├── memchr v2.3.3
-│   │   ├── regex-automata v0.1.9
-│   │   │   └── byteorder v1.3.4
-│   │   └── serde v1.0.106 (*)
-│   ├── byteorder v1.3.4
 │   ├── caseless v0.2.1
 │   │   └── unicode-normalization v0.1.12
 │   │       └── smallvec v1.3.0
@@ -68,7 +61,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │   └── socket2 v0.3.12
 │   │       ├── cfg-if v0.1.10
 │   │       └── libc v0.2.71
-│   ├── exitcode v1.1.2
 │   ├── flate2 v1.0.14
 │   │   ├── cfg-if v0.1.10
 │   │   ├── crc32fast v1.2.0 (*)
@@ -78,17 +70,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │       [build-dependencies]
 │   │       ├── cc v1.0.50
 │   │       └── pkg-config v0.3.17
-│   ├── foreign-types-shared v0.1.1
-│   ├── generational-arena v0.2.3
-│   │   └── cfg-if v0.1.10
-│   ├── gethostname v0.2.1
-│   │   └── libc v0.2.71
-│   ├── getrandom v0.1.14
-│   │   ├── cfg-if v0.1.10
-│   │   └── libc v0.2.71
-│   ├── hex v0.4.2
-│   ├── hexf-parse v0.1.0
-│   ├── indexmap v1.3.2 (*)
 │   ├── is-macro v0.1.8 (proc-macro)
 │   │   ├── Inflector v0.11.4
 │   │   ├── pmutil v0.5.3
