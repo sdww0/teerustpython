@@ -198,9 +198,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   ├── thread_local v1.0.1 (*)
 │   ├── uname v0.1.1
 │   │   └── libc v0.2.71
-│   ├── unic-bidi v0.9.0
-│   ├── unic-char-property v0.9.0 (*)
-│   ├── unic-normal v0.9.0
 └── rustyline v6.1.0 (*)
 [dev-dependencies]
 └── cpython v0.2.1
