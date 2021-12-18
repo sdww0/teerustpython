@@ -38,11 +38,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │   ├── num-traits v0.2.11 (*)
 │   │   └── time v0.1.43
 │   │       └── libc v0.2.71
-│   ├── crc v1.8.1
-│   │   [build-dependencies]
-│   │   └── build_const v0.2.1
-│   ├── crc32fast v1.2.0
-│   │   └── cfg-if v0.1.10
 │   ├── crossbeam-utils v0.7.2
 │   │   ├── cfg-if v0.1.10
 │   │   └── lazy_static v1.4.0
