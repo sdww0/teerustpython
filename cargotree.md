@@ -222,28 +222,10 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   ├── uname v0.1.1
 │   │   └── libc v0.2.71
 │   ├── unic-bidi v0.9.0
-│   │   ├── matches v0.1.8
-│   │   └── unic-ucd-bidi v0.9.0
-│   │       ├── unic-char-property v0.9.0 (*)
-│   │       ├── unic-char-range v0.9.0
-│   │       └── unic-ucd-version v0.9.0 (*)
 │   ├── unic-char-property v0.9.0 (*)
 │   ├── unic-normal v0.9.0
-│   │   └── unic-ucd-normal v0.9.0
-│   │       ├── unic-char-property v0.9.0 (*)
-│   │       ├── unic-char-range v0.9.0
-│   │       ├── unic-ucd-hangul v0.9.0
-│   │       │   └── unic-ucd-version v0.9.0 (*)
-│   │       └── unic-ucd-version v0.9.0 (*)
 │   ├── unic-ucd-age v0.9.0
-│   │   ├── unic-char-property v0.9.0 (*)
-│   │   ├── unic-char-range v0.9.0
-│   │   └── unic-ucd-version v0.9.0 (*)
 │   ├── unic-ucd-category v0.9.0
-│   │   ├── matches v0.1.8
-│   │   ├── unic-char-property v0.9.0 (*)
-│   │   ├── unic-char-range v0.9.0
-│   │   └── unic-ucd-version v0.9.0 (*)
 │   ├── unic-ucd-ident v0.9.0 (*)
 │   ├── unicode-casing v0.1.0
 │   ├── unicode_names2 v0.4.0

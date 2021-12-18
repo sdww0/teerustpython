@@ -24,6 +24,7 @@ sha-1 = "0.8"
 sha2 = "0.8"
 sha3 = "0.8"
 blake2 = "0.8"
+# this is no_std
 volatile = "0.2"
 
 num-complex = { version = "0.2.2", features = ["serde"] }
@@ -75,17 +76,17 @@ parking_lot = { git = "https://github.com/Amanieu/parking_lot" } # TODO: use pub
 thread_local = "1.0"
 
 ## unicode stuff
-unicode_names2 = "0.4"
+unicode_names2 = {path="/root/sgx/teerustpython/already/unicode_names2-0.4.0"}
 # TODO: use unic for this; needed for title case:
 # https://github.com/RustPython/RustPython/pull/832#discussion_r275428939
-unicode-casing = "0.1"
+unicode-casing = {path="/root/sgx/teerustpython/already/unicod-casing-master"}
 # update version all at the same time
-unic-bidi          = "0.9"
-unic-char-property = "0.9"
-unic-normal        = "0.9"
-unic-ucd-category  = "0.9"
-unic-ucd-age       = "0.9"
-unic-ucd-ident     = "0.9"
+unic-bidi          = {path="/root/sgx/teerustpython/already/rust-unic-master/unic/bidi"}
+unic-char-property = {path="/root/sgx/teerustpython/already/rust-unic-master/unic/char/property"}
+unic-normal        = {path="/root/sgx/teerustpython/already/rust-unic-master/unic/normal"}
+unic-ucd-category  = {path="/root/sgx/teerustpython/already/rust-unic-master/unic/ucd/category"}
+unic-ucd-age       = {path="/root/sgx/teerustpython/already/rust-unic-master/unic/ucd/age"}
+unic-ucd-ident     = {path="/root/sgx/teerustpython/already/rust-unic-master/unic/ucd/ident"}
 
 flame = { version = "0.2", optional = true }
 flamer = { version = "0.3", optional = true }
@@ -95,7 +96,7 @@ pwd = "1"
 
 [target.'cfg(unix)'.dependencies]
 exitcode = "1.1.2"
-uname = "0.1.1"
+# uname = "0.1.1"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 crc32fast = "1.2.0"

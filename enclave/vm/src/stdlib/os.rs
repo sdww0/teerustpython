@@ -1375,13 +1375,13 @@ impl UnameResult {
 
 #[cfg(unix)]
 fn os_uname(vm: &VirtualMachine) -> PyResult {
-    let info = uname::uname().map_err(|err| convert_io_error(vm, err))?;
+    // let info = uname::uname().map_err(|err| convert_io_error(vm, err))?;
     Ok(UnameResult {
-        sysname: info.sysname,
-        nodename: info.nodename,
-        release: info.release,
-        version: info.version,
-        machine: info.machine,
+        sysname: "sgx sysname",
+        nodename: "nodename",
+        release: "release",
+        version: "version",
+        machine: "machine",
     }
     .into_obj(vm))
 }
