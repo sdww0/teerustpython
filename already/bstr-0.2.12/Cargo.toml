@@ -30,9 +30,9 @@ debug = true
 bench = false
 
 [dependencies]
-lazy_static    = { version = "1.4.0", features = ["spin_no_std"] }
-memcher = {path = "/root/sgx/teerustpython/already/memcher-2.3.3"}
-serde            = { git = "https://github.com/mesalock-linux/serde-sgx" }
+lazy_static    = { version = "1.4.0", features = ["spin_no_std"] ,optional=true}
+memchr = {path = "/root/sgx/teerustpython/already/memchr-2.3.3"}
+serde            = { git = "https://github.com/mesalock-linux/serde-sgx" ,optional=true}
 cfg-if         = "0.1.9"
 
 [dependencies.regex-automata]

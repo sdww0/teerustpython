@@ -1,0 +1,36 @@
+
+[package]
+name = "miniz_oxide_c_api-fuzz"
+version = "0.0.1"
+authors = ["Automatically generated"]
+publish = false
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libc="0.2.22"
+
+[dependencies.miniz_oxide_c_api]
+path = ".."
+[dependencies.miniz_oxide]
+path = "../miniz_oxide"
+[dependencies.libfuzzer-sys]
+git = "https://github.com/rust-fuzz/libfuzzer-sys.git"
+
+# Prevent this from interfering with workspaces
+[workspace]
+members = ["."]
+
+[[bin]]
+name = "fuzz_high"
+path = "fuzz_targets/fuzz_high.rs"
+
+[features]
+default = ["fuzzing"]
+fuzzing = ["miniz_oxide_c_api/fuzzing"]
+
+
+[[bin]]
+name = "inflate_nonwrapping"
+path = "fuzz_targets/inflate_nonwrapping.rs"

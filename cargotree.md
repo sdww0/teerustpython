@@ -34,10 +34,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │   [build-dependencies]
 │   │   └── regex v1.3.6 (*)
 │   ├── chrono v0.4.11
-│   │   ├── num-integer v0.1.42 (*)
-│   │   ├── num-traits v0.2.11 (*)
-│   │   └── time v0.1.43
-│   │       └── libc v0.2.71
 │   ├── crossbeam-utils v0.7.2
 │   │   ├── cfg-if v0.1.10
 │   │   └── lazy_static v1.4.0
@@ -57,14 +53,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │       ├── cfg-if v0.1.10
 │   │       └── libc v0.2.71
 │   ├── flate2 v1.0.14
-│   │   ├── cfg-if v0.1.10
-│   │   ├── crc32fast v1.2.0 (*)
-│   │   ├── libc v0.2.71
-│   │   └── libz-sys v1.0.25
-│   │       └── libc v0.2.71
-│   │       [build-dependencies]
-│   │       ├── cc v1.0.50
-│   │       └── pkg-config v0.3.17
 │   ├── is-macro v0.1.8 (proc-macro)
 │   │   ├── Inflector v0.11.4
 │   │   ├── pmutil v0.5.3
@@ -76,17 +64,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │   └── syn v1.0.17 (*)
 │   ├── itertools v0.8.2 (*)
 │   ├── lexical v4.0.0
-│   │   ├── cfg-if v0.1.10
-│   │   └── lexical-core v0.6.2
-│   │       ├── arrayvec v0.4.12
-│   │       │   └── nodrop v0.1.14
-│   │       ├── cfg-if v0.1.10
-│   │       ├── ryu v1.0.3
-│   │       └── static_assertions v0.3.4
-│   │       [build-dependencies]
-│   │       └── rustc_version v0.2.3
-│   │   [build-dependencies]
-│   │   └── rustc_version v0.2.3 (*)
 │   ├── libc v0.2.71
 │   ├── libz-sys v1.0.25 (*)
 │   ├── log v0.4.8 (*)

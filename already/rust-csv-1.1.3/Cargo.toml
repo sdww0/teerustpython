@@ -1,0 +1,41 @@
+[package]
+name = "csv"
+version = "1.1.3"  #:version
+authors = ["Andrew Gallant <jamslam@gmail.com>"]
+description = "Fast CSV parsing with support for serde."
+documentation = "http://burntsushi.net/rustdoc/csv/"
+homepage = "https://github.com/BurntSushi/rust-csv"
+repository = "https://github.com/BurntSushi/rust-csv"
+readme = "README.md"
+keywords = ["csv", "comma", "parser", "delimited", "serde"]
+license = "Unlicense/MIT"
+categories = ["encoding", "parser-implementations"]
+exclude = ["/.travis.yml", "/appveyor.yml", "/ci/*", "/scripts/*"]
+edition = "2018"
+
+[badges]
+travis-ci = { repository = "BurntSushi/rust-csv" }
+appveyor = { repository = "BurntSushi/rust-csv" }
+
+[workspace]
+members = ["csv-core", "csv-index"]
+
+[lib]
+bench = false
+
+[dependencies]
+bstr = { path="/root/sgx/teerustpython/already/bstr-0.2.12", features = ["serde1"] }
+csv-core = { path = "csv-core", version = "0.1.6" }
+itoa             = { git = "https://github.com/mesalock-linux/itoa-sgx" }
+ryu = "1"
+serde            = { git = "https://github.com/mesalock-linux/serde-sgx" }
+sgx_tstd                       = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
+
+[dev-dependencies]
+serde = { git = "https://github.com/mesalock-linux/serde-sgx", features = ["derive"] }
+
+[profile.release]
+debug = true
+
+[profile.bench]
+debug = true

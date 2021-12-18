@@ -1,0 +1,18 @@
+sudo: enabled
+language:
+  - rust
+  - cpp
+compiler:
+  - gcc
+rust:
+  - stable
+  - nightly
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install valgrind
+script:
+  - cargo test
+  - cargo test -p miniz_oxide
+  - ./test.sh
+after_success:
+  - ./travis-after-success.sh
