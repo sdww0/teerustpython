@@ -1,7 +1,8 @@
 use core::ops;
 #[cfg(feature = "std")]
 use std::borrow::Cow;
-
+#[cfg(feature = "std")]
+use std::vec::Vec;
 /// A specialized copy-on-write byte string.
 ///
 /// The purpose of this type is to permit usage of a "borrowed or owned

@@ -1,7 +1,9 @@
-use std::fs::File;
+use std::untrusted::fs::File;
 use std::io;
 use std::path::Path;
 use std::result;
+use std::vec::Vec;
+use std::vec;
 
 use csv_core::{
     self, WriteResult, Writer as CoreWriter,

@@ -3,9 +3,11 @@ use std::fmt;
 use std::iter::FromIterator;
 use std::ops::{self, Range};
 use std::result;
-
+use std::vec::Vec;
+use std::vec;
 use bstr::{BString, ByteSlice};
 use serde::de::Deserialize;
+use std::boxed::Box;
 
 use crate::deserializer::deserialize_byte_record;
 use crate::error::{new_utf8_error, Result, Utf8Error};

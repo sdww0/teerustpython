@@ -1,6 +1,4 @@
-use std::string::String;
-use std::vec::Vec;
-use std::vec;
+
 macro_rules! impl_partial_eq {
     ($lhs:ty, $rhs:ty) => {
         impl<'a, 'b> PartialEq<$rhs> for $lhs {
@@ -69,7 +67,9 @@ mod bstring {
     use std::fmt;
     use std::iter::FromIterator;
     use std::ops;
-
+    use std::vec::Vec;
+    use std::string::String;
+    use std::vec;
     use bstr::BStr;
     use bstring::BString;
     use ext_vec::ByteVec;
@@ -306,10 +306,14 @@ mod bstring {
 mod bstr {
     #[cfg(feature = "std")]
     use std::borrow::Cow;
-
+    #[cfg(feature = "std")]
+    use std::string::String;
+    #[cfg(feature = "std")]
+    use std::vec::Vec;
     use core::cmp::Ordering;
     use core::fmt;
     use core::ops;
+
 
     use bstr::BStr;
     use ext_slice::ByteSlice;
@@ -662,7 +666,8 @@ mod bstr_serde {
 mod bstring_serde {
     use std::cmp;
     use std::fmt;
-
+    use std::string::String;
+    use std::vec::Vec;
     use serde::{
         de::Error, de::SeqAccess, de::Visitor, Deserialize, Deserializer,
         Serialize, Serializer,

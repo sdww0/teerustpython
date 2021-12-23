@@ -4,7 +4,8 @@ use std::iter::FromIterator;
 use std::ops::{self, Range};
 use std::result;
 use std::str;
-
+use std::vec::Vec;
+use std::string::String;
 use serde::de::Deserialize;
 
 use crate::byte_record::{ByteRecord, ByteRecordIter, Position};

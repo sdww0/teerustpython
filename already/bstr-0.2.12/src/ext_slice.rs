@@ -4,13 +4,19 @@ use std::borrow::Cow;
 use std::ffi::OsStr;
 #[cfg(feature = "std")]
 use std::path::Path;
+#[cfg(feature = "std")]
+use std::vec::Vec;
+#[cfg(feature = "std")]
+use std::string::String;
+#[cfg(feature = "std")]
+use std::vec;
 
 use core::cmp;
 use core::ops;
 use core::ptr;
 use core::slice;
 use core::str;
-use std::vec::Vec;
+
 use memchr::{memchr, memrchr};
 
 use ascii;

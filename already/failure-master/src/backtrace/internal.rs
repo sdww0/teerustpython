@@ -4,7 +4,7 @@ use std::ffi::OsString;
 use std::fmt;
 #[allow(deprecated)] // to allow for older Rust versions (<1.24)
 use std::sync::atomic::{AtomicUsize, ATOMIC_USIZE_INIT, Ordering};
-use std::sync::Mutex;
+use std::sync::SgxMutex as Mutex;
 
 pub use super::backtrace::Backtrace;
 

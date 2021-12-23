@@ -1,5 +1,6 @@
 use bstr::BStr;
-use std::string::String;
+
+use std::vec::Vec;
 /// A wrapper for `Vec<u8>` that provides convenient string oriented trait
 /// impls.
 ///

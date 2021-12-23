@@ -20,11 +20,13 @@
 //! variable to a non-zero value (this also enables backtraces for panics).
 //! Use the `RUST_FAILURE_BACKTRACE` variable to enable or disable backtraces
 //! for `failure` specifically.
-#![cfg_attr(not(feature = "std"), no_std)]
+#![no_std]
+// #![cfg_attr(not(feature = "std"), no_std)]
 #![deny(missing_docs)]
 #![deny(warnings)]
-#![cfg_attr(feature = "small-error", feature(extern_types, allocator_api))]
 
+#![cfg_attr(feature = "small-error", feature(extern_types, allocator_api))]
+extern crate sgx_tstd as std;
 macro_rules! with_std { ($($i:item)*) => ($(#[cfg(feature = "std")]$i)*) }
 macro_rules! without_std { ($($i:item)*) => ($(#[cfg(not(feature = "std"))]$i)*) }
 
@@ -40,7 +42,7 @@ mod box_std;
 mod compat;
 mod context;
 mod result_ext;
-
+use std::boxed::Box;
 use core::any::TypeId;
 use core::fmt::{Debug, Display};
 
@@ -60,7 +62,7 @@ extern crate failure_derive;
 pub use failure_derive::*;
 
 with_std! {
-    extern crate core;
+    // extern crate core;
 
     mod sync_failure;
     pub use sync_failure::SyncFailure;

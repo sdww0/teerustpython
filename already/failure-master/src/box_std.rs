@@ -1,7 +1,7 @@
 use std::error::Error;
 use std::fmt;
 use Fail;
-
+use std::boxed::Box;
 pub struct BoxStd(pub Box<dyn Error + Send + Sync + 'static>);
 
 impl fmt::Display for BoxStd {

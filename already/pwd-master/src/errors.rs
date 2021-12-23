@@ -1,4 +1,8 @@
+
+use std::string::String;
 #[derive(Debug, Clone, PartialEq, Fail)]
+
+
 pub enum PwdError {
     #[fail(display = "Error during string conversion: {}", _0)]
     StringConvError(String),

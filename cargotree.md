@@ -35,15 +35,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │   └── socket2 v0.3.12
 │   │       ├── cfg-if v0.1.10
 │   │       └── libc v0.2.71
-│   ├── is-macro v0.1.8 (proc-macro)
-│   │   ├── Inflector v0.11.4
-│   │   ├── pmutil v0.5.3
-│   │   │   ├── proc-macro2 v1.0.10 (*)
-│   │   │   ├── quote v1.0.3 (*)
-│   │   │   └── syn v1.0.17 (*)
-│   │   ├── proc-macro2 v1.0.10 (*)
-│   │   ├── quote v1.0.3 (*)
-│   │   └── syn v1.0.17 (*)
 │   ├── lexical v4.0.0
 │   ├── libz-sys v1.0.25 (*)
 │   ├── md-5 v0.8.0
@@ -55,31 +46,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │   ├── cfg-if v0.1.10
 │   │   ├── libc v0.2.71
 │   │   └── void v1.0.2
-│   ├── num-integer v0.1.42 (*)
-│   ├── num-iter v0.1.40
-│   │   ├── num-integer v0.1.42 (*)
-│   │   └── num-traits v0.2.11 (*)
-│   │   [build-dependencies]
-│   │   └── autocfg v1.0.0
-│   ├── num-rational v0.2.4
-│   │   ├── num-integer v0.1.42 (*)
-│   │   └── num-traits v0.2.11 (*)
-│   │   [build-dependencies]
-│   │   └── autocfg v1.0.0
-│   ├── num_cpus v1.12.0
-│   │   └── libc v0.2.71
-│   ├── num_enum v0.4.3
-│   │   ├── derivative v2.1.1 (proc-macro)
-│   │   │   ├── proc-macro2 v1.0.10 (*)
-│   │   │   ├── quote v1.0.3 (*)
-│   │   │   └── syn v1.0.17 (*)
-│   │   └── num_enum_derive v0.4.3 (proc-macro)
-│   │       ├── proc-macro-crate v0.1.4
-│   │       │   └── toml v0.5.6
-│   │       │       └── serde v1.0.106 (*)
-│   │       ├── proc-macro2 v1.0.10 (*)
-│   │       ├── quote v1.0.3 (*)
-│   │       └── syn v1.0.17 (*)
 │   ├── once_cell v1.3.1
 │   ├── parking_lot v0.10.2 (https://github.com/Amanieu/parking_lot#99aa542b)
 │   │   ├── instant v0.1.3
@@ -90,35 +56,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │       ├── instant v0.1.3
 │   │       ├── libc v0.2.71
 │   │       └── smallvec v1.3.0
-│   ├── paste v0.1.10
-│   │   ├── paste-impl v0.1.10 (proc-macro)
-│   │   │   ├── proc-macro-hack v0.5.15 (proc-macro)
-│   │   │   ├── proc-macro2 v1.0.10 (*)
-│   │   │   ├── quote v1.0.3 (*)
-│   │   │   └── syn v1.0.17 (*)
-│   │   └── proc-macro-hack v0.5.15 (proc-macro)
-│   ├── pwd v1.3.0
-│   │   ├── failure v0.1.7
-│   │   │   ├── backtrace v0.3.41
-│   │   │   │   ├── backtrace-sys v0.1.35
-│   │   │   │   │   └── libc v0.2.71
-│   │   │   │   │   [build-dependencies]
-│   │   │   │   │   └── cc v1.0.50
-│   │   │   │   ├── cfg-if v0.1.10
-│   │   │   │   ├── libc v0.2.71
-│   │   │   │   └── rustc-demangle v0.1.16
-│   │   │   └── failure_derive v0.1.7 (proc-macro)
-│   │   │       ├── proc-macro2 v1.0.10 (*)
-│   │   │       ├── quote v1.0.3 (*)
-│   │   │       ├── syn v1.0.17 (*)
-│   │   │       └── synstructure v0.12.3
-│   │   │           ├── proc-macro2 v1.0.10 (*)
-│   │   │           ├── quote v1.0.3 (*)
-│   │   │           ├── syn v1.0.17 (*)
-│   │   │           └── unicode-xid v0.2.0
-│   │   └── libc v0.2.71
-│   ├── result-like v0.2.1
-│   │   └── is-macro v0.1.8 (proc-macro) (*)
 │   ├── rustc_version_runtime v0.1.5
 │   │   ├── rustc_version v0.2.3 (*)
 │   │   └── semver v0.9.0 (*)

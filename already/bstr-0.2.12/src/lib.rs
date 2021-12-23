@@ -408,15 +408,15 @@ pub use utf8::{
 
 mod ascii;
 mod bstr;
-// #[cfg(feature = "std")]
+#[cfg(feature = "std")]
 mod bstring;
 mod byteset;
 mod cow;
 mod ext_slice;
-// #[cfg(feature = "std")]
+#[cfg(feature = "std")]
 mod ext_vec;
 mod impls;
-// #[cfg(feature = "std")]
+#[cfg(feature = "std")]
 pub mod io;
 mod search;
 #[cfg(test)]

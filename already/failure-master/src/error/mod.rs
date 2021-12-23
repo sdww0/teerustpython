@@ -15,7 +15,7 @@ use self::error_impl::ErrorImpl;
 #[cfg(feature = "std")]
 use std::error::Error as StdError;
 
-
+use std::boxed::Box;
 /// The `Error` type, which can contain any failure.
 ///
 /// Functions which accumulate many kinds of errors should return this type.

@@ -36,13 +36,13 @@
 2. is-macro (proc) (use directly (?) waiting merge to check)
 3. num_enum (proc) (can use directly by adding default-feature = false)
 4. paste (proc) (can use directly (default is no_std))
-5. pwd (proc)
-6. result-like (proc)
-7. num-integer
-8. num-iter
-9. num-rational
-10. num_cpus
-11. csv
+5. pwd (proc) (done)
+6. result-like (proc) (done)
+7. num-integer (done)
+8. num-iter (done)
+9. num-rational (done, delete bigint(todo ))
+10. num_cpus  (done)
+11. csv (done)
 12. statrs
 13. blake2
 14. dns-lookup

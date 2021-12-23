@@ -11,7 +11,7 @@ use std::path::{Path, PathBuf};
 use std::ptr;
 use std::str;
 use std::vec;
-
+use std::string::ToString;
 use ext_slice::ByteSlice;
 use utf8::{self, Utf8Error};
 

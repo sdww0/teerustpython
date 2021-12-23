@@ -54,10 +54,10 @@ version = "0.1.3"
 version = "1.2.1"
 
 [features]
-default = [ "unicode"]
+default = ["std", "unicode"]
 serde1 = ["serde1-nostd", "serde/std"]
 serde1-nostd = ["serde"]
-# std = []
+std = []
 unicode = ["lazy_static", "regex-automata"]
 [badges.appveyor]
 repository = "BurntSushi/bstr"

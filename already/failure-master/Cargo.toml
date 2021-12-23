@@ -17,6 +17,10 @@ path = "./failure_derive"
 optional = true
 version = "0.3.3"
 
+[dependencies]
+sgx_tstd                       = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
+
+
 [workspace]
 members = [".", "failure_derive"]
 
@@ -26,5 +30,5 @@ maintenance = { status = "deprecated" }
 [features]
 default = ["std", "derive"]
 #small-error = ["std"]
-std = ["backtrace"]
+std = []
 derive = ["failure_derive"]

@@ -1,7 +1,10 @@
 use errors::*;
-use libc::{c_char, endpwent, getpwent, getpwnam, getpwuid, getuid, passwd, setpwent};
+use libc::{c_char, passwd};
 use std::ffi::{CStr, CString};
-
+use std::string::ToString;
+use std::string::String;
+use std::format;
+use libc::ocall::getuid;
 /// The main struct for the library, a safe version
 /// of the POSIX `struct passwd`
 ///
@@ -41,26 +44,26 @@ impl Iterator for PasswdIter {
 
     fn next(&mut self) -> Option<Self::Item> {
         if !self.inited {
-            unsafe {
-                setpwent();
-            };
+            // unsafe {
+            //     setpwent();
+            // };
             self.inited = true;
         }
+        None
+        // let next = unsafe { getpwent() };
 
-        let next = unsafe { getpwent() };
+        // if next.is_null() {
+        //     unsafe {
+        //         endpwent();
+        //     };
+        //     return None;
+        // }
 
-        if next.is_null() {
-            unsafe {
-                endpwent();
-            };
-            return None;
-        }
-
-        if let Ok(passwd) = Passwd::from_unsafe(next) {
-            Some(passwd)
-        } else {
-            None
-        }
+        // if let Ok(passwd) = Passwd::from_unsafe(next) {
+        //     Some(passwd)
+        // } else {
+        //     None
+        // }
     }
 }
 
@@ -129,12 +132,13 @@ impl Passwd {
     /// ```
     pub fn from_name(name: &str) -> Result<Option<Passwd>> {
         let cname = CString::new(name).map_err(|e| PwdError::StringConvError(format!("{:?}", e)))?;
-        let pwd = unsafe { getpwnam(cname.as_ptr()) };
-        if pwd.is_null() {
-            Ok(None)
-        } else {
-            Ok(Some(Passwd::from_unsafe(pwd)?))
-        }
+        Ok(None)
+        // let pwd = unsafe { getpwnam(cname.as_ptr()) };
+        // if pwd.is_null() {
+        //     Ok(None)
+        // } else {
+        //     Ok(Some(Passwd::from_unsafe(pwd)?))
+        // }
     }
 
     /// Looks up the uid and returns a Passwd with the user's values, if the user is found
@@ -164,10 +168,11 @@ impl Passwd {
     /// #   }
     /// # }
     /// ```
-    pub fn from_uid(uid: u32) -> Option<Passwd> {
-        let pwd = unsafe { getpwuid(uid) };
-        Passwd::from_unsafe(pwd).ok()
-    }
+    // pub fn from_uid(uid: u32) -> Option<Passwd> {
+    //     Ok(None)
+    //     // let pwd = unsafe { getpwuid(uid) };
+    //     // Passwd::from_unsafe(pwd).ok()
+    // }
 
     /// Shortcut for `Passwd::from_uid(libc::getuid() as u32)`, so see the docs for that constructor
     ///
@@ -193,10 +198,10 @@ impl Passwd {
     /// #   }
     /// # }
     /// ```
-    pub fn current_user() -> Option<Passwd> {
-        let uid = unsafe { getuid() };
-        Passwd::from_uid(uid as u32)
-    }
+    // pub fn current_user() -> Option<Passwd> {
+    //     let uid = unsafe { getuid() };
+    //     Passwd::from_uid(uid as u32)
+    // }
 
     /// Returns an iterator over all entries in the /etc/passwd file
     ///

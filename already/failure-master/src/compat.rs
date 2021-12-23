@@ -1,5 +1,5 @@
 use core::fmt::{self, Display};
-
+use std::boxed::Box;
 /// A compatibility wrapper around an error type from this crate.
 ///
 /// `Compat` implements `std::error::Error`, allowing the types from this

@@ -1,7 +1,7 @@
 use Fail;
 use std::error::Error;
 use std::fmt::{self, Debug, Display};
-use std::sync::Mutex;
+use std::sync::SgxMutex as Mutex;
 
 /// Wrapper for `std` errors to make them `Sync`.
 ///

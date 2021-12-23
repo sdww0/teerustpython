@@ -2,6 +2,8 @@ use std::error::Error as StdError;
 use std::fmt;
 use std::io;
 use std::result;
+use std::string::String;
+use std::boxed::Box;
 
 use crate::byte_record::{ByteRecord, Position};
 use crate::deserializer::DeserializeError;

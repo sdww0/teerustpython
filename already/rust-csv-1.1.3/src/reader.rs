@@ -1,8 +1,9 @@
-use std::fs::File;
+use std::untrusted::fs::File;
 use std::io::{self, BufRead, Seek};
 use std::marker::PhantomData;
 use std::path::Path;
 use std::result;
+use std::boxed::Box;
 
 use csv_core::{Reader as CoreReader, ReaderBuilder as CoreReaderBuilder};
 use serde::de::DeserializeOwned;

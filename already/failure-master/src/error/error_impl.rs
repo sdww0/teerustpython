@@ -2,7 +2,7 @@ use core::any::TypeId;
 
 use Fail;
 use backtrace::Backtrace;
-
+use std::boxed::Box;
 pub(crate) struct ErrorImpl {
     inner: Box<Inner<dyn Fail>>,
 }
