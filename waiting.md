@@ -32,10 +32,10 @@
 29. uname
 
 
-1. arr_macro (proc)
-2. is-macro (proc)
-3. num_enum (proc)
-4. paste (proc)
+1. arr_macro (proc) (can use directly (default is no_std))
+2. is-macro (proc) (use directly (?) waiting merge to check)
+3. num_enum (proc) (can use directly by adding default-feature = false)
+4. paste (proc) (can use directly (default is no_std))
 5. pwd (proc)
 6. result-like (proc)
 7. num-integer

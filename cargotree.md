@@ -5,12 +5,6 @@
 
 rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 ├── rustpython-vm v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave/vm)
-│   ├── arr_macro v0.1.3
-│   │   ├── arr_macro_impl v0.1.3 (proc-macro)
-│   │   │   ├── proc-macro-hack v0.5.15 (proc-macro)
-│   │   │   ├── quote v1.0.3 (*)
-│   │   │   └── syn v1.0.17 (*)
-│   │   └── proc-macro-hack v0.5.15 (proc-macro)
 │   ├── blake2 v0.8.1
 │   │   ├── byte-tools v0.3.1
 │   │   ├── crypto-mac v0.7.0
