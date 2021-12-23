@@ -1,5 +1,5 @@
 use bstr::BStr;
-
+use std::string::String;
 /// A wrapper for `Vec<u8>` that provides convenient string oriented trait
 /// impls.
 ///

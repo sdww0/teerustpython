@@ -1,5 +1,6 @@
 #![allow(unused_imports)]
-
+use std::string::String;
+use std::vec::Vec;
 use std::borrow::Cow;
 use std::error;
 use std::ffi::{OsStr, OsString};

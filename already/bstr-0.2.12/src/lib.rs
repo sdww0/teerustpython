@@ -365,13 +365,13 @@ not terribly uncommon. If you instead use byte strings, then you're guaranteed
 to write correct code for Unix, at the cost of getting a corner case wrong on
 Windows.
 */
-
+#![no_std]
 #![cfg_attr(not(feature = "std"), no_std)]
 #![allow(dead_code)]
 
-#[cfg(feature = "std")]
-extern crate core;
-
+// #[cfg(feature = "std")]
+// extern crate core;
+extern crate sgx_tstd as std;
 #[cfg(feature = "unicode")]
 #[macro_use]
 extern crate lazy_static;
@@ -408,15 +408,15 @@ pub use utf8::{
 
 mod ascii;
 mod bstr;
-#[cfg(feature = "std")]
+// #[cfg(feature = "std")]
 mod bstring;
 mod byteset;
 mod cow;
 mod ext_slice;
-#[cfg(feature = "std")]
+// #[cfg(feature = "std")]
 mod ext_vec;
 mod impls;
-#[cfg(feature = "std")]
+// #[cfg(feature = "std")]
 pub mod io;
 mod search;
 #[cfg(test)]

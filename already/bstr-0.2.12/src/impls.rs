@@ -1,3 +1,6 @@
+use std::string::String;
+use std::vec::Vec;
+use std::vec;
 macro_rules! impl_partial_eq {
     ($lhs:ty, $rhs:ty) => {
         impl<'a, 'b> PartialEq<$rhs> for $lhs {

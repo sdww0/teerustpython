@@ -4,23 +4,13 @@
 **如果已经移植或者为build-dependencies等，则该枝会被删除**
 
 rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
-├── cfg-if v0.1.10
-├── dirs-next v1.0.1
-├── env_logger v0.7.1
-├── log v0.4.8 (*)
-├── num-traits v0.2.11
-├── rustpython-compiler v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave/compiler)
-├── rustpython-parser v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave/parser) (*)
 ├── rustpython-vm v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave/vm)
-│   ├── adler32 v1.0.4
 │   ├── arr_macro v0.1.3
 │   │   ├── arr_macro_impl v0.1.3 (proc-macro)
 │   │   │   ├── proc-macro-hack v0.5.15 (proc-macro)
 │   │   │   ├── quote v1.0.3 (*)
 │   │   │   └── syn v1.0.17 (*)
 │   │   └── proc-macro-hack v0.5.15 (proc-macro)
-│   ├── base64 v0.11.0
-│   ├── bitflags v1.2.1
 │   ├── blake2 v0.8.1
 │   │   ├── byte-tools v0.3.1
 │   │   ├── crypto-mac v0.7.0
@@ -33,7 +23,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │       └── smallvec v1.3.0
 │   │   [build-dependencies]
 │   │   └── regex v1.3.6 (*)
-│   ├── chrono v0.4.11
 │   ├── crossbeam-utils v0.7.2
 │   │   ├── cfg-if v0.1.10
 │   │   └── lazy_static v1.4.0
@@ -52,7 +41,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │   └── socket2 v0.3.12
 │   │       ├── cfg-if v0.1.10
 │   │       └── libc v0.2.71
-│   ├── flate2 v1.0.14
 │   ├── is-macro v0.1.8 (proc-macro)
 │   │   ├── Inflector v0.11.4
 │   │   ├── pmutil v0.5.3
@@ -62,24 +50,17 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │   ├── proc-macro2 v1.0.10 (*)
 │   │   ├── quote v1.0.3 (*)
 │   │   └── syn v1.0.17 (*)
-│   ├── itertools v0.8.2 (*)
 │   ├── lexical v4.0.0
-│   ├── libc v0.2.71
 │   ├── libz-sys v1.0.25 (*)
-│   ├── log v0.4.8 (*)
-│   ├── maplit v1.0.2
 │   ├── md-5 v0.8.0
 │   │   ├── block-buffer v0.7.3 (*)
 │   │   ├── digest v0.8.1 (*)
 │   │   └── opaque-debug v0.2.3
-│   ├── mt19937 v1.0.1
 │   ├── nix v0.17.0
 │   │   ├── bitflags v1.2.1
 │   │   ├── cfg-if v0.1.10
 │   │   ├── libc v0.2.71
 │   │   └── void v1.0.2
-│   ├── num-bigint v0.2.6 (*)
-│   ├── num-complex v0.2.4 (*)
 │   ├── num-integer v0.1.42 (*)
 │   ├── num-iter v0.1.40
 │   │   ├── num-integer v0.1.42 (*)
@@ -87,12 +68,10 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │   [build-dependencies]
 │   │   └── autocfg v1.0.0
 │   ├── num-rational v0.2.4
-│   │   ├── num-bigint v0.2.6 (*)
 │   │   ├── num-integer v0.1.42 (*)
 │   │   └── num-traits v0.2.11 (*)
 │   │   [build-dependencies]
 │   │   └── autocfg v1.0.0
-│   ├── num-traits v0.2.11 (*)
 │   ├── num_cpus v1.12.0
 │   │   └── libc v0.2.71
 │   ├── num_enum v0.4.3
@@ -144,9 +123,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │   │           ├── syn v1.0.17 (*)
 │   │   │           └── unicode-xid v0.2.0
 │   │   └── libc v0.2.71
-│   ├── rand v0.7.3 (*)
-│   ├── rand_core v0.5.1 (*)
-│   ├── regex v1.3.6 (*)
 │   ├── result-like v0.2.1
 │   │   └── is-macro v0.1.8 (proc-macro) (*)
 │   ├── rustc_version_runtime v0.1.5
@@ -155,8 +131,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │   [build-dependencies]
 │   │   ├── rustc_version v0.2.3 (*)
 │   │   └── semver v0.9.0 (*)
-│   ├── rustpython-bytecode v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave/bytecode) (*)
-│   ├── rustpython-compiler v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave/compiler) (*)
 │   ├── rustpython-derive v0.1.2 (proc-macro) (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave/derive)
 │   │   ├── maplit v1.0.2
 │   │   ├── once_cell v1.3.1
@@ -165,7 +139,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │   ├── rustpython-bytecode v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave/bytecode) (*)
 │   │   ├── rustpython-compiler v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave/compiler) (*)
 │   │   └── syn v1.0.17 (*)
-│   ├── rustpython-parser v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave/parser) (*)
 │   ├── rustyline v6.1.0
 │   │   ├── cfg-if v0.1.10
 │   │   ├── dirs v2.0.1
@@ -180,9 +153,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │   ├── unicode-segmentation v1.6.0
 │   │   ├── unicode-width v0.1.7
 │   │   └── utf8parse v0.2.0
-│   ├── serde v1.0.106 (*)
-│   ├── sha-1 v0.8.2
-│   ├── sha2 v0.8.1 (*)
 │   ├── sha3 v0.8.2
 │   │   ├── block-buffer v0.7.3 (*)
 │   │   ├── byte-tools v0.3.1
@@ -190,12 +160,10 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │   ├── keccak v0.1.0
 │   │   └── opaque-debug v0.2.3
 │   ├── smallbox v0.8.0
-│   ├── socket2 v0.3.12 (*)
 │   ├── statrs v0.12.0
 │   │   └── rand v0.7.3 (*)
 │   ├── subprocess v0.2.4
 │   │   └── libc v0.2.71
-│   ├── thread_local v1.0.1 (*)
 │   ├── uname v0.1.1
 │   │   └── libc v0.2.71
 └── rustyline v6.1.0 (*)

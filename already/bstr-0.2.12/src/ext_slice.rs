@@ -10,7 +10,7 @@ use core::ops;
 use core::ptr;
 use core::slice;
 use core::str;
-
+use std::vec::Vec;
 use memchr::{memchr, memrchr};
 
 use ascii;

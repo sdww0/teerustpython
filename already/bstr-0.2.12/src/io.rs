@@ -8,7 +8,8 @@ More APIs may be added in the future.
 */
 
 use std::io;
-
+use std::vec::Vec;
+use std::vec;
 use ext_slice::ByteSlice;
 use ext_vec::ByteVec;
 

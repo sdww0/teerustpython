@@ -21,9 +21,10 @@ appveyor = { repository = "BurntSushi/rust-csv" }
 bench = false
 
 [features]
-default = ["libc"]
-libc = ["memchr/libc"]
-
+# default = []
+# default = ["libc"]
+# libc = ["memchr/libc"]
+# libc = [""]
 [dependencies]
 memchr = { path="/root/sgx/teerustpython/already/memchr-2.3.3", default-features = false }
 sgx_tstd                       = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
