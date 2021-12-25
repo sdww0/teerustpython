@@ -3,6 +3,7 @@ use crate::statistics::*;
 use std::borrow::Borrow;
 use std::f64;
 use std::format;
+
 impl<T> Statistics<f64> for T
 where
     T: IntoIterator,
@@ -175,7 +176,7 @@ where
         for x in self {
             let borrow = *x.borrow();
             let borrow2 = match iter.next() {
-                None => panic!(format!("{}", StatsError::ContainersMustBeSameLength)),
+                None => panic!(&format!("{}", StatsError::ContainersMustBeSameLength)),
                 Some(x) => *x.borrow(),
             };
             let old_mean2 = mean2;
@@ -185,7 +186,7 @@ where
             comoment += (borrow - mean1) * (borrow2 - old_mean2);
         }
         if iter.next().is_some() {
-            panic!(format!("{}", StatsError::ContainersMustBeSameLength));
+            panic!(&format!("{}", StatsError::ContainersMustBeSameLength));
         }
 
         if n > 1.0 {
@@ -205,7 +206,7 @@ where
         for x in self {
             let borrow = *x.borrow();
             let borrow2 = match iter.next() {
-                None => panic!(format!("{}", StatsError::ContainersMustBeSameLength)),
+                None => panic!(&format!("{}", StatsError::ContainersMustBeSameLength)),
                 Some(x) => *x.borrow(),
             };
             let old_mean2 = mean2;
@@ -215,7 +216,7 @@ where
             comoment += (borrow - mean1) * (borrow2 - old_mean2);
         }
         if iter.next().is_some() {
-            panic!(format!("{}", StatsError::ContainersMustBeSameLength));
+            panic!(&format!("{}", StatsError::ContainersMustBeSameLength));
         }
         if n > 0.0 {
             comoment / n

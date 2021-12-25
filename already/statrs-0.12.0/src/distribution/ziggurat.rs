@@ -1,7 +1,7 @@
 use super::ziggurat_tables;
 use rand::distributions::Open01;
 use rand::Rng;
-use std::vec;
+
 pub fn sample_std_normal<R: Rng + ?Sized>(r: &mut R) -> f64 {
     #[inline]
     fn pdf(x: f64) -> f64 {

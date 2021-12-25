@@ -1,11 +1,12 @@
+use std::vec::Vec;
+use std::vec;
 use crate::distribution::{CheckedDiscrete, Discrete};
 use crate::function::factorial;
 use rand::distributions::Distribution;
 use rand::Rng;
 use crate::statistics::*;
 use crate::{Result, StatsError};
-use std::vec::Vec;
-use std::vec;
+
 /// Implements the
 /// [Multinomial](https://en.wikipedia.org/wiki/Multinomial_distribution)
 /// distribution which is a generalization of the

@@ -3,6 +3,7 @@ use crate::statistics::*;
 use std::f64;
 use std::vec::Vec;
 use std::vec;
+
 impl OrderStatistics<f64> for [f64] {
     fn order_statistic(&mut self, order: usize) -> f64 {
         let n = self.len();

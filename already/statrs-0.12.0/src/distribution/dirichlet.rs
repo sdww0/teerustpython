@@ -4,8 +4,8 @@ use rand::distributions::Distribution;
 use rand::Rng;
 use crate::statistics::*;
 use std::f64;
-use crate::{prec, Result, StatsError};
 use std::vec::Vec;
+use crate::{prec, Result, StatsError};
 use std::vec;
 /// Implements the
 /// [Dirichlet](https://en.wikipedia.org/wiki/Dirichlet_distribution)
