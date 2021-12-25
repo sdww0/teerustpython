@@ -2,6 +2,7 @@
 pub extern crate byteorder;
 pub extern crate block_padding;
 pub extern crate generic_array;
+extern crate sgx_tstd as std;
 extern crate byte_tools;
 
 use byteorder::{ByteOrder, BE};
