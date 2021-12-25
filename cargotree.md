@@ -19,7 +19,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │   ├── itoa v0.4.5
 │   │   ├── ryu v1.0.3
 │   │   └── serde v1.0.106 (*)
-│   ├── digest v0.8.1 (*)
 │   ├── dns-lookup v1.0.1
 │   │   ├── libc v0.2.71
 │   │   └── socket2 v0.3.12
