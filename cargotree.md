@@ -12,16 +12,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │   │   └── subtle v1.0.0
 │   │   ├── digest v0.8.1 (*)
 │   │   └── opaque-debug v0.2.3
-│   ├── caseless v0.2.1
-│   │   └── unicode-normalization v0.1.12
-│   │       └── smallvec v1.3.0
-│   │   [build-dependencies]
-│   │   └── regex v1.3.6 (*)
-│   ├── crossbeam-utils v0.7.2
-│   │   ├── cfg-if v0.1.10
-│   │   └── lazy_static v1.4.0
-│   │   [build-dependencies]
-│   │   └── autocfg v1.0.0
 │   ├── csv v1.1.3
 │   │   ├── bstr v0.2.12 (*)
 │   │   ├── csv-core v0.1.10
@@ -36,7 +26,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │       ├── cfg-if v0.1.10
 │   │       └── libc v0.2.71
 │   ├── lexical v4.0.0
-│   ├── libz-sys v1.0.25 (*)
 │   ├── md-5 v0.8.0
 │   │   ├── block-buffer v0.7.3 (*)
 │   │   ├── digest v0.8.1 (*)
@@ -91,8 +80,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │   ├── keccak v0.1.0
 │   │   └── opaque-debug v0.2.3
 │   ├── smallbox v0.8.0
-│   ├── statrs v0.12.0
-│   │   └── rand v0.7.3 (*)
 │   ├── subprocess v0.2.4
 │   │   └── libc v0.2.71
 │   ├── uname v0.1.1
