@@ -165,64 +165,64 @@ where
         self.population_variance().sqrt()
     }
 
-    fn covariance(self, other: Self) -> f64 {
-        let mut n = 0.0;
-        let mut mean1 = 0.0;
-        let mut mean2 = 0.0;
-        let mut comoment = 0.0;
+    // fn covariance(self, other: Self) -> f64 {
+    //     let mut n = 0.0;
+    //     let mut mean1 = 0.0;
+    //     let mut mean2 = 0.0;
+    //     let mut comoment = 0.0;
 
-        let mut iter = other.into_iter();
-        for x in self {
-            let borrow = *x.borrow();
-            let borrow2 = match iter.next() {
-                None => panic!(format!("{}", StatsError::ContainersMustBeSameLength)),
-                Some(x) => *x.borrow(),
-            };
-            let old_mean2 = mean2;
-            n += 1.0;
-            mean1 += (borrow - mean1) / n;
-            mean2 += (borrow2 - mean2) / n;
-            comoment += (borrow - mean1) * (borrow2 - old_mean2);
-        }
-        if iter.next().is_some() {
-            panic!(format!("{}", StatsError::ContainersMustBeSameLength));
-        }
+    //     let mut iter = other.into_iter();
+    //     for x in self {
+    //         let borrow = *x.borrow();
+    //         let borrow2 = match iter.next() {
+    //             None => panic!(format!("{}", StatsError::ContainersMustBeSameLength)),
+    //             Some(x) => *x.borrow(),
+    //         };
+    //         let old_mean2 = mean2;
+    //         n += 1.0;
+    //         mean1 += (borrow - mean1) / n;
+    //         mean2 += (borrow2 - mean2) / n;
+    //         comoment += (borrow - mean1) * (borrow2 - old_mean2);
+    //     }
+    //     if iter.next().is_some() {
+    //         panic!(format!("{}", StatsError::ContainersMustBeSameLength));
+    //     }
 
-        if n > 1.0 {
-            comoment / (n - 1.0)
-        } else {
-            f64::NAN
-        }
-    }
+    //     if n > 1.0 {
+    //         comoment / (n - 1.0)
+    //     } else {
+    //         f64::NAN
+    //     }
+    // }
 
-    fn population_covariance(self, other: Self) -> f64 {
-        let mut n = 0.0;
-        let mut mean1 = 0.0;
-        let mut mean2 = 0.0;
-        let mut comoment = 0.0;
+    // fn population_covariance(self, other: Self) -> f64 {
+    //     let mut n = 0.0;
+    //     let mut mean1 = 0.0;
+    //     let mut mean2 = 0.0;
+    //     let mut comoment = 0.0;
 
-        let mut iter = other.into_iter();
-        for x in self {
-            let borrow = *x.borrow();
-            let borrow2 = match iter.next() {
-                None => panic!(format!("{}", StatsError::ContainersMustBeSameLength)),
-                Some(x) => *x.borrow(),
-            };
-            let old_mean2 = mean2;
-            n += 1.0;
-            mean1 += (borrow - mean1) / n;
-            mean2 += (borrow2 - mean2) / n;
-            comoment += (borrow - mean1) * (borrow2 - old_mean2);
-        }
-        if iter.next().is_some() {
-            panic!(format!("{}", StatsError::ContainersMustBeSameLength));
-        }
-        if n > 0.0 {
-            comoment / n
-        } else {
-            f64::NAN
-        }
-    }
+    //     let mut iter = other.into_iter();
+    //     for x in self {
+    //         let borrow = *x.borrow();
+    //         let borrow2 = match iter.next() {
+    //             None => panic!(format!("{}", StatsError::ContainersMustBeSameLength)),
+    //             Some(x) => *x.borrow(),
+    //         };
+    //         let old_mean2 = mean2;
+    //         n += 1.0;
+    //         mean1 += (borrow - mean1) / n;
+    //         mean2 += (borrow2 - mean2) / n;
+    //         comoment += (borrow - mean1) * (borrow2 - old_mean2);
+    //     }
+    //     if iter.next().is_some() {
+    //         panic!(format!("{}", StatsError::ContainersMustBeSameLength));
+    //     }
+    //     if n > 0.0 {
+    //         comoment / n
+    //     } else {
+    //         f64::NAN
+    //     }
+    // }
 
     fn quadratic_mean(self) -> f64 {
         let mut i = 0.0;

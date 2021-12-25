@@ -113,7 +113,7 @@ openssl-probe = { version = "0.1", optional = true }
 num_cpus = "1"
 
 [target.'cfg(not(any(target_arch = "wasm32", target_os = "redox")))'.dependencies]
-dns-lookup = "1.0"
+# dns-lookup = "1.0"
 flate2 = { version = "1.0", features = ["zlib"], default-features = false }
 libz-sys = "1.0"
 

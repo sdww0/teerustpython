@@ -43,9 +43,9 @@
 9. num-rational (done, delete bigint(todo ))
 10. num_cpus  (done)
 11. csv (done)
-12. statrs
-13. blake2
-14. dns-lookup
+12. statrs (done)
+13. blake2 (done)
+14. dns-lookup (remove)
 
 
 

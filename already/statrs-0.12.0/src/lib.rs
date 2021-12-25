@@ -41,7 +41,7 @@ macro_rules! assert_almost_eq {
 }
 
 pub mod consts;
-pub mod distribution;
+
 pub mod euclid;
 pub mod function;
 pub mod generate;
