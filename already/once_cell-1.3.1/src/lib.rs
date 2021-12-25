@@ -222,7 +222,6 @@ might be easier to debug than a deadlock.
 */
 #![no_std]
 #![cfg_attr(not(feature = "std"), no_std)]
-extern crate sgx_tstd as std;
 
 #[cfg(feature = "std")]
 #[cfg(feature = "parking_lot")]
@@ -242,6 +241,7 @@ pub mod unsync {
     };
 
     #[cfg(feature = "std")]
+    extern crate sgx_tstd as std;
     use std::panic::{RefUnwindSafe, UnwindSafe};
 
     /// A cell which can be written to only once. Not thread safe.
@@ -493,6 +493,7 @@ pub mod unsync {
     }
 
     #[cfg(feature = "std")]
+    
     impl<T, F: RefUnwindSafe> RefUnwindSafe for Lazy<T, F> where OnceCell<T>: RefUnwindSafe {}
 
     impl<T: fmt::Debug, F> fmt::Debug for Lazy<T, F> {
@@ -567,6 +568,7 @@ pub mod unsync {
 }
 
 #[cfg(feature = "std")]
+extern crate sgx_tstd as std;
 pub mod sync {
     use std::{
         cell::Cell,

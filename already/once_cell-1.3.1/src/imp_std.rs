@@ -8,9 +8,9 @@ use std::{
     marker::PhantomData,
     panic::{RefUnwindSafe, UnwindSafe},
     sync::atomic::{AtomicBool, AtomicUsize, Ordering},
-    thread::{self},
+    thread::{self, SgxThread},
 };
-use std::thread::SgxThread as Thread;
+
 #[derive(Debug)]
 pub(crate) struct OnceCell<T> {
     // This `state` word is actually an encoded version of just a pointer to a
@@ -48,7 +48,7 @@ const STATE_MASK: usize = 0x3;
 // Representation of a node in the linked list of waiters in the RUNNING state.
 #[repr(align(4))] // Ensure the two lower bits are free to use as state bits.
 struct Waiter {
-    thread: Cell<Option<Thread>>,
+    thread: Cell<Option<SgxThread>>,
     signaled: AtomicBool,
     next: *const Waiter,
 }
