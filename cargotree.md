@@ -19,10 +19,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │       ├── cfg-if v0.1.10
 │   │       └── libc v0.2.71
 │   ├── lexical v4.0.0
-│   ├── md-5 v0.8.0
-│   │   ├── block-buffer v0.7.3 (*)
-│   │   ├── digest v0.8.1 (*)
-│   │   └── opaque-debug v0.2.3
 │   ├── nix v0.17.0
 │   │   ├── bitflags v1.2.1
 │   │   ├── cfg-if v0.1.10
