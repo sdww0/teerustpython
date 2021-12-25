@@ -1,0 +1,5 @@
+- Port Knuth's Algorithm D to Rust's libcore.
+- Port itoa to libcore.
+- Drop support for <= 1.27.0 after Jan 21st 2020 (1 year old).
+    - Remove bare_trait_objects
+    - Remove const_err
