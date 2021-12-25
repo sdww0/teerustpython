@@ -22,12 +22,13 @@
 //! }
 //! # }
 //! ```
-#![no_std]
+
 #![crate_type = "lib"]
 #![crate_name = "statrs"]
+#![no_std]
+extern crate rand;
 extern crate sgx_tstd as std;
-extern crate sgx_rand as rand;
-
+use std::vec::Vec;
 #[macro_export]
 macro_rules! assert_almost_eq {
     ($a:expr, $b:expr, $prec:expr) => {

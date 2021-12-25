@@ -1,5 +1,6 @@
-use super::RankTieBreaker;
 use std::vec::Vec;
+use super::RankTieBreaker;
+
 /// The `OrderStatistics` trait provides statistical utilities
 /// having to do with ordering. All the algorithms are in-place thus requiring
 /// a mutable borrow.

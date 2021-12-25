@@ -3,6 +3,7 @@ use crate::statistics::*;
 use std::borrow::Borrow;
 use std::f64;
 use std::format;
+
 impl<T> Statistics<f64> for T
 where
     T: IntoIterator,
@@ -165,6 +166,7 @@ where
         self.population_variance().sqrt()
     }
 
+<<<<<<< HEAD
     // fn covariance(self, other: Self) -> f64 {
     //     let mut n = 0.0;
     //     let mut mean1 = 0.0;
@@ -223,6 +225,66 @@ where
     //         f64::NAN
     //     }
     // }
+=======
+    fn covariance(self, other: Self) -> f64 {
+        let mut n = 0.0;
+        let mut mean1 = 0.0;
+        let mut mean2 = 0.0;
+        let mut comoment = 0.0;
+
+        let mut iter = other.into_iter();
+        for x in self {
+            let borrow = *x.borrow();
+            let borrow2 = match iter.next() {
+                None => panic!(&format!("{}", StatsError::ContainersMustBeSameLength)),
+                Some(x) => *x.borrow(),
+            };
+            let old_mean2 = mean2;
+            n += 1.0;
+            mean1 += (borrow - mean1) / n;
+            mean2 += (borrow2 - mean2) / n;
+            comoment += (borrow - mean1) * (borrow2 - old_mean2);
+        }
+        if iter.next().is_some() {
+            panic!(&format!("{}", StatsError::ContainersMustBeSameLength));
+        }
+
+        if n > 1.0 {
+            comoment / (n - 1.0)
+        } else {
+            f64::NAN
+        }
+    }
+
+    fn population_covariance(self, other: Self) -> f64 {
+        let mut n = 0.0;
+        let mut mean1 = 0.0;
+        let mut mean2 = 0.0;
+        let mut comoment = 0.0;
+
+        let mut iter = other.into_iter();
+        for x in self {
+            let borrow = *x.borrow();
+            let borrow2 = match iter.next() {
+                None => panic!(&format!("{}", StatsError::ContainersMustBeSameLength)),
+                Some(x) => *x.borrow(),
+            };
+            let old_mean2 = mean2;
+            n += 1.0;
+            mean1 += (borrow - mean1) / n;
+            mean2 += (borrow2 - mean2) / n;
+            comoment += (borrow - mean1) * (borrow2 - old_mean2);
+        }
+        if iter.next().is_some() {
+            panic!(&format!("{}", StatsError::ContainersMustBeSameLength));
+        }
+        if n > 0.0 {
+            comoment / n
+        } else {
+            f64::NAN
+        }
+    }
+>>>>>>> a4eadbe26c5b9e9f445e737fc708350810afde8a
 
     fn quadratic_mean(self) -> f64 {
         let mut i = 0.0;
