@@ -357,7 +357,11 @@ pub trait Statistics<T> {
     /// assert_almost_eq!(z1.covariance(&z2), -5.5, 1e-14);
     /// # }
     /// ```
+<<<<<<< HEAD
     // fn covariance(self, other: Self) -> T;
+=======
+    fn covariance(self, other: Self) -> T;
+>>>>>>> 07e1ee434b58c0a4a9501df2568f9655f0cee2de
 
     /// Evaluates the population covariance between the two provider populations
     ///
@@ -394,7 +398,11 @@ pub trait Statistics<T> {
     /// assert_almost_eq!(z1.population_covariance(&z2), -11.0 / 3.0, 1e-14);
     /// # }
     /// ```
+<<<<<<< HEAD
     // fn population_covariance(self, other: Self) -> T;
+=======
+    fn population_covariance(self, other: Self) -> T;
+>>>>>>> 07e1ee434b58c0a4a9501df2568f9655f0cee2de
 
     /// Estimates the quadratic mean (Root Mean Square) of the data
     ///

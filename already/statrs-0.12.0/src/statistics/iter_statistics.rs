@@ -167,6 +167,7 @@ where
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     // fn covariance(self, other: Self) -> f64 {
     //     let mut n = 0.0;
     //     let mut mean1 = 0.0;
@@ -226,6 +227,8 @@ where
     //     }
     // }
 =======
+=======
+>>>>>>> 07e1ee434b58c0a4a9501df2568f9655f0cee2de
     fn covariance(self, other: Self) -> f64 {
         let mut n = 0.0;
         let mut mean1 = 0.0;
@@ -284,7 +287,10 @@ where
             f64::NAN
         }
     }
+<<<<<<< HEAD
 >>>>>>> a4eadbe26c5b9e9f445e737fc708350810afde8a
+=======
+>>>>>>> 07e1ee434b58c0a4a9501df2568f9655f0cee2de
 
     fn quadratic_mean(self) -> f64 {
         let mut i = 0.0;
