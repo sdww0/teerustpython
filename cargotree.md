@@ -6,7 +6,6 @@
 rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 ├── rustpython-vm v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave/vm)
 │   ├── blake2 v0.8.1
-<<<<<<< HEAD
 │   ├── caseless v0.2.1
 │   │   └── unicode-normalization v0.1.12
 │   │       └── smallvec v1.3.0
@@ -17,14 +16,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │   └── lazy_static v1.4.0
 │   │   [build-dependencies]
 │   │   └── autocfg v1.0.0
-=======
-│   │   ├── byte-tools v0.3.1
-│   │   ├── crypto-mac v0.7.0
-│   │   │   ├── generic-array v0.12.3 (*)
-│   │   │   └── subtle v1.0.0
-│   │   ├── digest v0.8.1 (*)
-│   │   └── opaque-debug v0.2.3
->>>>>>> a4eadbe26c5b9e9f445e737fc708350810afde8a
 │   ├── csv v1.1.3
 │   │   ├── bstr v0.2.12 (*)
 │   │   ├── csv-core v0.1.10
