@@ -4,8 +4,15 @@ use crossbeam_utils::atomic::AtomicCell;
 use std::convert::TryFrom;
 use std::mem::size_of;
 use std::str::FromStr;
-use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
+use std::sync::{SgxRwLock as RwLock,SGxRwLockReadGuard as  RwLockReadGuard,SgxRwLockReadGuard as RwLockWriteGuard};
+use std::string::String;
+use std::borrow::ToOwned;
 
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
 use super::objbyteinner::{
     ByteInnerFindOptions, ByteInnerNewOptions, ByteInnerPaddingOptions, ByteInnerSplitOptions,
     ByteInnerTranslateOptions, ByteOr, PyByteInner,

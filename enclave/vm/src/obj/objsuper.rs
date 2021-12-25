@@ -5,6 +5,13 @@ See also:
 https://github.com/python/cpython/blob/50b48572d9a90c5bb36e2bef6179548ea927a35a/Objects/typeobject.c#L7663
 
 */
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
 
 use super::objstr::PyStringRef;
 use super::objtype::{self, PyClass, PyClassRef};

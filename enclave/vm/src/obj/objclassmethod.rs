@@ -5,7 +5,12 @@ use crate::pyobject::{
 };
 use crate::slots::SlotDescriptor;
 use crate::vm::VirtualMachine;
-
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
 /// classmethod(function) -> method
 ///
 /// Convert a function to be a class method.

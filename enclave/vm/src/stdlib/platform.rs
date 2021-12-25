@@ -2,6 +2,9 @@ pub(crate) use decl::make_module;
 
 #[pymodule(name = "platform")]
 mod decl {
+    use std::string::String;
+
+    use std::borrow::ToOwned;
     use crate::version;
     use crate::vm::VirtualMachine;
 

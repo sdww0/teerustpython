@@ -1,7 +1,12 @@
 use num_bigint::BigInt;
 use num_traits::ToPrimitive;
 use std::hash::{Hash, Hasher};
-
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
 use crate::obj::objfloat;
 use crate::pyobject::PyObjectRef;
 use crate::pyobject::PyResult;

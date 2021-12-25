@@ -1,6 +1,11 @@
 use crate::bytecode::FrozenModule;
 use std::collections::HashMap;
-
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
 pub fn get_module_inits() -> HashMap<String, FrozenModule> {
     let mut modules = HashMap::new();
 

@@ -6,6 +6,13 @@ use crate::VirtualMachine;
 
 use num_bigint::BigInt;
 use std::str::FromStr;
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
 
 mod machinery;
 

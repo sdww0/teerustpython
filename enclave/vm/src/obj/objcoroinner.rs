@@ -3,9 +3,16 @@ use crate::exceptions::{self, PyBaseExceptionRef};
 use crate::frame::{ExecutionResult, FrameRef};
 use crate::pyobject::{PyObjectRef, PyResult};
 use crate::vm::VirtualMachine;
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
 
 use crossbeam_utils::atomic::AtomicCell;
-use std::sync::RwLock;
+use std::sync::SgxRwLock as RwLock;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Variant {

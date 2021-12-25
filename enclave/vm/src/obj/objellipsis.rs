@@ -1,6 +1,13 @@
 use super::objtype::{issubclass, PyClassRef};
 use crate::pyobject::{PyContext, PyEllipsisRef, PyResult};
 use crate::vm::VirtualMachine;
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
 
 pub fn init(context: &PyContext) {
     extend_class!(context, &context.ellipsis_type, {

@@ -4,7 +4,12 @@ use crate::obj::objstr::PyStringRef;
 use crate::obj::objtype::PyClassRef;
 use crate::pyobject::{PyObjectRef, PyRef, PyResult, PyValue};
 use crate::vm::VirtualMachine;
-
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
 impl PyValue for Passwd {
     fn class(vm: &VirtualMachine) -> PyClassRef {
         vm.class("pwd", "struct_passwd")
@@ -54,15 +59,15 @@ fn pwd_getpwnam(name: PyStringRef, vm: &VirtualMachine) -> PyResult<Passwd> {
     }
 }
 
-fn pwd_getpwuid(uid: u32, vm: &VirtualMachine) -> PyResult<Passwd> {
-    match Passwd::from_uid(uid) {
-        Some(passwd) => Ok(passwd),
-        _ => {
-            let message = vm.new_str(format!("getpwuid(): uid not found: {}", uid));
-            Err(vm.new_key_error(message))
-        }
-    }
-}
+// fn pwd_getpwuid(uid: u32, vm: &VirtualMachine) -> PyResult<Passwd> {
+//     match Passwd::from_uid(uid) {
+//         Some(passwd) => Ok(passwd),
+//         _ => {
+//             let message = vm.new_str(format!("getpwuid(): uid not found: {}", uid));
+//             Err(vm.new_key_error(message))
+//         }
+//     }
+// }
 
 pub fn make_module(vm: &VirtualMachine) -> PyObjectRef {
     let ctx = &vm.ctx;

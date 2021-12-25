@@ -4,8 +4,14 @@
 //! into python ast.AST objects.
 
 use std::ops::Deref;
-
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
 use num_complex::Complex64;
+use std::borrow::ToOwned;
 
 use rustpython_parser::{ast, mode::Mode, parser};
 

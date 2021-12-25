@@ -1,7 +1,14 @@
 use std::fmt;
 use std::mem::size_of;
 use std::ops::{DerefMut, Range};
-use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
+use std::sync::{SgxRwLock as RwLock,SGxRwLockReadGuard as  RwLockReadGuard,SgxRwLockReadGuard as RwLockWriteGuard};
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
 
 use crossbeam_utils::atomic::AtomicCell;
 use num_bigint::{BigInt, ToBigInt};

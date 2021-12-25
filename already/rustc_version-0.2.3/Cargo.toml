@@ -20,7 +20,11 @@ readme = "README.md"
 keywords = ["version", "rustc"]
 license = "MIT/Apache-2.0"
 repository = "https://github.com/Kimundi/rustc-version-rs"
+
+[dependencies]
+sgx_tstd                       = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
+
 [dependencies.semver]
-version = "0.9"
+path="/root/sgx/teerustpython/already/semver-0.9.0"
 [badges.travis-ci]
 repository = "Kimundi/rustc-version-rs"

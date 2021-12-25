@@ -38,9 +38,9 @@ sgx_tstd                       = { git = "https://github.com/apache/teaclave-sgx
 
 
 [dependencies.regex-automata]
-version = "0.1.5"
+path = "/root/sgx/teerustpython/already/regex-automata-0.1.9"
 optional = true
-default-features = false
+# default-features = false
 
 
 [dev-dependencies.quickcheck]

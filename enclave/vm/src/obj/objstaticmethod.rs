@@ -3,7 +3,12 @@ use crate::function::OptionalArg;
 use crate::pyobject::{PyClassImpl, PyContext, PyObjectRef, PyRef, PyResult, PyValue};
 use crate::slots::SlotDescriptor;
 use crate::vm::VirtualMachine;
-
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
 #[pyclass(name = "staticmethod")]
 #[derive(Clone, Debug)]
 pub struct PyStaticMethod {

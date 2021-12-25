@@ -17,7 +17,12 @@ use crate::scope::Scope;
 use crate::slots::{SlotCall, SlotDescriptor};
 use crate::VirtualMachine;
 use itertools::Itertools;
-
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
 pub type PyFunctionRef = PyRef<PyFunction>;
 
 #[pyclass]

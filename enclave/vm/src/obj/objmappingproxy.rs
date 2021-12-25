@@ -7,7 +7,12 @@ use crate::pyobject::{
     ItemProtocol, PyClassImpl, PyContext, PyObjectRef, PyRef, PyResult, PyValue, TryFromObject,
 };
 use crate::vm::VirtualMachine;
-
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
 #[pyclass]
 #[derive(Debug)]
 pub struct PyMappingProxy {

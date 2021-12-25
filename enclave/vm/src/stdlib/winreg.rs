@@ -1,7 +1,14 @@
 #![allow(non_snake_case)]
 use std::convert::TryInto;
 use std::io;
-use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
+use std::sync::{SgxRwLock as RwLock,SGxRwLockReadGuard as  RwLockReadGuard,SgxRwLockReadGuard as RwLockWriteGuard};
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
 
 use super::os;
 use crate::function::OptionalArg;

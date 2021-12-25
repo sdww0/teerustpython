@@ -108,7 +108,7 @@
 #![cfg_attr(test, deny(warnings))]
 #![no_std]
 extern crate sgx_tstd as std;
-
+extern crate sgx_libc as libc;
 pub use crate::crc::{Crc, CrcReader, CrcWriter};
 pub use crate::gz::GzBuilder;
 pub use crate::gz::GzHeader;

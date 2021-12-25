@@ -7,9 +7,15 @@
 use std::cell::{Cell, Ref, RefCell};
 use std::collections::hash_map::HashMap;
 use std::collections::hash_set::HashSet;
-use std::sync::{Arc, Mutex, MutexGuard};
+use std::sync::{Arc, SgxMutex as Mutex, SgxMutexGuard as MutexGuard};
 use std::{env, fmt};
-
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
 use arr_macro::arr;
 use crossbeam_utils::atomic::AtomicCell;
 use num_bigint::BigInt;

@@ -5,9 +5,16 @@
 
 use statrs::function::erf::{erf, erfc};
 use statrs::function::gamma::{gamma, ln_gamma};
-
+use num_integer::Integer;
 use num_bigint::BigInt;
 use num_traits::{One, Zero};
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
 
 use crate::function::{Args, OptionalArg};
 use crate::obj::objfloat::{self, IntoPyFloat, PyFloatRef};

@@ -5,6 +5,13 @@ use crate::obj::{objiter, objtype};
 use crate::pyobject::{Either, PyObjectRef, PyResult, TypeProtocol};
 use crate::VirtualMachine;
 use volatile::Volatile;
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
 
 fn operator_length_hint(obj: PyObjectRef, default: OptionalArg, vm: &VirtualMachine) -> PyResult {
     let default = default.unwrap_or_else(|| vm.new_int(0));

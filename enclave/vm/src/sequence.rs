@@ -2,7 +2,12 @@ use crate::pyobject::{IdProtocol, PyObjectRef, PyResult};
 use crate::vm::VirtualMachine;
 use std::ops::Deref;
 use std::sync::{RwLockReadGuard, RwLockWriteGuard};
-
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
 type DynPyIter<'a> = Box<dyn ExactSizeIterator<Item = &'a PyObjectRef> + 'a>;
 
 #[allow(clippy::len_without_is_empty)]

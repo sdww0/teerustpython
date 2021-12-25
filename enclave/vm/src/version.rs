@@ -6,6 +6,10 @@ const MINOR: usize = 5;
 const MICRO: usize = 0;
 const RELEASELEVEL: &str = "alpha";
 const SERIAL: usize = 0;
+use std::format;
+use std::string::String;
+use std::borrow::ToOwned;
+use std::string::ToString;
 
 #[pystruct_sequence(name = "version_info")]
 #[derive(Default, Debug)]
@@ -45,8 +49,10 @@ pub fn get_version_number() -> String {
 }
 
 pub fn get_compiler() -> String {
-    let rustc_version = rustc_version_runtime::version_meta();
-    format!("rustc {}", rustc_version.semver)
+    
+    // let rustc_version = rustc_version_runtime::version_meta();
+    // format!("rustc {}", rustc_version.semver)
+    "rustc sgx compiler".to_string;
 }
 
 pub fn get_build_info() -> String {

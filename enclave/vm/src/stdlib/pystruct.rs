@@ -19,6 +19,13 @@ mod _struct {
     use num_traits::ToPrimitive;
     use std::io::{Cursor, Read, Write};
     use std::iter::Peekable;
+    use std::string::String;
+    use std::vec::Vec;
+    use std::boxed::Box;
+    use std::vec;
+    use std::format;
+    use std::string::ToString;
+    use std::borrow::ToOwned;
 
     use crate::exceptions::PyBaseExceptionRef;
     use crate::function::Args;

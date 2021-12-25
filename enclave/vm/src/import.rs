@@ -2,6 +2,14 @@
  * Import mechanics
  */
 use rand::Rng;
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::eprintln;
+use std::borrow::ToOwned;
 
 use crate::bytecode::CodeObject;
 use crate::exceptions::PyBaseExceptionRef;

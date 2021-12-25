@@ -5,7 +5,12 @@ use crate::obj::objstr;
 use crate::obj::objstr::PyStringRef;
 use crate::pyobject::{ItemProtocol, PyObjectRef, PyResult};
 use crate::vm::VirtualMachine;
-
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
 fn imp_extension_suffixes(vm: &VirtualMachine) -> PyResult {
     Ok(vm.ctx.new_list(vec![]))
 }

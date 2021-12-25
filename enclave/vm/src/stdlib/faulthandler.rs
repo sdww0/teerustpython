@@ -2,7 +2,13 @@ use crate::frame::FrameRef;
 use crate::function::OptionalArg;
 use crate::pyobject::PyObjectRef;
 use crate::vm::VirtualMachine;
-
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::eprintln;
 fn dump_frame(frame: &FrameRef) {
     eprintln!(
         "  File \"{}\", line {} in {}",

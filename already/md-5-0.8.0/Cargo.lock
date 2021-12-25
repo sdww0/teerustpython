@@ -3,20 +3,17 @@
 [[package]]
 name = "block-buffer"
 version = "0.7.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c0940dc441f31689269e10ac70eb1002a3a1d3ad1390e030043662eb7fe4688b"
 dependencies = [
  "block-padding",
  "byte-tools",
  "byteorder",
  "generic-array",
+ "sgx_tstd",
 ]
 
 [[package]]
 name = "block-padding"
 version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fa79dedbb091f449f1f39e53edf88d5dbe95f895dae6135a8d7b881fb5af73f5"
 dependencies = [
  "byte-tools",
 ]
@@ -24,14 +21,14 @@ dependencies = [
 [[package]]
 name = "byte-tools"
 version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e3b5ca7a04898ad4bcd41c90c5285445ff5b791899bb1b0abdd2a2aa791211d7"
 
 [[package]]
 name = "byteorder"
-version = "1.4.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "14c189c53d098945499cdfa7ecc63567cf3886b3332b312a5b4585d8d3a6a610"
+version = "1.3.4"
+source = "git+https://github.com/mesalock-linux/byteorder-sgx#325f392dcd294109eb05f0a3c45e4141514c7784"
+dependencies = [
+ "sgx_tstd",
+]
 
 [[package]]
 name = "cc"

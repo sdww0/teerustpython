@@ -14,7 +14,14 @@ use flate2::{write::ZlibEncoder, Compression, Decompress, FlushDecompress, Statu
 use libz_sys as libz;
 
 use std::io::Write;
-use std::sync::Mutex;
+use std::sync::SgxMutex as Mutex;
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
 
 // copied from zlibmodule.c (commit 530f506ac91338)
 const MAX_WBITS: u8 = 15;

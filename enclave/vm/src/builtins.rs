@@ -4,6 +4,13 @@
 
 use std::char;
 use std::str;
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
 
 use num_bigint::Sign;
 use num_traits::{Signed, ToPrimitive, Zero};

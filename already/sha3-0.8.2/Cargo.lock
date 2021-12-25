@@ -7,7 +7,7 @@ dependencies = [
  "block-padding",
  "byte-tools",
  "byteorder",
- "generic-array 0.12.3",
+ "generic-array",
  "sgx_tstd",
 ]
 
@@ -40,17 +40,8 @@ checksum = "22a9137b95ea06864e018375b72adfb7db6e6f68cfc8df5a04d00288050485ee"
 name = "digest"
 version = "0.8.1"
 dependencies = [
- "generic-array 0.12.4",
+ "generic-array",
  "sgx_tstd",
-]
-
-[[package]]
-name = "generic-array"
-version = "0.12.3"
-dependencies = [
- "serde",
- "sgx_tstd",
- "typenum 1.10.0",
 ]
 
 [[package]]
@@ -59,7 +50,7 @@ version = "0.12.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ffdf9f34f1447443d37393cc6c2b8313aebddcd96906caf34e54c68d8e57d7bd"
 dependencies = [
- "typenum 1.14.0",
+ "typenum",
 ]
 
 [[package]]
@@ -93,6 +84,8 @@ version = "0.1.0"
 [[package]]
 name = "opaque-debug"
 version = "0.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2839e79665f131bdb5782e51f2c6c9599c133c6098982a54c794358bf432529c"
 
 [[package]]
 name = "proc-macro-hack"
@@ -108,14 +101,6 @@ name = "proc-macro-hack-impl"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7be55bf0ae1635f4d7c7ddd6efc05c631e98a82104a73d35550bbc52db960027"
-
-[[package]]
-name = "serde"
-version = "1.0.118"
-source = "git+https://github.com/mesalock-linux/serde-sgx#db0226f1d5d70fca6b96af2c285851502204e21c"
-dependencies = [
- "sgx_tstd",
-]
 
 [[package]]
 name = "sgx_alloc"
@@ -207,13 +192,6 @@ dependencies = [
  "hex-literal",
  "keccak",
  "opaque-debug",
- "sgx_tstd",
-]
-
-[[package]]
-name = "typenum"
-version = "1.10.0"
-dependencies = [
  "sgx_tstd",
 ]
 

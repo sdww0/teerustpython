@@ -6,7 +6,12 @@ use crate::frame::FrameRef;
 use crate::function::OptionalArg;
 use crate::pyobject::{PyClassImpl, PyContext, PyObjectRef, PyRef, PyResult, PyValue};
 use crate::vm::VirtualMachine;
-
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
 pub type PyCoroutineRef = PyRef<PyCoroutine>;
 
 #[pyclass(name = "coroutine")]

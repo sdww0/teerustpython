@@ -1,23 +1,32 @@
 use std::ffi;
-use std::fs::File;
-use std::fs::OpenOptions;
+use std::untrusted::fs::File;
+use std::untrusted::fs::OpenOptions;
 use std::io::{self, ErrorKind, Read, Write};
 #[cfg(unix)]
 use std::os::unix::fs::OpenOptionsExt;
 #[cfg(windows)]
 use std::os::windows::fs::OpenOptionsExt;
-use std::sync::RwLock;
+use std::sync::SgxRwLock as RwLock;
 use std::time::{Duration, SystemTime};
-use std::{env, fs};
-
+use std::{env};
+use std::untrusted::fs;
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::borrow::ToOwned;
+use std::os::fs::MetadataExt;
+use std::format;
+use std::string::ToString;
+use sgx_libc as libc;
 use bitflags::bitflags;
 use crossbeam_utils::atomic::AtomicCell;
-#[cfg(unix)]
-use nix::errno::Errno;
-#[cfg(all(unix, not(target_os = "redox")))]
-use nix::pty::openpty;
-#[cfg(unix)]
-use nix::unistd::{self, Gid, Pid, Uid};
+// #[cfg(unix)]
+// use nix::errno::Errno;
+// #[cfg(all(unix, not(target_os = "redox")))]
+// use nix::pty::openpty;
+// #[cfg(unix)]
+// use nix::unistd::{self, Gid, Pid, Uid};
 #[cfg(unix)]
 use std::os::unix::io::RawFd;
 #[cfg(windows)]
@@ -293,39 +302,39 @@ pub fn convert_io_error(vm: &VirtualMachine, err: io::Error) -> PyBaseExceptionR
     os_error
 }
 
-#[cfg(unix)]
-pub fn convert_nix_error(vm: &VirtualMachine, err: nix::Error) -> PyBaseExceptionRef {
-    let nix_error = match err {
-        nix::Error::InvalidPath => {
-            let exc_type = vm.ctx.exceptions.file_not_found_error.clone();
-            vm.new_exception_msg(exc_type, err.to_string())
-        }
-        nix::Error::InvalidUtf8 => {
-            let exc_type = vm.ctx.exceptions.unicode_error.clone();
-            vm.new_exception_msg(exc_type, err.to_string())
-        }
-        nix::Error::UnsupportedOperation => vm.new_runtime_error(err.to_string()),
-        nix::Error::Sys(errno) => {
-            let exc_type = convert_nix_errno(vm, errno);
-            vm.new_exception_msg(exc_type, err.to_string())
-        }
-    };
+// #[cfg(unix)]
+// pub fn convert_nix_error(vm: &VirtualMachine, err: nix::Error) -> PyBaseExceptionRef {
+//     let nix_error = match err {
+//         nix::Error::InvalidPath => {
+//             let exc_type = vm.ctx.exceptions.file_not_found_error.clone();
+//             vm.new_exception_msg(exc_type, err.to_string())
+//         }
+//         nix::Error::InvalidUtf8 => {
+//             let exc_type = vm.ctx.exceptions.unicode_error.clone();
+//             vm.new_exception_msg(exc_type, err.to_string())
+//         }
+//         nix::Error::UnsupportedOperation => vm.new_runtime_error(err.to_string()),
+//         nix::Error::Sys(errno) => {
+//             let exc_type = convert_nix_errno(vm, errno);
+//             vm.new_exception_msg(exc_type, err.to_string())
+//         }
+//     };
 
-    if let nix::Error::Sys(errno) = err {
-        vm.set_attr(nix_error.as_object(), "errno", vm.ctx.new_int(errno as i32))
-            .unwrap();
-    }
+//     if let nix::Error::Sys(errno) = err {
+//         vm.set_attr(nix_error.as_object(), "errno", vm.ctx.new_int(errno as i32))
+//             .unwrap();
+//     }
 
-    nix_error
-}
+//     nix_error
+// }
 
-#[cfg(unix)]
-fn convert_nix_errno(vm: &VirtualMachine, errno: Errno) -> PyClassRef {
-    match errno {
-        Errno::EPERM => vm.ctx.exceptions.permission_error.clone(),
-        _ => vm.ctx.exceptions.os_error.clone(),
-    }
-}
+// #[cfg(unix)]
+// fn convert_nix_errno(vm: &VirtualMachine, errno: Errno) -> PyClassRef {
+//     match errno {
+//         Errno::EPERM => vm.ctx.exceptions.permission_error.clone(),
+//         _ => vm.ctx.exceptions.os_error.clone(),
+//     }
+// }
 
 /// Convert the error stored in the `errno` variable into an Exception
 #[inline]
@@ -359,93 +368,70 @@ fn get_permissions(mode: u32) -> Permissions {
     }
 }
 
-#[cfg(unix)]
-fn get_right_permission(
-    mode: u32,
-    file_owner: Uid,
-    file_group: Gid,
-) -> Result<Permissions, nix::Error> {
-    let owner_mode = (mode & 0o700) >> 6;
-    let owner_permissions = get_permissions(owner_mode);
+// #[cfg(unix)]
+// fn get_right_permission(
+//     mode: u32,
+//     file_owner: Uid,
+//     file_group: Gid,
+// ) -> Result<Permissions, nix::Error> {
+//     let owner_mode = (mode & 0o700) >> 6;
+//     let owner_permissions = get_permissions(owner_mode);
 
-    let group_mode = (mode & 0o070) >> 3;
-    let group_permissions = get_permissions(group_mode);
+//     let group_mode = (mode & 0o070) >> 3;
+//     let group_permissions = get_permissions(group_mode);
 
-    let others_mode = mode & 0o007;
-    let others_permissions = get_permissions(others_mode);
+//     let others_mode = mode & 0o007;
+//     let others_permissions = get_permissions(others_mode);
 
-    let user_id = nix::unistd::getuid();
-    let groups_ids = getgroups()?;
+//     let user_id = nix::unistd::getuid();
+//     let groups_ids = getgroups()?;
 
-    if file_owner == user_id {
-        Ok(owner_permissions)
-    } else if groups_ids.contains(&file_group) {
-        Ok(group_permissions)
-    } else {
-        Ok(others_permissions)
-    }
-}
+//     if file_owner == user_id {
+//         Ok(owner_permissions)
+//     } else if groups_ids.contains(&file_group) {
+//         Ok(group_permissions)
+//     } else {
+//         Ok(others_permissions)
+//     }
+// }
 
-#[cfg(target_os = "macos")]
-fn getgroups() -> nix::Result<Vec<Gid>> {
-    use libc::{c_int, gid_t};
-    use std::ptr;
-    let ret = unsafe { libc::getgroups(0, ptr::null_mut()) };
-    let mut groups = Vec::<Gid>::with_capacity(Errno::result(ret)? as usize);
-    let ret = unsafe {
-        libc::getgroups(
-            groups.capacity() as c_int,
-            groups.as_mut_ptr() as *mut gid_t,
-        )
-    };
+// #[cfg(any(target_os = "linux", target_os = "android", target_os = "openbsd"))]
+// use nix::unistd::getgroups;
 
-    Errno::result(ret).map(|s| {
-        unsafe { groups.set_len(s as usize) };
-        groups
-    })
-}
 
-#[cfg(any(target_os = "linux", target_os = "android", target_os = "openbsd"))]
-use nix::unistd::getgroups;
+// #[cfg(unix)]
+// fn os_access(path: PyPathLike, mode: u8, vm: &VirtualMachine) -> PyResult<bool> {
+//     use std::os::unix::fs::MetadataExt;
 
-#[cfg(target_os = "redox")]
-fn getgroups() -> nix::Result<Vec<Gid>> {
-    unimplemented!("redox getgroups")
-}
+//     let flags = AccessFlags::from_bits(mode).ok_or_else(|| {
+//         vm.new_value_error(
+//             "One of the flags is wrong, there are only 4 possibilities F_OK, R_OK, W_OK and X_OK"
+//                 .to_owned(),
+//         )
+//     })?;
 
-#[cfg(unix)]
-fn os_access(path: PyPathLike, mode: u8, vm: &VirtualMachine) -> PyResult<bool> {
-    use std::os::unix::fs::MetadataExt;
+//     let metadata = fs::metadata(&path.path);
 
-    let flags = AccessFlags::from_bits(mode).ok_or_else(|| {
-        vm.new_value_error(
-            "One of the flags is wrong, there are only 4 possibilities F_OK, R_OK, W_OK and X_OK"
-                .to_owned(),
-        )
-    })?;
+//     // if it's only checking for F_OK
+//     if flags == AccessFlags::F_OK {
+//         return Ok(metadata.is_ok());
+//     }
 
-    let metadata = fs::metadata(&path.path);
+//     let metadata = metadata.map_err(|err| convert_io_error(vm, err))?;
 
-    // if it's only checking for F_OK
-    if flags == AccessFlags::F_OK {
-        return Ok(metadata.is_ok());
-    }
+//     let user_id = metadata.uid();
+//     let group_id = metadata.gid();
+//     let mode = metadata.mode();
 
-    let metadata = metadata.map_err(|err| convert_io_error(vm, err))?;
+//     let perm = get_right_permission(mode, Uid::from_raw(user_id), Gid::from_raw(group_id))
+//         .map_err(|err| convert_nix_error(vm, err))?;
 
-    let user_id = metadata.uid();
-    let group_id = metadata.gid();
-    let mode = metadata.mode();
+//     let r_ok = !flags.contains(AccessFlags::R_OK) || perm.is_readable;
+//     let w_ok = !flags.contains(AccessFlags::W_OK) || perm.is_writable;
+//     let x_ok = !flags.contains(AccessFlags::X_OK) || perm.is_executable;
 
-    let perm = get_right_permission(mode, Uid::from_raw(user_id), Gid::from_raw(group_id))
-        .map_err(|err| convert_nix_error(vm, err))?;
-
-    let r_ok = !flags.contains(AccessFlags::R_OK) || perm.is_readable;
-    let w_ok = !flags.contains(AccessFlags::W_OK) || perm.is_writable;
-    let x_ok = !flags.contains(AccessFlags::X_OK) || perm.is_executable;
-
-    Ok(r_ok && w_ok && x_ok)
-}
+//     Ok(r_ok && w_ok && x_ok)
+// }
 #[cfg(windows)]
 fn os_access(path: PyPathLike, mode: u8) -> bool {
     use winapi::um::{fileapi, winnt};
@@ -1020,124 +1006,120 @@ fn os_chdir(path: PyStringRef, vm: &VirtualMachine) -> PyResult<()> {
     env::set_current_dir(path.as_str()).map_err(|err| convert_io_error(vm, err))
 }
 
-#[cfg(all(unix, not(target_os = "redox")))]
-fn os_chroot(path: PyStringRef, vm: &VirtualMachine) -> PyResult<()> {
-    nix::unistd::chroot(path.as_str()).map_err(|err| convert_nix_error(vm, err))
-}
 
-#[cfg(unix)]
-fn os_get_inheritable(fd: RawFd, vm: &VirtualMachine) -> PyResult<bool> {
-    use nix::fcntl::fcntl;
-    use nix::fcntl::FcntlArg;
-    let flags = fcntl(fd, FcntlArg::F_GETFD);
-    match flags {
-        Ok(ret) => Ok((ret & libc::FD_CLOEXEC) == 0),
-        Err(err) => Err(convert_nix_error(vm, err)),
-    }
-}
+// #[cfg(unix)]
+// fn os_get_inheritable(fd: RawFd, vm: &VirtualMachine) -> PyResult<bool> {
+//     use nix::fcntl::fcntl;
+//     use nix::fcntl::FcntlArg;
+//     let flags = fcntl(fd, FcntlArg::F_GETFD);
+//     match flags {
+//         Ok(ret) => Ok((ret & libc::FD_CLOEXEC) == 0),
+//         Err(err) => Err(convert_nix_error(vm, err)),
+//     }
+// }
 
 fn os_set_inheritable(fd: i64, inheritable: bool, vm: &VirtualMachine) -> PyResult<()> {
-    #[cfg(not(any(unix, windows)))]
-    {
+    // #[cfg(not(any(unix, windows)))]
+    // {
         unimplemented!()
-    }
-    #[cfg(unix)]
-    {
-        let fd = fd as RawFd;
-        let _set_flag = || {
-            use nix::fcntl::fcntl;
-            use nix::fcntl::FcntlArg;
-            use nix::fcntl::FdFlag;
+    // }
+    // #[cfg(unix)]
+    // {
+    //     let fd = fd as RawFd;
+    //     let _set_flag = || {
+    //         use nix::fcntl::fcntl;
+    //         use nix::fcntl::FcntlArg;
+    //         use nix::fcntl::FdFlag;
 
-            let flags = FdFlag::from_bits_truncate(fcntl(fd, FcntlArg::F_GETFD)?);
-            let mut new_flags = flags;
-            new_flags.set(FdFlag::from_bits_truncate(libc::FD_CLOEXEC), !inheritable);
-            if flags != new_flags {
-                fcntl(fd, FcntlArg::F_SETFD(new_flags))?;
-            }
-            Ok(())
-        };
-        _set_flag().or_else(|err| Err(convert_nix_error(vm, err)))
-    }
-    #[cfg(windows)]
-    {
-        use winapi::um::{handleapi, winbase};
-        let fd = fd as RawHandle;
-        let flags = if inheritable {
-            winbase::HANDLE_FLAG_INHERIT
-        } else {
-            0
-        };
-        let ret =
-            unsafe { handleapi::SetHandleInformation(fd, winbase::HANDLE_FLAG_INHERIT, flags) };
-        if ret == 0 {
-            Err(errno_err(vm))
-        } else {
-            Ok(())
-        }
-    }
+    //         let flags = FdFlag::from_bits_truncate(fcntl(fd, FcntlArg::F_GETFD)?);
+    //         let mut new_flags = flags;
+    //         new_flags.set(FdFlag::from_bits_truncate(libc::FD_CLOEXEC), !inheritable);
+    //         if flags != new_flags {
+    //             fcntl(fd, FcntlArg::F_SETFD(new_flags))?;
+    //         }
+    //         Ok(())
+    //     };
+    //     _set_flag().or_else(|err| Err(convert_nix_error(vm, err)))
+    // }
+    // #[cfg(windows)]
+    // {
+    //     use winapi::um::{handleapi, winbase};
+    //     let fd = fd as RawHandle;
+    //     let flags = if inheritable {
+    //         winbase::HANDLE_FLAG_INHERIT
+    //     } else {
+    //         0
+    //     };
+    //     let ret =
+    //         unsafe { handleapi::SetHandleInformation(fd, winbase::HANDLE_FLAG_INHERIT, flags) };
+    //     if ret == 0 {
+    //         Err(errno_err(vm))
+    //     } else {
+    //         Ok(())
+    //     }
+    // }
 }
 
-#[cfg(unix)]
-fn os_get_blocking(fd: RawFd, vm: &VirtualMachine) -> PyResult<bool> {
-    use nix::fcntl::fcntl;
-    use nix::fcntl::FcntlArg;
-    let flags = fcntl(fd, FcntlArg::F_GETFL);
-    match flags {
-        Ok(ret) => Ok((ret & libc::O_NONBLOCK) == 0),
-        Err(err) => Err(convert_nix_error(vm, err)),
-    }
-}
+// #[cfg(unix)]
+// fn os_get_blocking(fd: RawFd, vm: &VirtualMachine) -> PyResult<bool> {
+//     use nix::fcntl::fcntl;
+//     use nix::fcntl::FcntlArg;
+//     let flags = fcntl(fd, FcntlArg::F_GETFL);
+//     match flags {
+//         Ok(ret) => Ok((ret & libc::O_NONBLOCK) == 0),
+//         Err(err) => Err(convert_nix_error(vm, err)),
+//     }
+// }
 
-#[cfg(unix)]
-fn os_set_blocking(fd: RawFd, blocking: bool, vm: &VirtualMachine) -> PyResult<()> {
-    let _set_flag = || {
-        use nix::fcntl::fcntl;
-        use nix::fcntl::FcntlArg;
-        use nix::fcntl::OFlag;
+// #[cfg(unix)]
+// fn os_set_blocking(fd: RawFd, blocking: bool, vm: &VirtualMachine) -> PyResult<()> {
+//     let _set_flag = || {
+//         use nix::fcntl::fcntl;
+//         use nix::fcntl::FcntlArg;
+//         use nix::fcntl::OFlag;
 
-        let flags = OFlag::from_bits_truncate(fcntl(fd, FcntlArg::F_GETFL)?);
-        let mut new_flags = flags;
-        new_flags.set(OFlag::from_bits_truncate(libc::O_NONBLOCK), !blocking);
-        if flags != new_flags {
-            fcntl(fd, FcntlArg::F_SETFL(new_flags))?;
-        }
-        Ok(())
-    };
-    _set_flag().or_else(|err| Err(convert_nix_error(vm, err)))
-}
+//         let flags = OFlag::from_bits_truncate(fcntl(fd, FcntlArg::F_GETFL)?);
+//         let mut new_flags = flags;
+//         new_flags.set(OFlag::from_bits_truncate(libc::O_NONBLOCK), !blocking);
+//         if flags != new_flags {
+//             fcntl(fd, FcntlArg::F_SETFL(new_flags))?;
+//         }
+//         Ok(())
+//     };
+//     _set_flag().or_else(|err| Err(convert_nix_error(vm, err)))
+// }
 
-#[cfg(unix)]
-fn os_pipe(vm: &VirtualMachine) -> PyResult<(RawFd, RawFd)> {
-    use nix::unistd::close;
-    use nix::unistd::pipe;
-    let (rfd, wfd) = pipe().map_err(|err| convert_nix_error(vm, err))?;
-    os_set_inheritable(rfd.into(), false, vm)
-        .and_then(|_| os_set_inheritable(wfd.into(), false, vm))
-        .or_else(|err| {
-            let _ = close(rfd);
-            let _ = close(wfd);
-            Err(err)
-        })?;
-    Ok((rfd, wfd))
-}
+// #[cfg(unix)]
+// fn os_pipe(vm: &VirtualMachine) -> PyResult<(RawFd, RawFd)> {
+//     use nix::unistd::close;
+//     use nix::unistd::pipe;
+//     let (rfd, wfd) = pipe().map_err(|err| convert_nix_error(vm, err))?;
+//     os_set_inheritable(rfd.into(), false, vm)
+//         .and_then(|_| os_set_inheritable(wfd.into(), false, vm))
+//         .or_else(|err| {
+//             let _ = close(rfd);
+//             let _ = close(wfd);
+//             Err(err)
+//         })?;
+//     Ok((rfd, wfd))
+// }
 
-// cfg from nix
-#[cfg(any(
-    target_os = "android",
-    target_os = "dragonfly",
-    target_os = "emscripten",
-    target_os = "freebsd",
-    target_os = "linux",
-    target_os = "netbsd",
-    target_os = "openbsd"
-))]
-fn os_pipe2(flags: libc::c_int, vm: &VirtualMachine) -> PyResult<(RawFd, RawFd)> {
-    use nix::fcntl::OFlag;
-    use nix::unistd::pipe2;
-    let oflags = OFlag::from_bits_truncate(flags);
-    pipe2(oflags).map_err(|err| convert_nix_error(vm, err))
-}
+// // cfg from nix
+// #[cfg(any(
+//     target_os = "android",
+//     target_os = "dragonfly",
+//     target_os = "emscripten",
+//     target_os = "freebsd",
+//     target_os = "linux",
+//     target_os = "netbsd",
+//     target_os = "openbsd"
+// ))]
+// fn os_pipe2(flags: libc::c_int, vm: &VirtualMachine) -> PyResult<(RawFd, RawFd)> {
+//     use nix::fcntl::OFlag;
+//     use nix::unistd::pipe2;
+//     let oflags = OFlag::from_bits_truncate(flags);
+//     pipe2(oflags).map_err(|err| convert_nix_error(vm, err))
+// }
 
 #[cfg(unix)]
 fn os_system(command: PyStringRef) -> PyResult<i32> {
@@ -1180,135 +1162,135 @@ fn os_rename(src: PyPathLike, dst: PyPathLike, vm: &VirtualMachine) -> PyResult<
     fs::rename(src.path, dst.path).map_err(|err| convert_io_error(vm, err))
 }
 
-fn os_getpid(vm: &VirtualMachine) -> PyObjectRef {
-    let pid = std::process::id();
-    vm.new_int(pid)
-}
+// fn os_getpid(vm: &VirtualMachine) -> PyObjectRef {
+//     let pid = std::process::id();
+//     vm.new_int(pid)
+// }
 
 fn os_cpu_count(vm: &VirtualMachine) -> PyObjectRef {
     let cpu_count = num_cpus::get();
     vm.new_int(cpu_count)
 }
 
-fn os_exit(code: i32) {
-    std::process::exit(code)
-}
+// fn os_exit(code: i32) {
+//     std::process::exit(code)
+// }
 
-#[cfg(unix)]
-fn os_getppid(vm: &VirtualMachine) -> PyObjectRef {
-    let ppid = unistd::getppid().as_raw();
-    vm.new_int(ppid)
-}
+// #[cfg(unix)]
+// fn os_getppid(vm: &VirtualMachine) -> PyObjectRef {
+//     let ppid = unistd::getppid().as_raw();
+//     vm.new_int(ppid)
+// }
 
-#[cfg(unix)]
-fn os_getgid(vm: &VirtualMachine) -> PyObjectRef {
-    let gid = unistd::getgid().as_raw();
-    vm.new_int(gid)
-}
+// #[cfg(unix)]
+// fn os_getgid(vm: &VirtualMachine) -> PyObjectRef {
+//     let gid = unistd::getgid().as_raw();
+//     vm.new_int(gid)
+// }
 
-#[cfg(unix)]
-fn os_getegid(vm: &VirtualMachine) -> PyObjectRef {
-    let egid = unistd::getegid().as_raw();
-    vm.new_int(egid)
-}
+// #[cfg(unix)]
+// fn os_getegid(vm: &VirtualMachine) -> PyObjectRef {
+//     let egid = unistd::getegid().as_raw();
+//     vm.new_int(egid)
+// }
 
-#[cfg(unix)]
-fn os_getpgid(pid: u32, vm: &VirtualMachine) -> PyResult {
-    match unistd::getpgid(Some(Pid::from_raw(pid as i32))) {
-        Ok(pgid) => Ok(vm.new_int(pgid.as_raw())),
-        Err(err) => Err(convert_nix_error(vm, err)),
-    }
-}
+// #[cfg(unix)]
+// fn os_getpgid(pid: u32, vm: &VirtualMachine) -> PyResult {
+//     match unistd::getpgid(Some(Pid::from_raw(pid as i32))) {
+//         Ok(pgid) => Ok(vm.new_int(pgid.as_raw())),
+//         Err(err) => Err(convert_nix_error(vm, err)),
+//     }
+// }
 
-#[cfg(unix)]
-fn os_getpgrp(vm: &VirtualMachine) -> PyResult {
-    Ok(vm.new_int(unistd::getpgrp().as_raw()))
-}
+// #[cfg(unix)]
+// fn os_getpgrp(vm: &VirtualMachine) -> PyResult {
+//     Ok(vm.new_int(unistd::getpgrp().as_raw()))
+// }
 
-#[cfg(all(unix, not(target_os = "redox")))]
-fn os_getsid(pid: u32, vm: &VirtualMachine) -> PyResult {
-    match unistd::getsid(Some(Pid::from_raw(pid as i32))) {
-        Ok(sid) => Ok(vm.new_int(sid.as_raw())),
-        Err(err) => Err(convert_nix_error(vm, err)),
-    }
-}
+// #[cfg(all(unix, not(target_os = "redox")))]
+// fn os_getsid(pid: u32, vm: &VirtualMachine) -> PyResult {
+//     match unistd::getsid(Some(Pid::from_raw(pid as i32))) {
+//         Ok(sid) => Ok(vm.new_int(sid.as_raw())),
+//         Err(err) => Err(convert_nix_error(vm, err)),
+//     }
+// }
 
-#[cfg(unix)]
-fn os_getuid(vm: &VirtualMachine) -> PyObjectRef {
-    let uid = unistd::getuid().as_raw();
-    vm.new_int(uid)
-}
+// #[cfg(unix)]
+// fn os_getuid(vm: &VirtualMachine) -> PyObjectRef {
+//     let uid = unistd::getuid().as_raw();
+//     vm.new_int(uid)
+// }
 
-#[cfg(unix)]
-fn os_geteuid(vm: &VirtualMachine) -> PyObjectRef {
-    let euid = unistd::geteuid().as_raw();
-    vm.new_int(euid)
-}
+// #[cfg(unix)]
+// fn os_geteuid(vm: &VirtualMachine) -> PyObjectRef {
+//     let euid = unistd::geteuid().as_raw();
+//     vm.new_int(euid)
+// }
 
-#[cfg(unix)]
-fn os_setgid(gid: u32, vm: &VirtualMachine) -> PyResult<()> {
-    unistd::setgid(Gid::from_raw(gid)).map_err(|err| convert_nix_error(vm, err))
-}
+// #[cfg(unix)]
+// fn os_setgid(gid: u32, vm: &VirtualMachine) -> PyResult<()> {
+//     unistd::setgid(Gid::from_raw(gid)).map_err(|err| convert_nix_error(vm, err))
+// }
 
-#[cfg(all(unix, not(target_os = "redox")))]
-fn os_setegid(egid: u32, vm: &VirtualMachine) -> PyResult<()> {
-    unistd::setegid(Gid::from_raw(egid)).map_err(|err| convert_nix_error(vm, err))
-}
+// #[cfg(all(unix, not(target_os = "redox")))]
+// fn os_setegid(egid: u32, vm: &VirtualMachine) -> PyResult<()> {
+//     unistd::setegid(Gid::from_raw(egid)).map_err(|err| convert_nix_error(vm, err))
+// }
 
-#[cfg(unix)]
-fn os_setpgid(pid: u32, pgid: u32, vm: &VirtualMachine) -> PyResult<()> {
-    unistd::setpgid(Pid::from_raw(pid as i32), Pid::from_raw(pgid as i32))
-        .map_err(|err| convert_nix_error(vm, err))
-}
+// #[cfg(unix)]
+// fn os_setpgid(pid: u32, pgid: u32, vm: &VirtualMachine) -> PyResult<()> {
+//     unistd::setpgid(Pid::from_raw(pid as i32), Pid::from_raw(pgid as i32))
+//         .map_err(|err| convert_nix_error(vm, err))
+// }
 
-#[cfg(all(unix, not(target_os = "redox")))]
-fn os_setsid(vm: &VirtualMachine) -> PyResult<()> {
-    unistd::setsid()
-        .map(|_ok| ())
-        .map_err(|err| convert_nix_error(vm, err))
-}
+// #[cfg(all(unix, not(target_os = "redox")))]
+// fn os_setsid(vm: &VirtualMachine) -> PyResult<()> {
+//     unistd::setsid()
+//         .map(|_ok| ())
+//         .map_err(|err| convert_nix_error(vm, err))
+// }
 
-#[cfg(unix)]
-fn os_setuid(uid: u32, vm: &VirtualMachine) -> PyResult<()> {
-    unistd::setuid(Uid::from_raw(uid)).map_err(|err| convert_nix_error(vm, err))
-}
+// #[cfg(unix)]
+// fn os_setuid(uid: u32, vm: &VirtualMachine) -> PyResult<()> {
+//     unistd::setuid(Uid::from_raw(uid)).map_err(|err| convert_nix_error(vm, err))
+// }
 
-#[cfg(all(unix, not(target_os = "redox")))]
-fn os_seteuid(euid: u32, vm: &VirtualMachine) -> PyResult<()> {
-    unistd::seteuid(Uid::from_raw(euid)).map_err(|err| convert_nix_error(vm, err))
-}
+// #[cfg(all(unix, not(target_os = "redox")))]
+// fn os_seteuid(euid: u32, vm: &VirtualMachine) -> PyResult<()> {
+//     unistd::seteuid(Uid::from_raw(euid)).map_err(|err| convert_nix_error(vm, err))
+// }
 
-#[cfg(all(unix, not(target_os = "redox")))]
-fn os_setreuid(ruid: u32, euid: u32, vm: &VirtualMachine) -> PyResult<()> {
-    unistd::setuid(Uid::from_raw(ruid)).map_err(|err| convert_nix_error(vm, err))?;
-    unistd::seteuid(Uid::from_raw(euid)).map_err(|err| convert_nix_error(vm, err))
-}
+// #[cfg(all(unix, not(target_os = "redox")))]
+// fn os_setreuid(ruid: u32, euid: u32, vm: &VirtualMachine) -> PyResult<()> {
+//     unistd::setuid(Uid::from_raw(ruid)).map_err(|err| convert_nix_error(vm, err))?;
+//     unistd::seteuid(Uid::from_raw(euid)).map_err(|err| convert_nix_error(vm, err))
+// }
 
-// cfg from nix
-#[cfg(any(
-    target_os = "android",
-    target_os = "freebsd",
-    target_os = "linux",
-    target_os = "openbsd"
-))]
-fn os_setresuid(ruid: u32, euid: u32, suid: u32, vm: &VirtualMachine) -> PyResult<()> {
-    unistd::setresuid(
-        Uid::from_raw(ruid),
-        Uid::from_raw(euid),
-        Uid::from_raw(suid),
-    )
-    .map_err(|err| convert_nix_error(vm, err))
-}
+// // cfg from nix
+// #[cfg(any(
+//     target_os = "android",
+//     target_os = "freebsd",
+//     target_os = "linux",
+//     target_os = "openbsd"
+// ))]
+// fn os_setresuid(ruid: u32, euid: u32, suid: u32, vm: &VirtualMachine) -> PyResult<()> {
+//     unistd::setresuid(
+//         Uid::from_raw(ruid),
+//         Uid::from_raw(euid),
+//         Uid::from_raw(suid),
+//     )
+//     .map_err(|err| convert_nix_error(vm, err))
+// }
 
-#[cfg(all(unix, not(target_os = "redox")))]
-pub fn os_openpty(vm: &VirtualMachine) -> PyResult {
-    match openpty(None, None) {
-        Ok(r) => Ok(vm
-            .ctx
-            .new_tuple(vec![vm.new_int(r.master), vm.new_int(r.slave)])),
-        Err(err) => Err(convert_nix_error(vm, err)),
-    }
-}
+// #[cfg(all(unix, not(target_os = "redox")))]
+// pub fn os_openpty(vm: &VirtualMachine) -> PyResult {
+//     match openpty(None, None) {
+//         Ok(r) => Ok(vm
+//             .ctx
+//             .new_tuple(vec![vm.new_int(r.master), vm.new_int(r.slave)])),
+//         Err(err) => Err(convert_nix_error(vm, err)),
+//     }
+// }
 
 #[cfg(unix)]
 pub fn os_ttyname(fd: i32, vm: &VirtualMachine) -> PyResult {
@@ -1493,106 +1475,106 @@ fn os_sync(_vm: &VirtualMachine) -> PyResult<()> {
 }
 
 // cfg from nix
-#[cfg(any(
-    target_os = "android",
-    target_os = "freebsd",
-    target_os = "linux",
-    target_os = "openbsd"
-))]
-fn os_getresuid(vm: &VirtualMachine) -> PyResult<(u32, u32, u32)> {
-    let mut ruid = 0;
-    let mut euid = 0;
-    let mut suid = 0;
-    let ret = unsafe { libc::getresuid(&mut ruid, &mut euid, &mut suid) };
-    if ret == 0 {
-        Ok((ruid, euid, suid))
-    } else {
-        Err(errno_err(vm))
-    }
-}
+// #[cfg(any(
+//     target_os = "android",
+//     target_os = "freebsd",
+//     target_os = "linux",
+//     target_os = "openbsd"
+// ))]
+// fn os_getresuid(vm: &VirtualMachine) -> PyResult<(u32, u32, u32)> {
+//     let mut ruid = 0;
+//     let mut euid = 0;
+//     let mut suid = 0;
+//     let ret = unsafe { libc::getresuid(&mut ruid, &mut euid, &mut suid) };
+//     if ret == 0 {
+//         Ok((ruid, euid, suid))
+//     } else {
+//         Err(errno_err(vm))
+//     }
+// }
 
 // cfg from nix
-#[cfg(any(
-    target_os = "android",
-    target_os = "freebsd",
-    target_os = "linux",
-    target_os = "openbsd"
-))]
-fn os_getresgid(vm: &VirtualMachine) -> PyResult<(u32, u32, u32)> {
-    let mut rgid = 0;
-    let mut egid = 0;
-    let mut sgid = 0;
-    let ret = unsafe { libc::getresgid(&mut rgid, &mut egid, &mut sgid) };
-    if ret == 0 {
-        Ok((rgid, egid, sgid))
-    } else {
-        Err(errno_err(vm))
-    }
-}
+// #[cfg(any(
+//     target_os = "android",
+//     target_os = "freebsd",
+//     target_os = "linux",
+//     target_os = "openbsd"
+// ))]
+// fn os_getresgid(vm: &VirtualMachine) -> PyResult<(u32, u32, u32)> {
+//     let mut rgid = 0;
+//     let mut egid = 0;
+//     let mut sgid = 0;
+//     let ret = unsafe { libc::getresgid(&mut rgid, &mut egid, &mut sgid) };
+//     if ret == 0 {
+//         Ok((rgid, egid, sgid))
+//     } else {
+//         Err(errno_err(vm))
+//     }
+// }
 
 // cfg from nix
-#[cfg(any(
-    target_os = "android",
-    target_os = "freebsd",
-    target_os = "linux",
-    target_os = "openbsd"
-))]
-fn os_setresgid(rgid: u32, egid: u32, sgid: u32, vm: &VirtualMachine) -> PyResult<()> {
-    unistd::setresgid(
-        Gid::from_raw(rgid),
-        Gid::from_raw(egid),
-        Gid::from_raw(sgid),
-    )
-    .map_err(|err| convert_nix_error(vm, err))
-}
+// #[cfg(any(
+//     target_os = "android",
+//     target_os = "freebsd",
+//     target_os = "linux",
+//     target_os = "openbsd"
+// ))]
+// fn os_setresgid(rgid: u32, egid: u32, sgid: u32, vm: &VirtualMachine) -> PyResult<()> {
+//     unistd::setresgid(
+//         Gid::from_raw(rgid),
+//         Gid::from_raw(egid),
+//         Gid::from_raw(sgid),
+//     )
+//     .map_err(|err| convert_nix_error(vm, err))
+// }
 
 // cfg from nix
-#[cfg(any(
-    target_os = "android",
-    target_os = "freebsd",
-    target_os = "linux",
-    target_os = "openbsd"
-))]
-fn os_setregid(rgid: u32, egid: u32, vm: &VirtualMachine) -> PyResult<()> {
-    let ret = unsafe { libc::setregid(rgid, egid) };
-    if ret == 0 {
-        Ok(())
-    } else {
-        Err(errno_err(vm))
-    }
-}
+// #[cfg(any(
+//     target_os = "android",
+//     target_os = "freebsd",
+//     target_os = "linux",
+//     target_os = "openbsd"
+// ))]
+// fn os_setregid(rgid: u32, egid: u32, vm: &VirtualMachine) -> PyResult<()> {
+//     let ret = unsafe { libc::setregid(rgid, egid) };
+//     if ret == 0 {
+//         Ok(())
+//     } else {
+//         Err(errno_err(vm))
+//     }
+// }
 
 // cfg from nix
-#[cfg(any(
-    target_os = "android",
-    target_os = "freebsd",
-    target_os = "linux",
-    target_os = "openbsd"
-))]
-fn os_initgroups(user_name: PyStringRef, gid: u32, vm: &VirtualMachine) -> PyResult<()> {
-    let user = ffi::CString::new(user_name.as_str()).unwrap();
-    let gid = Gid::from_raw(gid);
-    unistd::initgroups(&user, gid).map_err(|err| convert_nix_error(vm, err))
-}
+// #[cfg(any(
+//     target_os = "android",
+//     target_os = "freebsd",
+//     target_os = "linux",
+//     target_os = "openbsd"
+// ))]
+// fn os_initgroups(user_name: PyStringRef, gid: u32, vm: &VirtualMachine) -> PyResult<()> {
+//     let user = ffi::CString::new(user_name.as_str()).unwrap();
+//     let gid = Gid::from_raw(gid);
+//     unistd::initgroups(&user, gid).map_err(|err| convert_nix_error(vm, err))
+// }
 
 // cfg from nix
-#[cfg(any(
-    target_os = "android",
-    target_os = "freebsd",
-    target_os = "linux",
-    target_os = "openbsd"
-))]
-fn os_setgroups(group_ids: PyIterable<u32>, vm: &VirtualMachine) -> PyResult<()> {
-    let gids = group_ids
-        .iter(vm)?
-        .map(|entry| match entry {
-            Ok(id) => Ok(unistd::Gid::from_raw(id)),
-            Err(err) => Err(err),
-        })
-        .collect::<Result<Vec<_>, _>>()?;
-    let ret = unistd::setgroups(&gids);
-    ret.map_err(|err| convert_nix_error(vm, err))
-}
+// #[cfg(any(
+//     target_os = "android",
+//     target_os = "freebsd",
+//     target_os = "linux",
+//     target_os = "openbsd"
+// ))]
+// fn os_setgroups(group_ids: PyIterable<u32>, vm: &VirtualMachine) -> PyResult<()> {
+//     let gids = group_ids
+//         .iter(vm)?
+//         .map(|entry| match entry {
+//             Ok(id) => Ok(unistd::Gid::from_raw(id)),
+//             Err(err) => Err(err),
+//         })
+//         .collect::<Result<Vec<_>, _>>()?;
+//     let ret = unistd::setgroups(&gids);
+//     ret.map_err(|err| convert_nix_error(vm, err))
+// }
 
 #[cfg(unix)]
 fn envp_from_dict(dict: PyDictRef, vm: &VirtualMachine) -> PyResult<Vec<ffi::CString>> {
@@ -1680,25 +1662,25 @@ impl PosixSpawnArgs {
                                 "POSIX_SPAWN_OPEN path should not have nul bytes".to_owned(),
                             )
                         })?;
-                        unsafe {
-                            libc::posix_spawn_file_actions_addopen(
-                                &mut file_actions,
-                                fd,
-                                path.as_ptr(),
-                                oflag,
-                                mode,
-                            )
-                        }
+                        // unsafe {
+                        //     libc::posix_spawn_file_actions_addopen(
+                        //         &mut file_actions,
+                        //         fd,
+                        //         path.as_ptr(),
+                        //         oflag,
+                        //         mode,
+                        //     )
+                        // }
                     }
                     PosixSpawnFileActionIdentifier::Close => {
                         let (fd,) = args.bind(vm)?;
-                        unsafe { libc::posix_spawn_file_actions_addclose(&mut file_actions, fd) }
+                        // unsafe { libc::posix_spawn_file_actions_addclose(&mut file_actions, fd) }
                     }
                     PosixSpawnFileActionIdentifier::Dup2 => {
                         let (fd, newfd) = args.bind(vm)?;
-                        unsafe {
-                            libc::posix_spawn_file_actions_adddup2(&mut file_actions, fd, newfd)
-                        }
+                        // unsafe {
+                        //     libc::posix_spawn_file_actions_adddup2(&mut file_actions, fd, newfd)
+                        // }
                     }
                 };
                 if ret != 0 {
@@ -1709,21 +1691,21 @@ impl PosixSpawnArgs {
 
         let mut attrp = unsafe {
             let mut sa = std::mem::MaybeUninit::uninit();
-            assert!(libc::posix_spawnattr_init(sa.as_mut_ptr()) == 0);
+            // assert!(libc::posix_spawnattr_init(sa.as_mut_ptr()) == 0);
             sa.assume_init()
         };
-        if let Some(sigs) = self.setsigdef {
-            use nix::sys::signal;
-            let mut set = signal::SigSet::empty();
-            for sig in sigs.iter(vm)? {
-                let sig = sig?;
-                let sig = signal::Signal::try_from(sig).map_err(|_| {
-                    vm.new_value_error(format!("signal number {} out of range", sig))
-                })?;
-                set.add(sig);
-            }
-            assert!(unsafe { libc::posix_spawnattr_setsigdefault(&mut attrp, set.as_ref()) } == 0);
-        }
+        // if let Some(sigs) = self.setsigdef {
+        //     use nix::sys::signal;
+        //     let mut set = signal::SigSet::empty();
+        //     for sig in sigs.iter(vm)? {
+        //         let sig = sig?;
+        //         let sig = signal::Signal::try_from(sig).map_err(|_| {
+        //             vm.new_value_error(format!("signal number {} out of range", sig))
+        //         })?;
+        //         set.add(sig);
+        //     }
+        //     assert!(unsafe { libc::posix_spawnattr_setsigdefault(&mut attrp, set.as_ref()) } == 0);
+        // }
 
         let mut args: Vec<ffi::CString> = self
             .args
@@ -1785,79 +1767,79 @@ fn os_posix_spawnp(args: PosixSpawnArgs, vm: &VirtualMachine) -> PyResult<libc::
     args.spawn(true, vm)
 }
 
-#[cfg(unix)]
-fn os_wifsignaled(status: i32) -> bool {
-    unsafe { libc::WIFSIGNALED(status) }
-}
-#[cfg(unix)]
-fn os_wifstopped(status: i32) -> bool {
-    unsafe { libc::WIFSTOPPED(status) }
-}
-#[cfg(unix)]
-fn os_wifexited(status: i32) -> bool {
-    unsafe { libc::WIFEXITED(status) }
-}
-#[cfg(unix)]
-fn os_wtermsig(status: i32) -> i32 {
-    unsafe { libc::WTERMSIG(status) }
-}
-#[cfg(unix)]
-fn os_wstopsig(status: i32) -> i32 {
-    unsafe { libc::WSTOPSIG(status) }
-}
-#[cfg(unix)]
-fn os_wexitstatus(status: i32) -> i32 {
-    unsafe { libc::WEXITSTATUS(status) }
-}
+// #[cfg(unix)]
+// fn os_wifsignaled(status: i32) -> bool {
+//     unsafe { libc::WIFSIGNALED(status) }
+// }
+// #[cfg(unix)]
+// fn os_wifstopped(status: i32) -> bool {
+//     unsafe { libc::WIFSTOPPED(status) }
+// }
+// #[cfg(unix)]
+// fn os_wifexited(status: i32) -> bool {
+//     unsafe { libc::WIFEXITED(status) }
+// }
+// #[cfg(unix)]
+// fn os_wtermsig(status: i32) -> i32 {
+//     unsafe { libc::WTERMSIG(status) }
+// }
+// #[cfg(unix)]
+// fn os_wstopsig(status: i32) -> i32 {
+//     unsafe { libc::WSTOPSIG(status) }
+// }
+// #[cfg(unix)]
+// fn os_wexitstatus(status: i32) -> i32 {
+//     unsafe { libc::WEXITSTATUS(status) }
+// }
 
 // TODO: os.wait[pid] for windows
-#[cfg(unix)]
-fn os_waitpid(pid: libc::pid_t, opt: i32, vm: &VirtualMachine) -> PyResult<(libc::pid_t, i32)> {
-    let mut status = 0;
-    let pid = unsafe { libc::waitpid(pid, &mut status, opt) };
-    let pid = Errno::result(pid).map_err(|e| convert_nix_error(vm, e))?;
-    Ok((pid, status))
-}
+// #[cfg(unix)]
+// fn os_waitpid(pid: libc::pid_t, opt: i32, vm: &VirtualMachine) -> PyResult<(libc::pid_t, i32)> {
+//     let mut status = 0;
+//     let pid = unsafe { libc::waitpid(pid, &mut status, opt) };
+//     let pid = Errno::result(pid).map_err(|e| convert_nix_error(vm, e))?;
+//     Ok((pid, status))
+// }
 #[cfg(unix)]
 fn os_wait(vm: &VirtualMachine) -> PyResult<(libc::pid_t, i32)> {
     os_waitpid(-1, 0, vm)
 }
 
 fn os_kill(pid: i32, sig: isize, vm: &VirtualMachine) -> PyResult<()> {
-    #[cfg(unix)]
-    {
-        let ret = unsafe { libc::kill(pid, sig as i32) };
-        if ret == -1 {
-            Err(errno_err(vm))
-        } else {
-            Ok(())
-        }
-    }
-    #[cfg(windows)]
-    {
-        use winapi::um::{handleapi, processthreadsapi, wincon, winnt};
-        let sig = sig as u32;
-        let pid = pid as u32;
+    // #[cfg(unix)]
+    // {
+    //     let ret = unsafe { libc::kill(pid, sig as i32) };
+    //     if ret == -1 {
+    //         Err(errno_err(vm))
+    //     } else {
+    //         Ok(())
+    //     }
+    // }
+    // #[cfg(windows)]
+    // {
+    //     use winapi::um::{handleapi, processthreadsapi, wincon, winnt};
+    //     let sig = sig as u32;
+    //     let pid = pid as u32;
 
-        if sig == wincon::CTRL_C_EVENT || sig == wincon::CTRL_BREAK_EVENT {
-            let ret = unsafe { wincon::GenerateConsoleCtrlEvent(sig, pid) };
-            let res = if ret == 0 { Err(errno_err(vm)) } else { Ok(()) };
-            return res;
-        }
+    //     if sig == wincon::CTRL_C_EVENT || sig == wincon::CTRL_BREAK_EVENT {
+    //         let ret = unsafe { wincon::GenerateConsoleCtrlEvent(sig, pid) };
+    //         let res = if ret == 0 { Err(errno_err(vm)) } else { Ok(()) };
+    //         return res;
+    //     }
 
-        let h = unsafe { processthreadsapi::OpenProcess(winnt::PROCESS_ALL_ACCESS, 0, pid) };
-        if h.is_null() {
-            return Err(errno_err(vm));
-        }
-        let ret = unsafe { processthreadsapi::TerminateProcess(h, sig) };
-        let res = if ret == 0 { Err(errno_err(vm)) } else { Ok(()) };
-        unsafe { handleapi::CloseHandle(h) };
-        res
-    }
-    #[cfg(not(any(unix, windows)))]
-    {
+    //     let h = unsafe { processthreadsapi::OpenProcess(winnt::PROCESS_ALL_ACCESS, 0, pid) };
+    //     if h.is_null() {
+    //         return Err(errno_err(vm));
+    //     }
+    //     let ret = unsafe { processthreadsapi::TerminateProcess(h, sig) };
+    //     let res = if ret == 0 { Err(errno_err(vm)) } else { Ok(()) };
+    //     unsafe { handleapi::CloseHandle(h) };
+    //     res
+    // }
+    // #[cfg(not(any(unix, windows)))]
+    // {
         unimplemented!()
-    }
+    // }
 }
 
 pub fn make_module(vm: &VirtualMachine) -> PyObjectRef {
@@ -1961,7 +1943,7 @@ pub fn make_module(vm: &VirtualMachine) -> PyObjectRef {
         "getcwd" => ctx.new_function(os_getcwd),
         "chdir" => ctx.new_function(os_chdir),
         "fspath" => ctx.new_function(os_fspath),
-        "getpid" => ctx.new_function(os_getpid),
+        // "getpid" => ctx.new_function(os_getpid),
         "cpu_count" => ctx.new_function(os_cpu_count),
         "_exit" => ctx.new_function(os_exit),
         "urandom" => ctx.new_function(os_urandom),
@@ -2029,20 +2011,20 @@ fn extend_module_platform_specific(vm: &VirtualMachine, module: &PyObjectRef) {
 
     extend_module!(vm, module, {
         "chmod" => ctx.new_function(os_chmod),
-        "get_inheritable" => ctx.new_function(os_get_inheritable), // TODO: windows
-        "get_blocking" => ctx.new_function(os_get_blocking),
-        "getppid" => ctx.new_function(os_getppid),
-        "getgid" => ctx.new_function(os_getgid),
-        "getegid" => ctx.new_function(os_getegid),
-        "getpgid" => ctx.new_function(os_getpgid),
-        "getuid" => ctx.new_function(os_getuid),
-        "getpgrp" => ctx.new_function(os_getpgrp),
-        "geteuid" => ctx.new_function(os_geteuid),
-        "pipe" => ctx.new_function(os_pipe), //TODO: windows
-        "set_blocking" => ctx.new_function(os_set_blocking),
-        "setgid" => ctx.new_function(os_setgid),
-        "setpgid" => ctx.new_function(os_setpgid),
-        "setuid" => ctx.new_function(os_setuid),
+        // "get_inheritable" => ctx.new_function(os_get_inheritable), // TODO: windows
+        // "get_blocking" => ctx.new_function(os_get_blocking),
+        // "getppid" => ctx.new_function(os_getppid),
+        // "getgid" => ctx.new_function(os_getgid),
+        // "getegid" => ctx.new_function(os_getegid),
+        // "getpgid" => ctx.new_function(os_getpgid),
+        // "getuid" => ctx.new_function(os_getuid),
+        // "getpgrp" => ctx.new_function(os_getpgrp),
+        // "geteuid" => ctx.new_function(os_geteuid),
+        // "pipe" => ctx.new_function(os_pipe), //TODO: windows
+        // "set_blocking" => ctx.new_function(os_set_blocking),
+        // "setgid" => ctx.new_function(os_setgid),
+        // "setpgid" => ctx.new_function(os_setpgid),
+        // "setuid" => ctx.new_function(os_setuid),
         "sync" => ctx.new_function(os_sync),
         "system" => ctx.new_function(os_system),
         "ttyname" => ctx.new_function(os_ttyname),
@@ -2079,61 +2061,61 @@ fn extend_module_platform_specific(vm: &VirtualMachine, module: &PyObjectRef) {
 
     #[cfg(not(target_os = "redox"))]
     extend_module!(vm, module, {
-        "chroot" => ctx.new_function(os_chroot),
-        "getsid" => ctx.new_function(os_getsid),
-        "setsid" => ctx.new_function(os_setsid),
-        "setegid" => ctx.new_function(os_setegid),
-        "seteuid" => ctx.new_function(os_seteuid),
-        "setreuid" => ctx.new_function(os_setreuid),
-        "openpty" => ctx.new_function(os_openpty),
+        // "chroot" => ctx.new_function(os_chroot),
+        // "getsid" => ctx.new_function(os_getsid),
+        // "setsid" => ctx.new_function(os_setsid),
+        // "setegid" => ctx.new_function(os_setegid),
+        // "seteuid" => ctx.new_function(os_seteuid),
+        // "setreuid" => ctx.new_function(os_setreuid),
+        // "openpty" => ctx.new_function(os_openpty),
         "O_DSYNC" => ctx.new_int(libc::O_DSYNC),
         "O_NDELAY" => ctx.new_int(libc::O_NDELAY),
         "O_NOCTTY" => ctx.new_int(libc::O_NOCTTY),
     });
 
     // cfg taken from nix
-    #[cfg(any(
-        target_os = "android",
-        target_os = "freebsd",
-        target_os = "linux",
-        target_os = "openbsd"
-    ))]
-    extend_module!(vm, module, {
-        "setresuid" => ctx.new_function(os_setresuid),
-        "getresuid" => ctx.new_function(os_getresuid),
-        "getresgid" => ctx.new_function(os_getresgid),
-        "setresgid" => ctx.new_function(os_setresgid),
-        "setregid" => ctx.new_function(os_setregid),
-        "initgroups" => ctx.new_function(os_initgroups),
-        "setgroups" => ctx.new_function(os_setgroups),
-    });
+    // #[cfg(any(
+    //     target_os = "android",
+    //     target_os = "freebsd",
+    //     target_os = "linux",
+    //     target_os = "openbsd"
+    // ))]
+    // extend_module!(vm, module, {
+    //     "setresuid" => ctx.new_function(os_setresuid),
+    //     "getresuid" => ctx.new_function(os_getresuid),
+    //     "getresgid" => ctx.new_function(os_getresgid),
+    //     "setresgid" => ctx.new_function(os_setresgid),
+    //     "setregid" => ctx.new_function(os_setregid),
+    //     "initgroups" => ctx.new_function(os_initgroups),
+    //     "setgroups" => ctx.new_function(os_setgroups),
+    // });
 
     // cfg taken from nix
-    #[cfg(any(
-        target_os = "dragonfly",
-        target_os = "freebsd",
-        all(
-            target_os = "linux",
-            not(any(target_env = "musl", target_arch = "mips", target_arch = "mips64"))
-        )
-    ))]
-    extend_module!(vm, module, {
-        "SEEK_DATA" => ctx.new_int(unistd::Whence::SeekData as i8),
-        "SEEK_HOLE" => ctx.new_int(unistd::Whence::SeekHole as i8)
-    });
+    // #[cfg(any(
+    //     target_os = "dragonfly",
+    //     target_os = "freebsd",
+    //     all(
+    //         target_os = "linux",
+    //         not(any(target_env = "musl", target_arch = "mips", target_arch = "mips64"))
+    //     )
+    // ))]
+    // extend_module!(vm, module, {
+    //     "SEEK_DATA" => ctx.new_int(unistd::Whence::SeekData as i8),
+    //     "SEEK_HOLE" => ctx.new_int(unistd::Whence::SeekHole as i8)
+    // });
     // cfg from nix
-    #[cfg(any(
-        target_os = "android",
-        target_os = "dragonfly",
-        target_os = "emscripten",
-        target_os = "freebsd",
-        target_os = "linux",
-        target_os = "netbsd",
-        target_os = "openbsd"
-    ))]
-    extend_module!(vm, module, {
-        "pipe2" => ctx.new_function(os_pipe2),
-    });
+    // #[cfg(any(
+    //     target_os = "android",
+    //     target_os = "dragonfly",
+    //     target_os = "emscripten",
+    //     target_os = "freebsd",
+    //     target_os = "linux",
+    //     target_os = "netbsd",
+    //     target_os = "openbsd"
+    // ))]
+    // extend_module!(vm, module, {
+    //     "pipe2" => ctx.new_function(os_pipe2),
+    // });
 
     #[cfg(any(target_os = "linux", target_os = "freebsd", target_os = "macos"))]
     extend_module!(vm, module, {

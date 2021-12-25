@@ -1,7 +1,12 @@
 use std::collections::HashMap;
 use std::mem;
 use std::ops::RangeInclusive;
-
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
 use indexmap::IndexMap;
 use result_like::impl_option_like;
 use smallbox::{smallbox, space::S1, SmallBox};

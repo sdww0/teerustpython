@@ -4,6 +4,13 @@
 
 use std::fmt;
 use std::ops::Deref;
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
 
 use super::objtype::PyClassRef;
 use crate::bytecode;

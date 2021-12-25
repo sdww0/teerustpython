@@ -12,8 +12,13 @@ mod _random {
     use num_bigint::{BigInt, Sign};
     use num_traits::Signed;
     use rand::{rngs::StdRng, RngCore, SeedableRng};
-
-    use std::sync::Mutex;
+    use std::string::String;
+    use std::vec::Vec;
+    use std::boxed::Box;
+    use std::vec;
+    use std::format;
+    use std::string::ToString;
+    use std::sync::SgxMutex as Mutex;
 
     #[derive(Debug)]
     enum PyRng {

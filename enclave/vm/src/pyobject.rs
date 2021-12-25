@@ -3,8 +3,13 @@ use std::collections::HashMap;
 use std::fmt;
 use std::marker::PhantomData;
 use std::ops::Deref;
-use std::sync::{Arc, Mutex};
-
+use std::sync::{Arc, SgxMutex as Mutex};
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
 use indexmap::IndexMap;
 use num_bigint::BigInt;
 use num_complex::Complex64;

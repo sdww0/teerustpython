@@ -10,12 +10,18 @@ use crate::pyobject::{
 };
 use crate::types::create_type;
 use crate::VirtualMachine;
+use std::borrow::ToOwned;
 
 use std::convert::TryFrom;
 use std::ffi::{CStr, CString};
 use std::fmt;
-use std::sync::{RwLock, RwLockWriteGuard};
-
+use std::sync::{SgxRwLock as RwLock,SgxRwLockReadGuard as RwLockWriteGuard};
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
 use foreign_types_shared::{ForeignType, ForeignTypeRef};
 use openssl::{
     asn1::{Asn1Object, Asn1ObjectRef},

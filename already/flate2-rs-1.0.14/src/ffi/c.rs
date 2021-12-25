@@ -1,4 +1,5 @@
 //! Implementation for C backends.
+use std::boxed::Box;
 use std::alloc::{self, Layout};
 use std::cmp;
 use std::convert::TryFrom;

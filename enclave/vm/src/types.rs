@@ -42,8 +42,9 @@ use crate::obj::objzip;
 use crate::pyobject::{PyAttributes, PyContext, PyObject};
 use std::mem::MaybeUninit;
 use std::ptr;
-use std::sync::{Arc, RwLock};
-
+use std::sync::{Arc, SgxRwLock as RwLock};
+use std::vec;
+use std::string::String;
 /// Holder of references to builtin types.
 #[derive(Debug)]
 pub struct TypeZoo {

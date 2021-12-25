@@ -24,7 +24,8 @@ repository = "https://github.com/steveklabnik/semver"
 version = "0.7.0"
 
 [dependencies]
-serde            = { git = "https://github.com/mesalock-linux/serde-sgx" ,optional = true}
+serde            = { git = "https://github.com/mesalock-linux/serde-sgx" , optional = true}
+
 [dev-dependencies.crates-index]
 version = "0.18.0"
 

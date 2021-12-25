@@ -16,11 +16,20 @@ use parking_lot::{
     RawMutex, RawThreadId,
 };
 use thread_local::ThreadLocal;
-
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
 use std::cell::RefCell;
 use std::io::Write;
 use std::time::Duration;
 use std::{fmt, thread};
+use std::thread::Thread;
+use std::thread::Builder;
+use std::thread_local;
+use std::borrow::ToOwned;
 
 // PY_TIMEOUT_MAX is a value in microseconds
 #[cfg(not(target_os = "windows"))]

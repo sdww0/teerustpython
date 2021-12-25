@@ -7,6 +7,13 @@ use rustpython_parser::lexer;
 use crate::obj::objstr::PyStringRef;
 use crate::pyobject::{PyObjectRef, PyResult};
 use crate::vm::VirtualMachine;
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
 
 fn keyword_iskeyword(s: PyStringRef, vm: &VirtualMachine) -> PyResult {
     let keywords = lexer::get_keywords();

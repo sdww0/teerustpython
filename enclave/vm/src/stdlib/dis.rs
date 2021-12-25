@@ -2,6 +2,14 @@ use crate::bytecode::CodeFlags;
 use crate::obj::objcode::PyCodeRef;
 use crate::pyobject::{ItemProtocol, PyObjectRef, PyResult, TryFromObject};
 use crate::vm::VirtualMachine;
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::print;
+use std::borrow::ToOwned;
 
 fn dis_dis(obj: PyObjectRef, vm: &VirtualMachine) -> PyResult {
     // Method or function:

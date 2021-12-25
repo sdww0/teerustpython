@@ -2,6 +2,13 @@ use crate::function::OptionalOption;
 use crate::pyobject::{Either, PyObjectRef, PyResult, TryFromObject};
 use crate::vm::VirtualMachine;
 use std::{io, mem};
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
 
 #[cfg(unix)]
 type RawFd = i32;

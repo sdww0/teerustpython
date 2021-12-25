@@ -3,7 +3,12 @@ use super::objiter;
 use super::objtype::PyClassRef;
 use crate::pyobject::{IdProtocol, PyClassImpl, PyContext, PyObjectRef, PyRef, PyResult, PyValue};
 use crate::vm::VirtualMachine;
-
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
 pub type PyFilterRef = PyRef<PyFilter>;
 
 /// filter(function or None, iterable) --> filter object

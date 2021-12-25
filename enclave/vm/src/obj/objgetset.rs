@@ -9,7 +9,12 @@ use crate::pyobject::{
 };
 use crate::slots::SlotDescriptor;
 use crate::vm::VirtualMachine;
-
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
 pub type PyGetterFunc = FunctionBox<dyn Fn(&VirtualMachine, PyObjectRef) -> PyResult + Send + Sync>;
 pub type PySetterFunc =
     FunctionBox<dyn Fn(&VirtualMachine, PyObjectRef, PyObjectRef) -> PyResult<()> + Send + Sync>;

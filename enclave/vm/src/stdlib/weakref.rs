@@ -8,7 +8,12 @@
 use crate::pyobject::PyObjectRef;
 use crate::vm::VirtualMachine;
 use std::sync::Arc;
-
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
 fn weakref_getweakrefcount(obj: PyObjectRef) -> usize {
     Arc::weak_count(&obj)
 }

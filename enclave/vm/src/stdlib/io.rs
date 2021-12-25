@@ -1,12 +1,18 @@
 /*
  * I/O core tools.
  */
-use std::fs;
+use std::untrusted::fs;
 use std::io::{self, prelude::*, Cursor, SeekFrom};
-use std::sync::{RwLock, RwLockWriteGuard};
-
+use std::sync::{SgxRwLock as RwLock,SgxRwLockReadGuard as RwLockWriteGuard};
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
 use crossbeam_utils::atomic::AtomicCell;
 use num_traits::ToPrimitive;
+use std::borrow::ToOwned;
 
 use crate::exceptions::PyBaseExceptionRef;
 use crate::function::{Args, KwArgs, OptionalArg, OptionalOption, PyFuncArgs};

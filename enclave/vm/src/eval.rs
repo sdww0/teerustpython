@@ -2,6 +2,13 @@ use crate::pyobject::PyResult;
 use crate::scope::Scope;
 use crate::vm::VirtualMachine;
 use rustpython_compiler::compile;
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
 
 pub fn eval(vm: &VirtualMachine, source: &str, scope: Scope, source_path: &str) -> PyResult {
     match vm.compile(source, compile::Mode::Eval, source_path.to_owned()) {

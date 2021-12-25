@@ -2,7 +2,12 @@ use super::objtype::PyClassRef;
 use crate::function::KwArgs;
 use crate::pyobject::{PyClassImpl, PyContext, PyRef, PyResult, PyValue};
 use crate::vm::VirtualMachine;
-
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
 /// A simple attribute-based namespace.
 ///
 /// SimpleNamespace(**kwargs)

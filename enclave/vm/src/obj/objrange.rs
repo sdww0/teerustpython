@@ -2,6 +2,13 @@ use crossbeam_utils::atomic::AtomicCell;
 use num_bigint::{BigInt, Sign};
 use num_integer::Integer;
 use num_traits::{One, Signed, Zero};
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
 
 use super::objint::{PyInt, PyIntRef};
 use super::objiter;

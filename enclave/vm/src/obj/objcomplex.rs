@@ -2,6 +2,13 @@ use num_complex::Complex64;
 use num_traits::Zero;
 use std::num::Wrapping;
 use std::str::FromStr;
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
 
 use super::objfloat::{self, IntoPyFloat, PyFloat};
 use super::objint::{self, PyInt};

@@ -2,11 +2,19 @@ use crate::pyobject::{PyObjectRef, PyResult, TryFromObject};
 use crate::vm::{VirtualMachine, NSIG};
 
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
+
 
 use arr_macro::arr;
 
-#[cfg(unix)]
-use nix::unistd::alarm as sig_alarm;
+// #[cfg(unix)]
+// use nix::unistd::alarm as sig_alarm;
 
 #[cfg(not(windows))]
 use libc::{SIG_DFL, SIG_ERR, SIG_IGN};
@@ -87,15 +95,15 @@ fn getsignal(signalnum: i32, vm: &VirtualMachine) -> PyResult {
     Ok(signal_handlers.borrow()[signalnum as usize].clone())
 }
 
-#[cfg(unix)]
-fn alarm(time: u32) -> u32 {
-    let prev_time = if time == 0 {
-        sig_alarm::cancel()
-    } else {
-        sig_alarm::set(time)
-    };
-    prev_time.unwrap_or(0)
-}
+// #[cfg(unix)]
+// fn alarm(time: u32) -> u32 {
+//     let prev_time = if time == 0 {
+//         sig_alarm::cancel()
+//     } else {
+//         sig_alarm::set(time)
+//     };
+//     prev_time.unwrap_or(0)
+// }
 
 #[cfg_attr(feature = "flame-it", flame)]
 pub fn check_signals(vm: &VirtualMachine) -> PyResult<()> {

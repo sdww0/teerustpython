@@ -2,11 +2,19 @@ pub(crate) use decl::make_module;
 
 #[pymodule(name = "itertools")]
 mod decl {
+    use std::string::String;
+    use std::vec::Vec;
+    use std::boxed::Box;
+    use std::vec;
+    use std::format;
+    use std::string::ToString;
     use crossbeam_utils::atomic::AtomicCell;
     use num_bigint::BigInt;
     use num_traits::{One, Signed, ToPrimitive, Zero};
     use std::iter;
-    use std::sync::{Arc, RwLock, RwLockWriteGuard};
+    use std::sync::{Arc};
+    use std::sync::{SgxRwLock as RwLock,SgxRwLockReadGuard as RwLockWriteGuard};
+    use std::borrow::ToOwned;
 
     use crate::function::{Args, OptionalArg, OptionalOption, PyFuncArgs};
     use crate::obj::objbool;

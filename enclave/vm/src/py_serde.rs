@@ -2,6 +2,13 @@ use num_traits::cast::ToPrimitive;
 use num_traits::sign::Signed;
 use serde::de::{DeserializeSeed, Visitor};
 use serde::ser::{Serialize, SerializeMap, SerializeSeq};
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
 
 use crate::obj::{
     objbool, objdict::PyDictRef, objfloat, objint, objlist::PyList, objstr, objtuple::PyTuple,

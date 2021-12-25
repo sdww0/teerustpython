@@ -15,11 +15,17 @@ use crate::VirtualMachine;
 
 use itertools::Itertools;
 use std::fmt;
-use std::fs::File;
+use std::untrusted::fs::File;
 use std::io::{self, BufRead, BufReader, Write};
-use std::sync::RwLock;
-
+use std::sync::SgxRwLock as RwLock;
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
 use crossbeam_utils::atomic::AtomicCell;
+use std::borrow::ToOwned;
 
 #[pyclass]
 pub struct PyBaseException {

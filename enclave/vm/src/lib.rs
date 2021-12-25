@@ -7,13 +7,16 @@
 
 // for methods like vm.to_str(), not the typical use of 'to' as a method prefix
 #![allow(clippy::wrong_self_convention, clippy::implicit_hasher)]
+#![allow(dead_code,unused_imports)]
 #![doc(html_logo_url = "https://raw.githubusercontent.com/RustPython/RustPython/master/logo.png")]
 #![doc(html_root_url = "https://docs.rs/rustpython-vm/")]
 #![cfg_attr(
     target_os = "redox",
     feature(matches_macro, proc_macro_hygiene, result_map_or)
 )]
-
+#![no_std]
+extern crate sgx_tstd as std;
+extern crate sgx_libc as libc;
 #[cfg(feature = "flame-it")]
 #[macro_use]
 extern crate flamer;

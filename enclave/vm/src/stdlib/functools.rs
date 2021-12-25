@@ -3,6 +3,13 @@ use crate::obj::objiter;
 use crate::obj::objtype;
 use crate::pyobject::{PyObjectRef, PyResult};
 use crate::vm::VirtualMachine;
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
 
 pub fn make_module(vm: &VirtualMachine) -> PyObjectRef {
     let ctx = &vm.ctx;

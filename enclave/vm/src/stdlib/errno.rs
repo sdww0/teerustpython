@@ -1,5 +1,12 @@
 use crate::pyobject::{ItemProtocol, PyObjectRef};
 use crate::VirtualMachine;
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
 
 pub fn make_module(vm: &VirtualMachine) -> PyObjectRef {
     let errorcode = vm.ctx.new_dict();

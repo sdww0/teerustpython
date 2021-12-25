@@ -2,6 +2,13 @@ pub(crate) use decl::make_module;
 
 #[pymodule(name = "binascii")]
 mod decl {
+
+    use std::vec::Vec;
+    use std::boxed::Box;
+    use std::vec;
+    use std::format;
+    use std::borrow::ToOwned;
+
     use crate::function::OptionalArg;
     use crate::obj::objbytearray::{PyByteArray, PyByteArrayRef};
     use crate::obj::objbyteinner::PyBytesLike;

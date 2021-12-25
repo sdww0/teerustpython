@@ -5,7 +5,12 @@ use crate::pyobject::{
 };
 use crate::stdlib::array::PyArray;
 use crate::vm::VirtualMachine;
-
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
 #[pyclass(name = "memoryview")]
 #[derive(Debug)]
 pub struct PyMemoryView {

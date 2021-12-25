@@ -2,6 +2,13 @@
  * Builtin set type with a sequence of unique items.
  */
 use std::fmt;
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
 
 use super::objlist::PyListIterator;
 use super::objtype::{self, PyClassRef};

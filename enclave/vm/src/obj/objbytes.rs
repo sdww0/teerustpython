@@ -3,6 +3,13 @@ use crossbeam_utils::atomic::AtomicCell;
 use std::mem::size_of;
 use std::ops::Deref;
 use std::str::FromStr;
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
 
 use super::objbyteinner::{
     ByteInnerFindOptions, ByteInnerNewOptions, ByteInnerPaddingOptions, ByteInnerSplitOptions,

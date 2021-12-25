@@ -1,13 +1,21 @@
 use std::io::{self, prelude::*};
 use std::net::{Ipv4Addr, Shutdown, SocketAddr, ToSocketAddrs};
-use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
+use std::sync::{SgxRwLock as RwLock,SGxRwLockReadGuard as  RwLockReadGuard,SgxRwLockReadGuard as RwLockWriteGuard};
 use std::time::Duration;
-
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
+use std::sys::unix::ext::io::IntoRawFd;
+use std::sys::unix::ext::io::AsRawFd;
 use byteorder::{BigEndian, ByteOrder};
 use crossbeam_utils::atomic::AtomicCell;
 use gethostname::gethostname;
-#[cfg(all(unix, not(target_os = "redox")))]
-use nix::unistd::sethostname;
+// #[cfg(all(unix, not(target_os = "redox")))]
+// use nix::unistd::sethostname;
 use socket2::{Domain, Protocol, Socket, Type as SocketType};
 
 use super::os::convert_io_error;
@@ -33,7 +41,7 @@ type RawSocket = std::os::windows::raw::SOCKET;
 
 #[cfg(unix)]
 mod c {
-    pub use libc::*;
+    pub use sgx_libc::*;
     // https://gitlab.redox-os.org/redox-os/relibc/-/blob/master/src/header/netdb/mod.rs
     #[cfg(target_os = "redox")]
     pub const AI_PASSIVE: c_int = 0x01;
@@ -314,34 +322,34 @@ impl PySocket {
         if buflen == 0 {
             let mut flag: libc::c_int = 0;
             let mut flagsize = std::mem::size_of::<libc::c_int>() as _;
-            let ret = unsafe {
-                c::getsockopt(
-                    fd,
-                    level,
-                    name,
-                    &mut flag as *mut libc::c_int as *mut _,
-                    &mut flagsize,
-                )
-            };
-            if ret < 0 {
+            // let ret = unsafe {
+            //     c::getsockopt(
+            //         fd,
+            //         level,
+            //         name,
+            //         &mut flag as *mut libc::c_int as *mut _,
+            //         &mut flagsize,
+            //     )
+            // };
+            // if ret < 0 {
                 Err(convert_sock_error(vm, io::Error::last_os_error()))
-            } else {
-                Ok(vm.new_int(flag))
-            }
+            // } else {
+            //     Ok(vm.new_int(flag))
+            // }
         } else {
             if buflen <= 0 || buflen > 1024 {
                 return Err(vm.new_os_error("getsockopt buflen out of range".to_owned()));
             }
             let mut buf = vec![0u8; buflen as usize];
             let mut buflen = buflen as _;
-            let ret =
-                unsafe { c::getsockopt(fd, level, name, buf.as_mut_ptr() as *mut _, &mut buflen) };
-            buf.truncate(buflen as usize);
-            if ret < 0 {
+            // let ret =
+            //     unsafe { c::getsockopt(fd, level, name, buf.as_mut_ptr() as *mut _, &mut buflen) };
+            // buf.truncate(buflen as usize);
+            // if ret < 0 {
                 Err(convert_sock_error(vm, io::Error::last_os_error()))
-            } else {
-                Ok(vm.ctx.new_bytes(buf))
-            }
+            // } else {
+            //     Ok(vm.ctx.new_bytes(buf))
+            // }
         }
     }
 
@@ -479,10 +487,10 @@ fn socket_gethostname(vm: &VirtualMachine) -> PyResult {
         .map_err(|err| vm.new_os_error(err.into_string().unwrap()))
 }
 
-#[cfg(all(unix, not(target_os = "redox")))]
-fn socket_sethostname(hostname: PyStringRef, vm: &VirtualMachine) -> PyResult<()> {
-    sethostname(hostname.as_str()).map_err(|err| convert_nix_error(vm, err))
-}
+// #[cfg(all(unix, not(target_os = "redox")))]
+// fn socket_sethostname(hostname: PyStringRef, vm: &VirtualMachine) -> PyResult<()> {
+//     sethostname(hostname.as_str()).map_err(|err| convert_nix_error(vm, err))
+// }
 
 fn socket_inet_aton(ip_string: PyStringRef, vm: &VirtualMachine) -> PyResult {
     ip_string
@@ -517,69 +525,69 @@ struct GAIOptions {
     flags: i32,
 }
 
-#[cfg(not(target_os = "redox"))]
-fn socket_getaddrinfo(opts: GAIOptions, vm: &VirtualMachine) -> PyResult {
-    let hints = dns_lookup::AddrInfoHints {
-        socktype: opts.ty,
-        protocol: opts.proto,
-        address: opts.family,
-        flags: opts.flags,
-    };
+// #[cfg(not(target_os = "redox"))]
+// fn socket_getaddrinfo(opts: GAIOptions, vm: &VirtualMachine) -> PyResult {
+//     let hints = dns_lookup::AddrInfoHints {
+//         socktype: opts.ty,
+//         protocol: opts.proto,
+//         address: opts.family,
+//         flags: opts.flags,
+//     };
 
-    let host = opts.host.as_ref().map(|s| s.as_str());
-    let port = opts.port.as_ref().map(|p| -> std::borrow::Cow<str> {
-        match p {
-            Either::A(ref s) => s.as_str().into(),
-            Either::B(i) => i.to_string().into(),
-        }
-    });
-    let port = port.as_ref().map(|p| p.as_ref());
+//     let host = opts.host.as_ref().map(|s| s.as_str());
+//     let port = opts.port.as_ref().map(|p| -> std::borrow::Cow<str> {
+//         match p {
+//             Either::A(ref s) => s.as_str().into(),
+//             Either::B(i) => i.to_string().into(),
+//         }
+//     });
+//     let port = port.as_ref().map(|p| p.as_ref());
 
-    let addrs = dns_lookup::getaddrinfo(host, port, Some(hints)).map_err(|err| {
-        let error_type = vm.class("_socket", "gaierror");
-        vm.new_exception_msg(error_type, io::Error::from(err).to_string())
-    })?;
+//     let addrs = dns_lookup::getaddrinfo(host, port, Some(hints)).map_err(|err| {
+//         let error_type = vm.class("_socket", "gaierror");
+//         vm.new_exception_msg(error_type, io::Error::from(err).to_string())
+//     })?;
 
-    let list = addrs
-        .map(|ai| {
-            ai.map(|ai| {
-                vm.ctx.new_tuple(vec![
-                    vm.new_int(ai.address),
-                    vm.new_int(ai.socktype),
-                    vm.new_int(ai.protocol),
-                    match ai.canonname {
-                        Some(s) => vm.new_str(s),
-                        None => vm.get_none(),
-                    },
-                    get_addr_tuple(ai.sockaddr).into_pyobject(vm).unwrap(),
-                ])
-            })
-        })
-        .collect::<io::Result<Vec<_>>>()
-        .map_err(|e| convert_sock_error(vm, e))?;
-    Ok(vm.ctx.new_list(list))
-}
+//     let list = addrs
+//         .map(|ai| {
+//             ai.map(|ai| {
+//                 vm.ctx.new_tuple(vec![
+//                     vm.new_int(ai.address),
+//                     vm.new_int(ai.socktype),
+//                     vm.new_int(ai.protocol),
+//                     match ai.canonname {
+//                         Some(s) => vm.new_str(s),
+//                         None => vm.get_none(),
+//                     },
+//                     get_addr_tuple(ai.sockaddr).into_pyobject(vm).unwrap(),
+//                 ])
+//             })
+//         })
+//         .collect::<io::Result<Vec<_>>>()
+//         .map_err(|e| convert_sock_error(vm, e))?;
+//     Ok(vm.ctx.new_list(list))
+// }
 
-#[cfg(not(target_os = "redox"))]
-fn socket_gethostbyaddr(
-    addr: PyStringRef,
-    vm: &VirtualMachine,
-) -> PyResult<(String, PyObjectRef, PyObjectRef)> {
-    // TODO: figure out how to do this properly
-    let ai = dns_lookup::getaddrinfo(Some(addr.as_str()), None, None)
-        .map_err(|e| convert_sock_error(vm, e.into()))?
-        .next()
-        .unwrap()
-        .map_err(|e| convert_sock_error(vm, e))?;
-    let (hostname, _) =
-        dns_lookup::getnameinfo(&ai.sockaddr, 0).map_err(|e| convert_sock_error(vm, e.into()))?;
-    Ok((
-        hostname,
-        vm.ctx.new_list(vec![]),
-        vm.ctx
-            .new_list(vec![vm.new_str(ai.sockaddr.ip().to_string())]),
-    ))
-}
+// #[cfg(not(target_os = "redox"))]
+// fn socket_gethostbyaddr(
+//     addr: PyStringRef,
+//     vm: &VirtualMachine,
+// ) -> PyResult<(String, PyObjectRef, PyObjectRef)> {
+//     // TODO: figure out how to do this properly
+//     let ai = dns_lookup::getaddrinfo(Some(addr.as_str()), None, None)
+//         .map_err(|e| convert_sock_error(vm, e.into()))?
+//         .next()
+//         .unwrap()
+//         .map_err(|e| convert_sock_error(vm, e))?;
+//     let (hostname, _) =
+//         dns_lookup::getnameinfo(&ai.sockaddr, 0).map_err(|e| convert_sock_error(vm, e.into()))?;
+//     Ok((
+//         hostname,
+//         vm.ctx.new_list(vec![]),
+//         vm.ctx
+//             .new_list(vec![vm.new_str(ai.sockaddr.ip().to_string())]),
+//     ))
+// }
 
 fn get_addr<T, I>(vm: &VirtualMachine, addr: T) -> PyResult<socket2::SockAddr>
 where
@@ -715,8 +723,8 @@ fn extend_module_platform_specific(_vm: &VirtualMachine, _module: &PyObjectRef) 
 fn extend_module_platform_specific(vm: &VirtualMachine, module: &PyObjectRef) {
     let ctx = &vm.ctx;
 
-    #[cfg(not(target_os = "redox"))]
-    extend_module!(vm, module, {
-        "sethostname" => ctx.new_function(socket_sethostname),
-    });
+    // #[cfg(not(target_os = "redox"))]
+    // extend_module!(vm, module, {
+    //     "sethostname" => ctx.new_function(socket_sethostname),
+    // });
 }

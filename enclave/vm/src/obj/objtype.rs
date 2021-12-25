@@ -1,6 +1,13 @@
 use std::collections::{HashMap, HashSet};
 use std::fmt;
-use std::sync::RwLock;
+use std::sync::SgxRwLock as RwLock;
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
 
 use super::objdict::PyDictRef;
 use super::objlist::PyList;

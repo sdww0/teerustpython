@@ -4,6 +4,9 @@ use crate::obj::objtype::{self, PyClassRef};
 use crate::pyobject::{PyObjectRef, PyResult, TypeProtocol};
 use crate::vm::VirtualMachine;
 
+use std::eprintln;
+use std::format;
+
 #[derive(FromArgs)]
 struct WarnArgs {
     #[pyarg(positional_only, optional = false)]

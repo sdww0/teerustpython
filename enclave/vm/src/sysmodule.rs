@@ -1,5 +1,12 @@
 use std::sync::Arc;
 use std::{env, mem};
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
 
 use crate::builtins;
 use crate::frame::FrameRef;

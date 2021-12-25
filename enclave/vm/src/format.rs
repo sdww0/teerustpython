@@ -3,6 +3,13 @@ use num_traits::cast::ToPrimitive;
 use num_traits::Signed;
 use std::cmp;
 use std::str::FromStr;
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum FormatPreconversor {

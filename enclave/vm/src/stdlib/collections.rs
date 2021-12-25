@@ -2,6 +2,14 @@ pub(crate) use _collections::make_module;
 
 #[pymodule]
 mod _collections {
+    use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
+
     use crate::function::OptionalArg;
     use crate::obj::{objiter, objtype::PyClassRef};
     use crate::pyobject::{
@@ -13,7 +21,7 @@ mod _collections {
     use crate::VirtualMachine;
     use itertools::Itertools;
     use std::collections::VecDeque;
-    use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
+    use std::sync::{SgxRwLock as RwLock, SgxRwLockReadGuard as RwLockReadGuard, SgxRwLockWriteGuard as RwLockWriteGuard};
 
     use crossbeam_utils::atomic::AtomicCell;
 

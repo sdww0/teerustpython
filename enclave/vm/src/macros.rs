@@ -1,5 +1,7 @@
 // count number of tokens given as arguments.
 // see: https://danielkeep.github.io/tlborm/book/blk-counting.html
+use std::borrow::ToOwned;
+
 #[macro_export]
 macro_rules! replace_expr {
     ($_t:tt $sub:expr) => {

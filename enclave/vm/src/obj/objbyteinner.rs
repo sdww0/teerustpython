@@ -3,6 +3,13 @@ use num_bigint::{BigInt, ToBigInt};
 use num_traits::{One, Signed, ToPrimitive, Zero};
 use std::convert::TryFrom;
 use std::ops::Range;
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
 
 use super::objbytearray::{PyByteArray, PyByteArrayRef};
 use super::objbytes::{PyBytes, PyBytesRef};

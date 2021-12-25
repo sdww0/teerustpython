@@ -3,6 +3,13 @@ use crate::obj::objbytes::{PyBytes, PyBytesRef};
 use crate::obj::objcode::{PyCode, PyCodeRef};
 use crate::pyobject::{PyObjectRef, PyResult};
 use crate::vm::VirtualMachine;
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
 
 fn marshal_dumps(co: PyCodeRef) -> PyBytes {
     PyBytes::new(co.code.to_bytes())
