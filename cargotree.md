@@ -67,7 +67,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │   ├── digest v0.8.1 (*)
 │   │   ├── keccak v0.1.0
 │   │   └── opaque-debug v0.2.3
-│   ├── smallbox v0.8.0
 │   ├── subprocess v0.2.4
 │   │   └── libc v0.2.71
 │   ├── uname v0.1.1
