@@ -35,7 +35,6 @@ rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 │   │   ├── cfg-if v0.1.10
 │   │   ├── libc v0.2.71
 │   │   └── void v1.0.2
-│   ├── once_cell v1.3.1
 │   ├── parking_lot v0.10.2 (https://github.com/Amanieu/parking_lot#99aa542b)
 │   │   ├── instant v0.1.3
 │   │   ├── lock_api v0.3.4 (https://github.com/Amanieu/parking_lot#99aa542b)
