@@ -6,16 +6,6 @@
 rustpython v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave)
 ├── rustpython-vm v0.1.2 (/home/waoa/incubator-teaclave-sgx-sdk/teerustpython/enclave/vm)
 │   ├── blake2 v0.8.1
-│   ├── caseless v0.2.1
-│   │   └── unicode-normalization v0.1.12
-│   │       └── smallvec v1.3.0
-│   │   [build-dependencies]
-│   │   └── regex v1.3.6 (*)
-│   ├── crossbeam-utils v0.7.2
-│   │   ├── cfg-if v0.1.10
-│   │   └── lazy_static v1.4.0
-│   │   [build-dependencies]
-│   │   └── autocfg v1.0.0
 │   ├── csv v1.1.3
 │   │   ├── bstr v0.2.12 (*)
 │   │   ├── csv-core v0.1.10
