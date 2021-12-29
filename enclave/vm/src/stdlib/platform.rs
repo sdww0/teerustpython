@@ -23,10 +23,10 @@ mod decl {
         version::get_compiler()
     }
 
-    #[pyfunction]
-    fn python_build(_vm: &VirtualMachine) -> (String, String) {
-        (version::get_git_identifier(), version::get_git_datetime())
-    }
+    // #[pyfunction]
+    // fn python_build(_vm: &VirtualMachine) -> (String, String) {
+    //     (version::get_git_identifier(), version::get_git_datetime())
+    // }
 
     #[pyfunction]
     fn python_branch(_vm: &VirtualMachine) -> String {

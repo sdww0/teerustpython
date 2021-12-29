@@ -1,3 +1,4 @@
+#![no_std]
 /// Check if an expression matches a refutable pattern.
 ///
 /// Syntax: `matches!(` *expression* `,` *pattern* `)`
@@ -27,6 +28,7 @@
 ///
 /// # fn main() { }
 /// ```
+
 #[macro_export]
 macro_rules! matches {
     ($expression:expr, $($pattern:tt)+) => {

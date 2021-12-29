@@ -4,7 +4,7 @@ use crossbeam_utils::atomic::AtomicCell;
 use std::convert::TryFrom;
 use std::mem::size_of;
 use std::str::FromStr;
-use std::sync::{SgxRwLock as RwLock,SGxRwLockReadGuard as  RwLockReadGuard,SgxRwLockReadGuard as RwLockWriteGuard};
+use std::sync::{SgxRwLock as RwLock,SgxRwLockReadGuard as  RwLockReadGuard,SgxRwLockWriteGuard as RwLockWriteGuard};
 use std::string::String;
 use std::borrow::ToOwned;
 

@@ -14,6 +14,8 @@ use std::cmp::{max, min};
 use std::fmt;
 use std::iter::repeat;
 use std::ops::Range;
+use std::vec::Vec;
+use std::string::String;
 
 use unic_ucd_bidi::bidi_class::abbr_names::*;
 use unic_ucd_bidi::BidiClass;

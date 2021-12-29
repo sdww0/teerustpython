@@ -17,6 +17,9 @@
 
 use std::convert::{From, Into};
 use std::fmt;
+use std::vec::Vec;
+use std::string::String;
+use std::string::ToString;
 
 use unic_ucd_bidi::BidiClass;
 

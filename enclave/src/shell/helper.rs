@@ -2,7 +2,11 @@ use rustpython_vm::obj::objstr::PyStringRef;
 use rustpython_vm::pyobject::{PyIterable, PyResult, TryFromObject};
 use rustpython_vm::scope::{NameProtocol, Scope};
 use rustpython_vm::VirtualMachine;
-
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::borrow::ToOwned;
+use std::vec;
 pub struct ShellHelper<'vm> {
     vm: &'vm VirtualMachine,
     scope: Scope,
@@ -142,32 +146,32 @@ impl<'vm> ShellHelper<'vm> {
     }
 }
 
-cfg_if::cfg_if! {
-    if #[cfg(not(target_os = "wasi"))] {
-        use rustyline::{
-            completion::Completer, highlight::Highlighter, hint::Hinter, validate::Validator, Context,
-            Helper,
-        };
-        impl Completer for ShellHelper<'_> {
-            type Candidate = String;
+// cfg_if::cfg_if! {
+//     if #[cfg(not(target_os = "wasi"))] {
+//         use rustyline::{
+//             completion::Completer, highlight::Highlighter, hint::Hinter, validate::Validator, Context,
+//             Helper,
+//         };
+//         impl Completer for ShellHelper<'_> {
+//             type Candidate = String;
 
-            fn complete(
-                &self,
-                line: &str,
-                pos: usize,
-                _ctx: &Context,
-            ) -> rustyline::Result<(usize, Vec<String>)> {
-                Ok(self
-                    .complete_opt(&line[0..pos])
-                    // as far as I can tell, there's no better way to do both completion
-                    // and indentation (or even just indentation)
-                    .unwrap_or_else(|| (line.len(), vec!["\t".to_owned()])))
-            }
-        }
+//             fn complete(
+//                 &self,
+//                 line: &str,
+//                 pos: usize,
+//                 _ctx: &Context,
+//             ) -> rustyline::Result<(usize, Vec<String>)> {
+//                 Ok(self
+//                     .complete_opt(&line[0..pos])
+//                     // as far as I can tell, there's no better way to do both completion
+//                     // and indentation (or even just indentation)
+//                     .unwrap_or_else(|| (line.len(), vec!["\t".to_owned()])))
+//             }
+//         }
 
-        impl Hinter for ShellHelper<'_> {}
-        impl Highlighter for ShellHelper<'_> {}
-        impl Validator for ShellHelper<'_> {}
-        impl Helper for ShellHelper<'_> {}
-    }
-}
+//         impl Hinter for ShellHelper<'_> {}
+//         impl Highlighter for ShellHelper<'_> {}
+//         impl Validator for ShellHelper<'_> {}
+//         impl Helper for ShellHelper<'_> {}
+//     }
+// }

@@ -1,7 +1,7 @@
 use crate::pyobject::{IdProtocol, PyObjectRef, PyResult};
 use crate::vm::VirtualMachine;
 use std::ops::Deref;
-use std::sync::{RwLockReadGuard, RwLockWriteGuard};
+use std::sync::{SgxRwLockReadGuard as RwLockReadGuard,SgxRwLockWriteGuard as RwLockWriteGuard};
 use std::string::String;
 use std::vec::Vec;
 use std::boxed::Box;

@@ -10,6 +10,7 @@ use std::format;
 use std::string::String;
 use std::borrow::ToOwned;
 use std::string::ToString;
+use std::vec;
 
 #[pystruct_sequence(name = "version_info")]
 #[derive(Default, Debug)]
@@ -22,14 +23,14 @@ pub struct VersionInfo {
 }
 extern crate chrono;
 use chrono::prelude::DateTime;
-use chrono::Local;
+// use chrono::Local;
 use std::time::{Duration, UNIX_EPOCH};
 
 pub fn get_version() -> String {
     format!(
-        "{:.80} ({:.80}) \n[{:.80}]",
+        "{:.80} \n[{:.80}]",
         get_version_number(),
-        get_build_info(),
+        // get_build_info(),
         get_compiler()
     )
 }
@@ -52,29 +53,29 @@ pub fn get_compiler() -> String {
     
     // let rustc_version = rustc_version_runtime::version_meta();
     // format!("rustc {}", rustc_version.semver)
-    "rustc sgx compiler".to_string;
+    format!("rustc sgx compiler")
 }
 
-pub fn get_build_info() -> String {
-    // See: https://reproducible-builds.org/docs/timestamps/
-    let git_revision = get_git_revision();
-    let separator = if git_revision.is_empty() { "" } else { ":" };
+// pub fn get_build_info() -> String {
+//     // See: https://reproducible-builds.org/docs/timestamps/
+//     let git_revision = get_git_revision();
+//     let separator = if git_revision.is_empty() { "" } else { ":" };
 
-    let git_identifier = get_git_identifier();
+//     let git_identifier = get_git_identifier();
 
-    format!(
-        "{id}{sep}{revision}, {date:.20}, {time:.9}",
-        id = if git_identifier.is_empty() {
-            "default".to_owned()
-        } else {
-            git_identifier
-        },
-        sep = separator,
-        revision = git_revision,
-        date = get_git_date(),
-        time = get_git_time(),
-    )
-}
+//     format!(
+//         "{id}{sep}{revision}, {date:.20}, {time:.9}",
+//         id = if git_identifier.is_empty() {
+//             "default".to_owned()
+//         } else {
+//             git_identifier
+//         },
+//         sep = separator,
+//         revision = git_revision,
+//         // date = get_git_date(),
+//         // time = get_git_time(),
+//     )
+// }
 
 pub fn get_git_revision() -> String {
     option_env!("RUSTPYTHON_GIT_HASH").unwrap_or("").to_owned()
@@ -101,32 +102,32 @@ pub fn get_git_identifier() -> String {
     }
 }
 
-fn get_git_timestamp_datetime() -> DateTime<Local> {
-    let timestamp = option_env!("RUSTPYTHON_GIT_TIMESTAMP")
-        .unwrap_or("")
-        .to_owned();
-    let timestamp = timestamp.parse::<u64>().unwrap_or(0);
+// fn get_git_timestamp_datetime() -> DateTime<Local> {
+//     let timestamp = option_env!("RUSTPYTHON_GIT_TIMESTAMP")
+//         .unwrap_or("")
+//         .to_owned();
+//     let timestamp = timestamp.parse::<u64>().unwrap_or(0);
 
-    let datetime = UNIX_EPOCH + Duration::from_secs(timestamp);
+//     let datetime = UNIX_EPOCH + Duration::from_secs(timestamp);
 
-    datetime.into()
-}
+//     datetime.into()
+// }
 
-pub fn get_git_date() -> String {
-    let datetime = get_git_timestamp_datetime();
+// pub fn get_git_date() -> String {
+//     let datetime = get_git_timestamp_datetime();
 
-    datetime.format("%b %e %Y").to_string()
-}
+//     datetime.format("%b %e %Y").to_string()
+// }
 
-pub fn get_git_time() -> String {
-    let datetime = get_git_timestamp_datetime();
+// pub fn get_git_time() -> String {
+//     let datetime = get_git_timestamp_datetime();
 
-    datetime.format("%H:%M:%S").to_string()
-}
+//     datetime.format("%H:%M:%S").to_string()
+// }
 
-pub fn get_git_datetime() -> String {
-    let date = get_git_date();
-    let time = get_git_time();
+// pub fn get_git_datetime() -> String {
+//     let date = get_git_date();
+//     let time = get_git_time();
 
-    format!("{} {}", date, time)
-}
+//     format!("{} {}", date, time)
+// }

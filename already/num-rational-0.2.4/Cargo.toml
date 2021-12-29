@@ -25,7 +25,7 @@ git = "https://github.com/mesalock-linux/num-bigint-sgx"
 # default-features = false
 
 [dependencies.num-integer]
-path = "/root/sgx/teerustpython/already/num-integer-0.1.42"
+git = "https://github.com/mesalock-linux/num-integer-sgx"
 default-features = false
 
 [dependencies.num-traits]
@@ -38,7 +38,7 @@ git = "https://github.com/mesalock-linux/serde-sgx"
 default-features = false
 
 [features]
-default = [ "std"]
+default = [ "bigint-std","std"]
 # default = ["bigint-std", "std"]
 
 i128 = ["num-integer/i128", "num-traits/i128"]

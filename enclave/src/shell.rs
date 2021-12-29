@@ -10,7 +10,10 @@ use rustpython_vm::{
     scope::Scope,
     VirtualMachine,
 };
-
+use std::borrow::ToOwned;
+use std::string::String;
+use std::eprintln;
+use std::println;
 enum ShellExecResult {
     Ok,
     PyErr(PyBaseExceptionRef),
@@ -40,7 +43,7 @@ pub fn run_shell(vm: &VirtualMachine, scope: Scope) -> PyResult<()> {
     let mut full_input = String::new();
 
     // Retrieve a `history_path_str` dependent on the OS
-    let repl_history_path = match dirs::config_dir() {
+    let repl_history_path = match dirs_next::config_dir() {
         Some(mut path) => {
             path.push("rustpython");
             path.push("repl_history.txt");

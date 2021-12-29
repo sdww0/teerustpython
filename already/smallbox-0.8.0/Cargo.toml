@@ -26,3 +26,8 @@ repository = "https://github.com/andylokandy/smallbox"
 coerce = []
 default = []
 std = []
+
+[dependencies]
+sgx_tstd                       = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
+
+

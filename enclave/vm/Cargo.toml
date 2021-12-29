@@ -31,7 +31,8 @@ num-complex = { path="/root/sgx/teerustpython/already/num-complex", features = [
 num-bigint = { git = "https://github.com/mesalock-linux/num-bigint-sgx", features = ["serde"] }
 num-traits       = { git = "https://github.com/mesalock-linux/num-traits-sgx" }
 
-num-integer = { path="/root/sgx/teerustpython/already/num-integer-0.1.42"}
+num-integer = { git = "https://github.com/mesalock-linux/num-integer-sgx"}
+
 num-rational = { path="/root/sgx/teerustpython/already/num-rational-0.2.4"}
 num-iter = { path="/root/sgx/teerustpython/already/num-iter-0.1.40"}
 rand = { git = "https://github.com/mesalock-linux/rand-sgx", tag = "v0.7.3_sgx1.1.3" }
@@ -52,7 +53,7 @@ caseless = {path="/root/sgx/teerustpython/already/caseless-0.2.1"}
 chrono = {git = "https://github.com/mesalock-linux/chrono-sgx"  }
 once_cell = {path="/root/sgx/teerustpython/already/once_cell-1.3.1"}
 lexical = {path="/root/sgx/teerustpython/already/rust-lexical-main/lexical"}
-itertools      = { version = "0.8.0", default-features = false }
+itertools      = { path="/root/sgx/teerustpython/already/itertools-master"}
 hex              = { git = "https://github.com/mesalock-linux/rust-hex-sgx" }
 hexf-parse = {path="/root/sgx/teerustpython/already/hexf-parse-0.1.0"}
 indexmap = {path="/root/sgx/teerustpython/already/indexmap"}
@@ -117,7 +118,7 @@ num_cpus = {path="/root/sgx/teerustpython/already/num_cpus-1.12.0"}
 
 [target.'cfg(not(any(target_arch = "wasm32", target_os = "redox")))'.dependencies]
 # dns-lookup = "1.0"
-flate2 = { path="/root/sgx/teerustpython/already/flate2-rs-1.0.14", features = ["zlib"], default-features = false }
+# flate2 = { path="/root/sgx/teerustpython/already/flate2-rs-1.0.14", features = ["zlib"], default-features = false }
 libz-sys = {path="/root/sgx/teerustpython/already/libz-sys-1.0.25"}
 
 [target.'cfg(windows)'.dependencies]

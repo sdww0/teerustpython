@@ -16,7 +16,7 @@ use std::vec;
 use std::format;
 use std::string::ToString;
 use std::fmt;
-use std::sync::{SgxRwLock as RwLock,SGxRwLockReadGuard as  RwLockReadGuard,SgxRwLockReadGuard as RwLockWriteGuard};
+use std::sync::{SgxRwLock as RwLock,SgxRwLockReadGuard as  RwLockReadGuard,SgxRwLockWriteGuard as RwLockWriteGuard};
 use std::borrow::ToOwned;
 
 use crossbeam_utils::atomic::AtomicCell;

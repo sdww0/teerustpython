@@ -3,6 +3,7 @@ use crate::vm::VirtualMachine;
 use std::collections::HashMap;
 use std::boxed::Box;
 use std::borrow::ToOwned;
+use std::string::String;
 
 pub mod array;
 #[cfg(feature = "rustpython-parser")]
@@ -80,19 +81,19 @@ pub fn get_module_inits() -> HashMap<String, StdlibInitFunc> {
         "dis".to_owned() => Box::new(dis::make_module),
         "errno".to_owned() => Box::new(errno::make_module),
         "_functools".to_owned() => Box::new(functools::make_module),
-        "hashlib".to_owned() => Box::new(hashlib::make_module),
-        "itertools".to_owned() => Box::new(itertools::make_module),
-        "_io".to_owned() => Box::new(io::make_module),
+        // "hashlib".to_owned() => Box::new(hashlib::make_module),
+        // "itertools".to_owned() => Box::new(itertools::make_module),
+        // "_io".to_owned() => Box::new(io::make_module),
         "_json".to_owned() => Box::new(json::make_module),
         "marshal".to_owned() => Box::new(marshal::make_module),
         "math".to_owned() => Box::new(math::make_module),
         "_operator".to_owned() => Box::new(operator::make_module),
         "_platform".to_owned() => Box::new(platform::make_module),
         "regex_crate".to_owned() => Box::new(re::make_module),
-        "_random".to_owned() => Box::new(random::make_module),
+        // "_random".to_owned() => Box::new(random::make_module),
         "_string".to_owned() => Box::new(string::make_module),
         "_struct".to_owned() => Box::new(pystruct::make_module),
-        "time".to_owned() => Box::new(time_module::make_module),
+        // "time".to_owned() => Box::new(time_module::make_module),
         "_weakref".to_owned() => Box::new(weakref::make_module),
         "_imp".to_owned() => Box::new(imp::make_module),
         "unicodedata".to_owned() => Box::new(unicodedata::make_module),
@@ -116,25 +117,25 @@ pub fn get_module_inits() -> HashMap<String, StdlibInitFunc> {
         modules.insert("symtable".to_owned(), Box::new(symtable::make_module));
     }
 
-    #[cfg(any(unix, windows, target_os = "wasi"))]
-    modules.insert(os::MODULE_NAME.to_owned(), Box::new(os::make_module));
+    // #[cfg(any(unix, windows, target_os = "wasi"))]
+    // modules.insert(os::MODULE_NAME.to_owned(), Box::new(os::make_module));
 
     // disable some modules on WASM
     #[cfg(not(target_arch = "wasm32"))]
     {
-        modules.insert("_socket".to_owned(), Box::new(socket::make_module));
-        modules.insert(
-            "_multiprocessing".to_owned(),
-            Box::new(multiprocessing::make_module),
-        );
-        modules.insert("signal".to_owned(), Box::new(signal::make_module));
-        modules.insert("select".to_owned(), Box::new(select::make_module));
-        #[cfg(feature = "ssl")]
-        modules.insert("_ssl".to_owned(), Box::new(ssl::make_module));
+        // modules.insert("_socket".to_owned(), Box::new(socket::make_module));
+        // modules.insert(
+        //     "_multiprocessing".to_owned(),
+        //     Box::new(multiprocessing::make_module),
+        // );
+        // modules.insert("signal".to_owned(), Box::new(signal::make_module));
+        // modules.insert("select".to_owned(), Box::new(select::make_module));
+        // #[cfg(feature = "ssl")]
+        // modules.insert("_ssl".to_owned(), Box::new(ssl::make_module));
         // modules.insert("_subprocess".to_owned(), Box::new(subprocess::make_module));
-        modules.insert("_thread".to_owned(), Box::new(thread::make_module));
-        #[cfg(not(target_os = "redox"))]
-        modules.insert("zlib".to_owned(), Box::new(zlib::make_module));
+        // modules.insert("_thread".to_owned(), Box::new(thread::make_module));
+        // #[cfg(not(target_os = "redox"))]
+        // modules.insert("zlib".to_owned(), Box::new(zlib::make_module));
         modules.insert(
             "faulthandler".to_owned(),
             Box::new(faulthandler::make_module),
@@ -142,10 +143,10 @@ pub fn get_module_inits() -> HashMap<String, StdlibInitFunc> {
     }
 
     // Unix-only
-    #[cfg(all(unix, not(any(target_os = "android", target_os = "redox"))))]
-    {
-        modules.insert("pwd".to_owned(), Box::new(pwd::make_module));
-    }
+    // #[cfg(all(unix, not(any(target_os = "android", target_os = "redox"))))]
+    // {
+    //     modules.insert("pwd".to_owned(), Box::new(pwd::make_module));
+    // }
 
     // Windows-only
     #[cfg(windows)]

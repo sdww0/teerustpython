@@ -4,7 +4,7 @@ use std::ffi::{CStr, CString};
 use std::string::ToString;
 use std::string::String;
 use std::format;
-use libc::ocall::getuid;
+// use libc::ocall::getuid;
 /// The main struct for the library, a safe version
 /// of the POSIX `struct passwd`
 ///

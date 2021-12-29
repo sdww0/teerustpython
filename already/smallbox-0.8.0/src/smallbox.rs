@@ -6,11 +6,12 @@ use std::marker::PhantomData;
 use std::mem::{self, ManuallyDrop};
 use std::ops;
 use std::ptr;
+use std::alloc::{self,Layout};
 
-#[cfg(not(any(feature = "std", doctest)))]
-use ::alloc::alloc::{self, Layout};
-#[cfg(any(feature = "std", doctest))]
-use std::alloc::{self, Layout};
+// #[cfg(not(any(feature = "std", doctest)))]
+// use ::alloc::alloc::{self, Layout};
+// #[cfg(any(feature = "std", doctest))]
+// use std::alloc::{self, Layout};
 
 #[cfg(feature = "coerce")]
 use std::marker::Unsize;

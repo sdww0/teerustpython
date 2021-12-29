@@ -34,13 +34,13 @@ fn argv(vm: &VirtualMachine) -> PyObjectRef {
     )
 }
 
-fn executable(ctx: &PyContext) -> PyObjectRef {
-    if let Some(arg) = env::args().next() {
-        ctx.new_str(arg)
-    } else {
-        ctx.none()
-    }
-}
+// fn executable(ctx: &PyContext) -> PyObjectRef {
+//     if let Some(arg) = std::env::args().next() {
+//         ctx.new_str(arg)
+//     } else {
+//         ctx.none()
+//     }
+// }
 
 fn getframe(offset: OptionalArg<usize>, vm: &VirtualMachine) -> PyResult<FrameRef> {
     let offset = offset.into_option().unwrap_or(0);
@@ -380,7 +380,7 @@ settrace() -- set the global debug tracing function
       "builtin_module_names" => builtin_module_names,
       "byteorder" => ctx.new_str(bytorder),
       "copyright" => ctx.new_str(copyright.to_owned()),
-      "executable" => executable(ctx),
+    //   "executable" => executable(ctx),
       "flags" => flags,
       "getrefcount" => ctx.new_function(sys_getrefcount),
       "getrecursionlimit" => ctx.new_function(sys_getrecursionlimit),

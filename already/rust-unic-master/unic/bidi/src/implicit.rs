@@ -12,6 +12,7 @@
 //! 3.3.4 - 3.3.6. Resolve implicit levels and types.
 
 use std::cmp::max;
+use std::vec::Vec;
 
 use unic_ucd_bidi::bidi_class::abbr_names::*;
 use unic_ucd_bidi::BidiClass;

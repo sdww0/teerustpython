@@ -15,6 +15,8 @@
 
 use std::cmp::max;
 use std::ops::Range;
+use std::vec::Vec;
+use std::vec;
 
 use unic_ucd_bidi::bidi_class::abbr_names::*;
 use unic_ucd_bidi::BidiClass;

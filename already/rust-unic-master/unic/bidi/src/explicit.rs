@@ -13,6 +13,8 @@
 //!
 //! <https://www.unicode.org/reports/tr9/#Explicit_Levels_and_Directions>
 
+use std::vec::Vec;
+
 use unic_ucd_bidi::bidi_class::abbr_names::*;
 use unic_ucd_bidi::BidiClass;
 

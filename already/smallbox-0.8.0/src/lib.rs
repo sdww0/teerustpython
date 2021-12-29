@@ -147,12 +147,8 @@
 
 #![cfg_attr(feature = "coerce", feature(unsize, coerce_unsized))]
 #![cfg_attr(not(feature = "std"), feature(cfg_doctest))]
-#![cfg_attr(all(not(feature = "std"), doctest), no_std)]
-
-#[cfg(not(any(feature = "std", doctest)))]
-extern crate alloc;
-#[cfg(all(not(feature = "std"), doctest))]
-extern crate core as std;
+#![no_std]
+extern crate sgx_tstd as std;
 
 mod smallbox;
 pub mod space;

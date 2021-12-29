@@ -570,21 +570,21 @@ macro_rules! dict_iterator {
                 self.dict.clone().len()
             }
 
-            #[pymethod(name = "__repr__")]
-            #[allow(clippy::redundant_closure_call)]
-            fn repr(zelf: PyRef<Self>, vm: &VirtualMachine) -> PyResult<String> {
-                let s = if let Some(_guard) = ReprGuard::enter(zelf.as_object()) {
-                    let mut str_parts = vec![];
-                    for (key, value) in zelf.dict.clone() {
-                        let s = vm.to_repr(&$result_fn(vm, key, value))?;
-                        str_parts.push(s.as_str().to_owned());
-                    }
-                    format!("{}([{}])", $class_name, str_parts.join(", "))
-                } else {
-                    "{...}".to_owned()
-                };
-                Ok(s)
-            }
+        //     #[pymethod(name = "__repr__")]
+        //     #[allow(clippy::redundant_closure_call)]
+        //     fn repr(zelf: PyRef<Self>, vm: &VirtualMachine) -> PyResult<String> {
+        //         let s = if let Some(_guard) = ReprGuard::enter(zelf.as_object()) {
+        //             let mut str_parts = vec![];
+        //             for (key, value) in zelf.dict.clone() {
+        //                 let s = vm.to_repr(&$result_fn(vm, key, value))?;
+        //                 str_parts.push(s.as_str().to_owned());
+        //             }
+        //             format!("{}([{}])", $class_name, str_parts.join(", "))
+        //         } else {
+        //             "{...}".to_owned()
+        //         };
+        //         Ok(s)
+        //     }
         }
 
         impl PyValue for $name {
@@ -611,23 +611,23 @@ macro_rules! dict_iterator {
                 }
             }
 
-            #[pymethod(name = "__next__")]
-            #[allow(clippy::redundant_closure_call)]
-            fn next(&self, vm: &VirtualMachine) -> PyResult {
-                if self.dict.entries.has_changed_size(&self.size) {
-                    return Err(
-                        vm.new_runtime_error("dictionary changed size during iteration".to_owned())
-                    );
-                }
-                let mut position = self.position.load();
-                match self.dict.entries.next_entry(&mut position) {
-                    Some((key, value)) => {
-                        self.position.store(position);
-                        Ok($result_fn(vm, key, value))
-                    }
-                    None => Err(objiter::new_stop_iteration(vm)),
-                }
-            }
+            // #[pymethod(name = "__next__")]
+            // #[allow(clippy::redundant_closure_call)]
+            // fn next(&self, vm: &VirtualMachine) -> PyResult {
+            //     if self.dict.entries.has_changed_size(&self.size) {
+            //         return Err(
+            //             vm.new_runtime_error("dictionary changed size during iteration".to_owned())
+            //         );
+            //     }
+            //     let mut position = self.position.load();
+            //     match self.dict.entries.next_entry(&mut position) {
+            //         Some((key, value)) => {
+            //             self.position.store(position);
+            //             Ok($result_fn(vm, key, value))
+            //         }
+            //         None => Err(objiter::new_stop_iteration(vm)),
+            //     }
+            // }
 
             #[pymethod(name = "__iter__")]
             fn iter(zelf: PyRef<Self>) -> PyRef<Self> {

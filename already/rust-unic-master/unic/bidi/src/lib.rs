@@ -8,7 +8,7 @@
 // <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
-
+#![no_std]
 #![warn(
     bad_style,
     missing_debug_implementations,
@@ -70,7 +70,7 @@
 //! ```
 //!
 //! [tr9]: https://www.unicode.org/reports/tr9/
-
+extern crate sgx_tstd as std;
 #[macro_use]
 extern crate matches;
 

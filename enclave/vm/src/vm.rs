@@ -1060,14 +1060,14 @@ impl VirtualMachine {
     /// Checks for triggered signals and calls the appropriate handlers. A no-op on
     /// platforms where signals are not supported.
     pub fn check_signals(&self) -> PyResult<()> {
-        #[cfg(not(target_arch = "wasm32"))]
-        {
-            crate::stdlib::signal::check_signals(self)
-        }
-        #[cfg(target_arch = "wasm32")]
-        {
+        // #[cfg(not(target_arch = "wasm32"))]
+        // {
+        //     crate::stdlib::signal::check_signals(self)
+        // }
+        // #[cfg(target_arch = "wasm32")]
+        // {
             Ok(())
-        }
+        // }
     }
 
     /// Returns a basic CompileOpts instance with options accurate to the vm. Used

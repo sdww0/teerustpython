@@ -8,7 +8,7 @@
 // <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
-
+#![no_std]
 #![warn(
     bad_style,
     missing_debug_implementations,
@@ -38,7 +38,7 @@
 
 mod decompose;
 mod recompose;
-
+extern crate sgx_tstd as std;
 use std::str::Chars;
 
 pub use crate::decompose::Decompositions;
