@@ -22,8 +22,8 @@ pub fn is_absolute_path(path: OsString) -> Option<PathBuf> {
 #[cfg(all(unix, not(target_os = "redox")))]
 extern crate sgx_libc as libc;
 
-use libc::ocall::sysconf;
-use libc::ocall::getpwuid_r;
+// use libc::ocall::sysconf;
+// use libc::ocall::getpwuid_r;
 
 
 #[cfg(all(unix, not(target_os = "redox")))]

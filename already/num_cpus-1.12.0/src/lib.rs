@@ -67,10 +67,10 @@ doctest!("../README.md");
 ///
 /// [smt]: https://en.wikipedia.org/wiki/Simultaneous_multithreading
 /// [sched affinity]: http://www.gnu.org/software/libc/manual/html_node/CPU-Affinity.html
-#[inline]
-pub fn get() -> usize {
-    get_num_cpus()
-}
+// #[inline]
+// pub fn get() -> usize {
+//     get_num_cpus()
+// }
 
 /// Returns the number of physical cores of the current system.
 ///
@@ -100,26 +100,26 @@ pub fn get() -> usize {
 /// ```
 ///
 /// [`get()`]: fn.get.html
-#[inline]
-pub fn get_physical() -> usize {
-    get_num_physical_cpus()
-}
+// #[inline]
+// pub fn get_physical() -> usize {
+//     get_num_physical_cpus()
+// }
 
 
-#[cfg(not(any(target_os = "linux", target_os = "windows", target_os="macos", target_os="openbsd")))]
-#[inline]
-fn get_num_physical_cpus() -> usize {
-    // Not implemented, fall back
-    get_num_cpus()
-}
+// #[cfg(not(any(target_os = "linux", target_os = "windows", target_os="macos", target_os="openbsd")))]
+// #[inline]
+// fn get_num_physical_cpus() -> usize {
+//     // Not implemented, fall back
+//     get_num_cpus()
+// }
 
-#[cfg(target_os = "windows")]
-fn get_num_physical_cpus() -> usize {
-    match get_num_physical_cpus_windows() {
-        Some(num) => num,
-        None => get_num_cpus()
-    }
-}
+// #[cfg(target_os = "windows")]
+// fn get_num_physical_cpus() -> usize {
+//     match get_num_physical_cpus_windows() {
+//         Some(num) => num,
+//         None => get_num_cpus()
+//     }
+// }
 
 #[cfg(target_os = "windows")]
 fn get_num_physical_cpus_windows() -> Option<usize> {
@@ -196,55 +196,55 @@ fn get_num_physical_cpus_windows() -> Option<usize> {
     }
 }
 
-#[cfg(target_os = "linux")]
-fn get_num_physical_cpus() -> usize {
-    use std::collections::HashMap;
-    use std::untrusted::fs::File;
-    use std::io::BufRead;
-    use std::io::BufReader;
+// #[cfg(target_os = "linux")]
+// fn get_num_physical_cpus() -> usize {
+//     use std::collections::HashMap;
+//     use std::untrusted::fs::File;
+//     use std::io::BufRead;
+//     use std::io::BufReader;
 
-    let file = match File::open("/proc/cpuinfo") {
-        Ok(val) => val,
-        Err(_) => return get_num_cpus(),
-    };
-    let reader = BufReader::new(file);
-    let mut map = HashMap::new();
-    let mut physid: u32 = 0;
-    let mut cores: usize = 0;
-    let mut chgcount = 0;
-    for line in reader.lines().filter_map(|result| result.ok()) {
-        let mut it = line.split(':');
-        let (key, value) = match (it.next(), it.next()) {
-            (Some(key), Some(value)) => (key.trim(), value.trim()),
-            _ => continue,
-        };
-        if key == "physical id" {
-            match value.parse() {
-                Ok(val) => physid = val,
-                Err(_) => break,
-            };
-            chgcount += 1;
-        }
-        if key == "cpu cores" {
-            match value.parse() {
-                Ok(val) => cores = val,
-                Err(_) => break,
-            };
-            chgcount += 1;
-        }
-        if chgcount == 2 {
-            map.insert(physid, cores);
-            chgcount = 0;
-        }
-    }
-    let count = map.into_iter().fold(0, |acc, (_, cores)| acc + cores);
+//     let file = match File::open("/proc/cpuinfo") {
+//         Ok(val) => val,
+//         Err(_) => return get_num_cpus(),
+//     };
+//     let reader = BufReader::new(file);
+//     let mut map = HashMap::new();
+//     let mut physid: u32 = 0;
+//     let mut cores: usize = 0;
+//     let mut chgcount = 0;
+//     for line in reader.lines().filter_map(|result| result.ok()) {
+//         let mut it = line.split(':');
+//         let (key, value) = match (it.next(), it.next()) {
+//             (Some(key), Some(value)) => (key.trim(), value.trim()),
+//             _ => continue,
+//         };
+//         if key == "physical id" {
+//             match value.parse() {
+//                 Ok(val) => physid = val,
+//                 Err(_) => break,
+//             };
+//             chgcount += 1;
+//         }
+//         if key == "cpu cores" {
+//             match value.parse() {
+//                 Ok(val) => cores = val,
+//                 Err(_) => break,
+//             };
+//             chgcount += 1;
+//         }
+//         if chgcount == 2 {
+//             map.insert(physid, cores);
+//             chgcount = 0;
+//         }
+//     }
+//     let count = map.into_iter().fold(0, |acc, (_, cores)| acc + cores);
 
-    if count == 0 {
-        get_num_cpus()
-    } else {
-        count
-    }
-}
+//     if count == 0 {
+//         get_num_cpus()
+//     } else {
+//         count
+//     }
+// }
 
 #[cfg(windows)]
 fn get_num_cpus() -> usize {
@@ -373,26 +373,26 @@ fn get_num_physical_cpus() -> usize {
     cpus as usize
 }
 
-#[cfg(target_os = "linux")]
-fn get_num_cpus() -> usize {
-    let mut set:  libc::cpu_set_t = unsafe { std::mem::zeroed() };
-    if unsafe { libc::ocall::sched_getaffinity(0, std::mem::size_of::<libc::cpu_set_t>(), &mut set) } == 0 {
-        let mut count: u32 = 0;
-        for i in 0..libc::CPU_SETSIZE as usize {
-            if unsafe { libc::CPU_ISSET(i, &set) } {
-                count += 1
-            }
-        }
-        count as usize
-    } else {
-        let cpus = unsafe { libc::ocall::sysconf(libc::_SC_NPROCESSORS_ONLN) };
-        if cpus < 1 {
-            1
-        } else {
-            cpus as usize
-        }
-    }
-}
+// #[cfg(target_os = "linux")]
+// fn get_num_cpus() -> usize {
+//     let mut set:  libc::cpu_set_t = unsafe { std::mem::zeroed() };
+//     if unsafe { libc::ocall::sched_getaffinity(0, std::mem::size_of::<libc::cpu_set_t>(), &mut set) } == 0 {
+//         let mut count: u32 = 0;
+//         for i in 0..libc::CPU_SETSIZE as usize {
+//             if unsafe { libc::CPU_ISSET(i, &set) } {
+//                 count += 1
+//             }
+//         }
+//         count as usize
+//     } else {
+//         let cpus = unsafe { libc::ocall::sysconf(libc::_SC_NPROCESSORS_ONLN) };
+//         if cpus < 1 {
+//             1
+//         } else {
+//             cpus as usize
+//         }
+//     }
+// }
 
 #[cfg(any(
     target_os = "nacl",
