@@ -13,7 +13,7 @@ keywords = ["literal", "data-structure", "hashmap", "macro"]
 categories = ["rust-patterns"]
 
 [dependencies]
-sgx_tstd                       = {  path  = "/root/sgx/sgx_tstd" }
+sgx_tstd                     = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
 
 
 

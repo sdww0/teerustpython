@@ -14,7 +14,7 @@ readme = "README.md"
 include = ["src/**/*", "build.rs", "vendor/liblz4/*", "Cargo.toml"]
 
 [dependencies]
-sgx_tstd                       = {  path  = "/root/sgx/sgx_tstd" }
+sgx_tstd                     = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
 
 
 

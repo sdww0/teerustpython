@@ -8,6 +8,6 @@ authors = ["Niko Matsakis <niko@alum.mit.edu>"]
 workspace = ".."
 
 [dependencies]
-sgx_tstd                       = {  path  = "/root/sgx/sgx_tstd" }
+sgx_tstd                     = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
 
 

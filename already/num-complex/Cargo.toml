@@ -17,7 +17,7 @@ exclude = ["/ci/*", "/.travis.yml", "/bors.toml"]
 features = ["std", "serde", "rand"]
 
 [dependencies]
-sgx_tstd                       = {  path  = "/root/sgx/sgx_tstd" }
+sgx_tstd                     = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
 
 
 

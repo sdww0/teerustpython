@@ -13,7 +13,7 @@ categories = ["internationalization", "text-processing", "parsing", "rendering"]
 exclude = []
 
 [dependencies]
-sgx_tstd                       = {  path  = "/root/sgx/sgx_tstd" }
+sgx_tstd                     = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
 
 unic-char-property = { path = "../../char/property/", version = "0.9.0" }
 unic-char-range = { path = "../../char/range", version = "0.9.0" }

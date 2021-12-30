@@ -34,7 +34,7 @@ lazy_static    = { version = "1.4.0", features = ["spin_no_std"] ,optional=true}
 memchr = {path = "/root/sgx/teerustpython/already/memchr-2.3.3",default-features=false}
 serde            = { git = "https://github.com/mesalock-linux/serde-sgx" ,optional=true}
 cfg-if         = "0.1.9"
-sgx_tstd                       = {  path  = "/root/sgx/sgx_tstd" }
+sgx_tstd                     = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
 
 
 
