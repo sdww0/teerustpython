@@ -33,7 +33,8 @@ features = ["std", "serde", "rand"]
 num-traits       = { git = "https://github.com/mesalock-linux/num-traits-sgx" ,default-features = false}
 rand             = { git = "https://github.com/mesalock-linux/rand-sgx", tag = "v0.7.3_sgx1.1.3" ,optional = true,default-features = false}
 serde            = { git = "https://github.com/mesalock-linux/serde-sgx",optional = true, default-features = false}
-sgx_tstd                       = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
+sgx_tstd                       = {  path  = "/root/sgx/sgx_tstd" }
+
 
 
 [build-dependencies.autocfg]

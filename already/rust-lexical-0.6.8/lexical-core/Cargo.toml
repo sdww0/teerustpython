@@ -29,7 +29,8 @@ exclude = [
 travis-ci = { repository = "Alexhuszagh/rust-lexical" }
 
 [dependencies]
-sgx_tstd                       = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
+sgx_tstd                       = {  path  = "/root/sgx/sgx_tstd" }
+
 
 bitflags = {path="/root/sgx/teerustpython/already/bitflags-1.2.1"}
 cfg-if = "0.1"

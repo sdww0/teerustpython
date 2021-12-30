@@ -36,7 +36,8 @@ bench = false
 
 [dependencies]
 sgx_alloc                      = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
-sgx_tstd                       = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
+sgx_tstd                       = {  path  = "/root/sgx/sgx_tstd" }
+
 serde            = { git = "https://github.com/mesalock-linux/serde-sgx" ,optional = true}
 [dependencies.rayon]
 version = "1.0"

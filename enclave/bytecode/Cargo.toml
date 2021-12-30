@@ -9,7 +9,8 @@ license = "MIT"
 
 
 [dependencies]
-sgx_tstd                       = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
+sgx_tstd                       = {  path  = "/root/sgx/sgx_tstd" }
+
 bincode          = { git = "https://github.com/mesalock-linux/bincode-sgx" }
 bitflags = {path = "/root/sgx/teerustpython/already/bitflags-1.2.1"}
 #lz4-compress = "0.1.1"
