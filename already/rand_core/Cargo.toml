@@ -27,7 +27,7 @@ mesalock_sgx = ["alloc", "sgx_tstd"]
 [dependencies]
 serde = { git = "https://github.com/mesalock-linux/serde-sgx", features = ["derive"], optional = true }
 getrandom = { git = "https://github.com/mesalock-linux/getrandom-sgx", optional = true }
-sgx_tstd                       = {  path  = "/root/sgx/sgx_tstd" }
+sgx_tstd                       = {  path  = "/root/sgx/sgx_tstd" , optional = true }
 
 
 [package.metadata.docs.rs]
