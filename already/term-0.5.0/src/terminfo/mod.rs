@@ -71,24 +71,24 @@ pub struct TermInfo {
 
 impl TermInfo {
     /// Create a `TermInfo` based on current environment.
-    pub fn from_env() -> Result<TermInfo> {
-        let term_var = env::var("TERM").ok();
-        let term_name = term_var
-            .as_ref()
-            .map(|s| &**s)
-            .or_else(|| env::var("MSYSCON")
-                     .ok()
-                     .and_then(|s| if s == "mintty.exe" {
-                         Some("msyscon")
-                     } else {
-                         None
-                     }));
-        if let Some(term_name) = term_name {
-            return TermInfo::from_name(term_name);
-        } else {
-            return Err(::Error::TermUnset);
-        }
-    }
+    // pub fn from_env() -> Result<TermInfo> {
+    //     let term_var = env::var("TERM").ok();
+    //     let term_name = term_var
+    //         .as_ref()
+    //         .map(|s| &**s)
+    //         .or_else(|| env::var("MSYSCON")
+    //                  .ok()
+    //                  .and_then(|s| if s == "mintty.exe" {
+    //                      Some("msyscon")
+    //                  } else {
+    //                      None
+    //                  }));
+    //     if let Some(term_name) = term_name {
+    //         return TermInfo::from_name(term_name);
+    //     } else {
+    //         return Err(::Error::TermUnset);
+    //     }
+    // }
 
     /// Create a `TermInfo` for the named terminal.
     pub fn from_name(name: &str) -> Result<TermInfo> {
@@ -381,9 +381,9 @@ impl<T: Write> TerminfoTerminal<T> {
     /// Create a new TerminfoTerminal for the current environment with the given Write.
     ///
     /// Returns `None` when the terminfo cannot be found or parsed.
-    pub fn new(out: T) -> Option<TerminfoTerminal<T>> {
-        TermInfo::from_env().map(move |ti| TerminfoTerminal::new_with_terminfo(out, ti)).ok()
-    }
+    // pub fn new(out: T) -> Option<TerminfoTerminal<T>> {
+    //     TermInfo::from_env().map(move |ti| TerminfoTerminal::new_with_terminfo(out, ti)).ok()
+    // }
 
     fn dim_if_necessary(&self, color: color::Color) -> color::Color {
         if color >= self.num_colors && color >= 8 && color < 16 {

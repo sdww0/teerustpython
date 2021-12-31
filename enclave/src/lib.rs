@@ -280,15 +280,15 @@ fn create_settings(/*matches: &ArgMatches*/) -> PySettings {
 }
 
 /// Get environment variable and turn it into integer.
-fn get_env_var_value(name: &str) -> Result<u8, std::env::VarError> {
-    env::var(name).map(|value| {
-        if let Ok(value) = u8::from_str(&value) {
-            value
-        } else {
-            1
-        }
-    })
-}
+// fn get_env_var_value(name: &str) -> Result<u8, std::env::VarError> {
+//     env::var(name).map(|value| {
+//         if let Ok(value) = u8::from_str(&value) {
+//             value
+//         } else {
+//             1
+//         }
+//     })
+// }
 
 /// Helper function to retrieve a sequence of paths from an environment variable.
 fn get_paths(env_variable_name: &str) -> impl Iterator<Item = String> + '_ {
