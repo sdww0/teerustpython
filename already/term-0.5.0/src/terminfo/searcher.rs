@@ -58,10 +58,10 @@ pub fn get_dbpath_for_term(term: &str) -> Option<PathBuf> {
         // ~/.terminfo, ncurses will search /etc/terminfo, then
         // /lib/terminfo, and eventually /usr/share/terminfo.
         // On Haiku the database can be found at /boot/system/data/terminfo
-        if let Some(mut homedir) = env::home_dir() {
-            homedir.push(".terminfo");
-            dirs_to_search.push(homedir)
-        }
+        // if let Some(mut homedir) = env::home_dir() {
+        //     homedir.push(".terminfo");
+        //     dirs_to_search.push(homedir)
+        // }
 
         dirs_to_search.push(PathBuf::from("/etc/terminfo"));
         dirs_to_search.push(PathBuf::from("/lib/terminfo"));

@@ -130,14 +130,14 @@ pub fn run_shell(vm: &VirtualMachine, scope: Scope) -> PyResult<()> {
         };
 
         if let Err(exc) = result {
-            if objtype::isinstance(&exc, &vm.ctx.exceptions.system_exit) {
-                repl.save_history(&repl_history_path).unwrap();
-                return Err(exc);
-            }
+            // if objtype::isinstance(&exc, &vm.ctx.exceptions.system_exit) {
+            //     repl.save_history(&repl_history_path).unwrap();
+            //     return Err(exc);
+            // }
             print_exception(vm, &exc);
         }
     }
-    repl.save_history(&repl_history_path).unwrap();
+    // repl.save_history(&repl_history_path).unwrap();
 
     Ok(())
 }

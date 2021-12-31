@@ -575,17 +575,17 @@ impl VirtualMachine {
 
     // TODO: #[track_caller] when stabilized
     fn _py_panic_failed(&self, exc: &PyBaseExceptionRef, msg: &str) -> ! {
-        // #[cfg(not(all(target_arch = "wasm32", not(target_os = "wasi"))))]
-        // {
-        //     let show_backtrace = env::var_os("RUST_BACKTRACE").map_or(false, |v| &v != "0");
-        //     let after = if show_backtrace {
-        //         exceptions::print_exception(self, exc);
-        //         "exception backtrace above"
-        //     } else {
-        //         "run with RUST_BACKTRACE=1 to see Python backtrace"
-        //     };
-        //     panic!("{}; {}", msg, after)
-        // }
+        #[cfg(not(all(target_arch = "wasm32", not(target_os = "wasi"))))]
+        {
+            // let show_backtrace = env::var_os("RUST_BACKTRACE").map_or(false, |v| &v != "0");
+            // let after = if show_backtrace {
+            //     exceptions::print_exception(self, exc);
+            //     "exception backtrace above"
+            // } else {
+            let after =     "run with RUST_BACKTRACE=1 to see Python backtrace";
+            // };
+            panic!("{}; {}", msg, after)
+        }
         #[cfg(all(target_arch = "wasm32", not(target_os = "wasi")))]
         {
             use wasm_bindgen::prelude::*;
