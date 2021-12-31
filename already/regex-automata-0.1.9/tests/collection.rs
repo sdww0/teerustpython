@@ -138,17 +138,17 @@ impl RegexTester {
             whitelist: vec![],
             blacklist: vec![],
         };
-        for x in env::var("REGEX_TEST").unwrap_or("".to_string()).split(",") {
-            let x = x.trim();
-            if x.is_empty() {
-                continue;
-            }
-            if x.starts_with("-") {
-                tester = tester.blacklist(&x[1..]);
-            } else {
-                tester = tester.whitelist(x);
-            }
-        }
+        // for x in env::var("REGEX_TEST").unwrap_or("".to_string()).split(",") {
+        //     let x = x.trim();
+        //     if x.is_empty() {
+        //         continue;
+        //     }
+        //     if x.starts_with("-") {
+        //         tester = tester.blacklist(&x[1..]);
+        //     } else {
+        //         tester = tester.whitelist(x);
+        //     }
+        // }
         tester
     }
 

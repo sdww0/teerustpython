@@ -78,8 +78,8 @@ fn main() {
     let mut throwaway = 0;
     throwaway += pretty32();
     throwaway += pretty64();
-    if std::env::var_os("ryu-benchmark").is_some() {
-        // Prevent the compiler from optimizing the code away.
-        println!("{}", throwaway);
-    }
+    // if std::env::var_os("ryu-benchmark").is_some() {
+    //     // Prevent the compiler from optimizing the code away.
+    //     println!("{}", throwaway);
+    // }
 }

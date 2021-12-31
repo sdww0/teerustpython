@@ -31,7 +31,8 @@ use std::borrow::ToOwned;
 use std::vec::Vec;
 use std::format;
 static CARGO_MANIFEST_DIR: Lazy<PathBuf> = Lazy::new(|| {
-    PathBuf::from(env::var_os("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR is not present"))
+    // PathBuf::from(env::var_os("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR is not present"))
+    PathBuf::new()
 });
 
 enum CompilationSourceKind {
