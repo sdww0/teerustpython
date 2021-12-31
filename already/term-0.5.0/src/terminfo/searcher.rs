@@ -40,19 +40,19 @@ pub fn get_dbpath_for_term(term: &str) -> Option<PathBuf> {
     // > the standard place.
     //
     // Given that ncurses is the defacto standard, we follow the ncurses manual.
-    if let Some(dir) = env::var_os("TERMINFO") {
-        dirs_to_search.push(PathBuf::from(dir));
-    }
+    // if let Some(dir) = env::var_os("TERMINFO") {
+    //     dirs_to_search.push(PathBuf::from(dir));
+    // }
 
-    if let Ok(dirs) = env::var("TERMINFO_DIRS") {
-        for i in dirs.split(':') {
-            if i == "" {
-                dirs_to_search.push(PathBuf::from("/usr/share/terminfo"));
-            } else {
-                dirs_to_search.push(PathBuf::from(i));
-            }
-        }
-    } else {
+    // if let Ok(dirs) = env::var("TERMINFO_DIRS") {
+    //     for i in dirs.split(':') {
+    //         if i == "" {
+    //             dirs_to_search.push(PathBuf::from("/usr/share/terminfo"));
+    //         } else {
+    //             dirs_to_search.push(PathBuf::from(i));
+    //         }
+    //     }
+    // } else {
         // Found nothing in TERMINFO_DIRS, use the default paths:
         // According to  /etc/terminfo/README, after looking at
         // ~/.terminfo, ncurses will search /etc/terminfo, then
@@ -67,7 +67,7 @@ pub fn get_dbpath_for_term(term: &str) -> Option<PathBuf> {
         dirs_to_search.push(PathBuf::from("/lib/terminfo"));
         dirs_to_search.push(PathBuf::from("/usr/share/terminfo"));
         dirs_to_search.push(PathBuf::from("/boot/system/data/terminfo"));
-    }
+    // }
 
     // Look for the terminal in all of the search directories
     for mut p in dirs_to_search {

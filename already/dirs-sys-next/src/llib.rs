@@ -40,16 +40,16 @@ use std::ptr;
 
 // https://github.com/rust-lang/rust/blob/master/src/libstd/sys/unix/os.rs#L498
 
-pub fn home_dir() -> Option<PathBuf> {
-    return env::var_os("HOME")
-        .and_then(|h| if h.is_empty() { None } else { Some(h) })
-        .or_else(|| unsafe { fallback() })
-        .map(PathBuf::from);
+// pub fn home_dir() -> Option<PathBuf> {
+    // return env::var_os("HOME")
+    //     .and_then(|h| if h.is_empty() { None } else { Some(h) })
+    //     .or_else(|| unsafe { fallback() })
+    //     .map(PathBuf::from);
 
     // #[cfg(any(target_os = "android", target_os = "ios", target_os = "emscripten"))]
-    unsafe fn fallback() -> Option<OsString> {
-        None
-    }
+    // unsafe fn fallback() -> Option<OsString> {
+    //     None
+    // }
     // #[cfg(not(any(target_os = "android", target_os = "ios", target_os = "emscripten")))]
     // unsafe fn fallback() -> Option<OsString> {
     //     let amt = match libc::ocall::sysconf(libc::_SC_GETPW_R_SIZE_MAX) {
@@ -78,12 +78,12 @@ pub fn home_dir() -> Option<PathBuf> {
     //         _ => None,
     //     }
     // }
-}
+// }
 
 }
 
-#[cfg(all(unix, not(target_os = "redox")))]
-pub use self::target_unix_not_redox::home_dir;
+// #[cfg(all(unix, not(target_os = "redox")))]
+// pub use self::target_unix_not_redox::home_dir;
 
 #[cfg(target_os = "redox")]
 extern crate redox_users;
@@ -121,28 +121,28 @@ use std::path::{Path, PathBuf};
 use super::{home_dir, is_absolute_path};
 use super::xdg_user_dirs;
 
-fn user_dir_file(home_dir: &Path) -> PathBuf {
-    env::var_os("XDG_CONFIG_HOME").and_then(is_absolute_path).unwrap_or_else(|| home_dir.join(".config")).join("user-dirs.dirs")
-}
+// fn user_dir_file(home_dir: &Path) -> PathBuf {
+//     env::var_os("XDG_CONFIG_HOME").and_then(is_absolute_path).unwrap_or_else(|| home_dir.join(".config")).join("user-dirs.dirs")
+// }
 
 // this could be optimized further to not create a map and instead retrieve the requested path only
-pub fn user_dir(user_dir_name: &str) -> Option<PathBuf> {
-    if let Some(home_dir) = home_dir() {
-        xdg_user_dirs::single(&home_dir, &user_dir_file(&home_dir), user_dir_name).remove(user_dir_name)
-    } else {
-        None
-    }
-}
+// pub fn user_dir(user_dir_name: &str) -> Option<PathBuf> {
+//     if let Some(home_dir) = home_dir() {
+//         xdg_user_dirs::single(&home_dir, &user_dir_file(&home_dir), user_dir_name).remove(user_dir_name)
+//     } else {
+//         None
+//     }
+// }
 
 use std::string::String;
-pub fn user_dirs(home_dir_path: &Path) -> HashMap<String, PathBuf> {
-    xdg_user_dirs::all(home_dir_path, &user_dir_file(home_dir_path))
-}
+// pub fn user_dirs(home_dir_path: &Path) -> HashMap<String, PathBuf> {
+//     xdg_user_dirs::all(home_dir_path, &user_dir_file(home_dir_path))
+// }
 
 }
 
-#[cfg(all(unix, not(any(target_os = "macos", target_os = "ios"))))]
-pub use self::target_unix_not_mac::{user_dir, user_dirs};
+// #[cfg(all(unix, not(any(target_os = "macos", target_os = "ios"))))]
+// pub use self::target_unix_not_mac::{user_dir, user_dirs};
 
 #[cfg(target_os = "windows")]
 extern crate winapi;

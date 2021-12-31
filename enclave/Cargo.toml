@@ -32,7 +32,7 @@ env_logger       = { git = "https://github.com/mesalock-linux/env_logger-sgx" }
 rustpython-compiler = {path = "compiler", version = "0.1.1"}
 rustpython-parser = {path = "parser", version = "0.1.1"}
 rustpython-vm = {path = "vm", version = "0.1.1"}
-dirs-next = { path="/root/sgx/teerustpython/already/dirsnext-v1.0.1" }
+# dirs-next = { path="/root/sgx/teerustpython/already/dirsnext-v1.0.1" }
 num-traits       = { git = "https://github.com/mesalock-linux/num-traits-sgx" }
 cfg-if = "0.1.9"
 

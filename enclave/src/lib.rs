@@ -291,19 +291,19 @@ fn create_settings(/*matches: &ArgMatches*/) -> PySettings {
 // }
 
 /// Helper function to retrieve a sequence of paths from an environment variable.
-fn get_paths(env_variable_name: &str) -> impl Iterator<Item = String> + '_ {
-    env::var_os(env_variable_name)
-        .into_iter()
-        .flat_map(move |paths| {
-            env::split_paths(&paths)
-                .map(|path| {
-                    path.into_os_string()
-                        .into_string()
-                        .unwrap_or_else(|_| panic!("{} isn't valid unicode", env_variable_name))
-                })
-                .collect::<Vec<_>>()
-        })
-}
+// fn get_paths(env_variable_name: &str) -> impl Iterator<Item = String> + '_ {
+//     env::var_os(env_variable_name)
+//         .into_iter()
+//         .flat_map(move |paths| {
+//             env::split_paths(&paths)
+//                 .map(|path| {
+//                     path.into_os_string()
+//                         .into_string()
+//                         .unwrap_or_else(|_| panic!("{} isn't valid unicode", env_variable_name))
+//                 })
+//                 .collect::<Vec<_>>()
+//         })
+// }
 
 // #[cfg(feature = "flame-it")]
 // fn write_profile(matches: &ArgMatches) -> Result<(), Box<dyn std::error::Error>> {

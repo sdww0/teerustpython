@@ -43,18 +43,18 @@ pub fn run_shell(vm: &VirtualMachine, scope: Scope) -> PyResult<()> {
     let mut full_input = String::new();
 
     // Retrieve a `history_path_str` dependent on the OS
-    let repl_history_path = match dirs_next::config_dir() {
-        Some(mut path) => {
-            path.push("rustpython");
-            path.push("repl_history.txt");
-            path
-        }
-        None => ".repl_history.txt".into(),
-    };
+    // let repl_history_path = match dirs_next::config_dir() {
+    //     Some(mut path) => {
+    //         path.push("rustpython");
+    //         path.push("repl_history.txt");
+    //         path
+    //     }
+    //     None => ".repl_history.txt".into(),
+    // };
 
-    if repl.load_history(&repl_history_path).is_err() {
+    // if repl.load_history(&repl_history_path).is_err() {
         println!("No previous history.");
-    }
+    // }
 
     let mut continuing = false;
 

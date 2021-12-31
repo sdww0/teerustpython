@@ -30,11 +30,11 @@ impl InternalBacktrace {
 
         match ENABLED.load(Ordering::SeqCst) {
             0 => {
-                let enabled = is_backtrace_enabled(|var| env::var_os(var));
-                ENABLED.store(enabled as usize + 1, Ordering::SeqCst);
-                if !enabled {
+                // let enabled = is_backtrace_enabled(|var| env::var_os(var));
+                // ENABLED.store(enabled as usize + 1, Ordering::SeqCst);
+                // if !enabled {
                     return InternalBacktrace { backtrace: None }
-                }
+                // }
             }
             1 => return InternalBacktrace { backtrace: None },
             _ => {}
