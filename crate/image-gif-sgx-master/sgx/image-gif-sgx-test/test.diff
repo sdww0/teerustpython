@@ -1,0 +1,85 @@
+diff --git a/sgx/image-gif-sgx-test/test.diff b/sgx/image-gif-sgx-test/test.diff
+index b935126..e69de29 100644
+--- a/sgx/image-gif-sgx-test/test.diff
++++ b/sgx/image-gif-sgx-test/test.diff
+@@ -1,40 +0,0 @@
+-diff --git a/src/lib.rs b/src/lib.rs
+-index da80bfe..27bb3f5 100644
+---- a/src/lib.rs
+-+++ b/src/lib.rs
+-@@ -114,7 +114,7 @@
+- // }
+- // # })().unwrap();
+- // ```
+--#![deny(missing_docs)]
+-+//#![deny(missing_docs)]
+- 
+- // Uncomment to run tests
+- //#![cfg_attr(test, feature(test))]
+-@@ -148,6 +148,7 @@ pub use reader::{StreamingDecoder, Decoded, DecodingError};
+- /// StreamingDecoder configuration parameters
+- pub use reader::{ColorOutput, MemoryLimit, Extensions};
+- pub use reader::{Reader, Decoder};
+-+pub use reader::InterlaceIterator;
+- 
+- pub use encoder::{Encoder, ExtensionData, Repeat};
+- 
+-diff --git a/src/reader/mod.rs b/src/reader/mod.rs
+-index 98cb414..0c2cddb 100644
+---- a/src/reader/mod.rs
+-+++ b/src/reader/mod.rs
+-@@ -374,10 +374,10 @@ impl<R> Reader<R> where R: Read {
+-     }
+- }
+- 
+--struct InterlaceIterator {
+--    len: usize,
+--    next: usize,
+--    pass: usize
+-+pub struct InterlaceIterator {
+-+    pub len: usize,
+-+    pub next: usize,
+-+    pub pass: usize
+- }
+- 
+- impl iter::Iterator for InterlaceIterator {
+diff --git a/src/lib.rs b/src/lib.rs
+index 28f01b8..27a0b1a 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -114,7 +114,7 @@
+ // }
+ // # })().unwrap();
+ // ```
+-#![deny(missing_docs)]
++//#![deny(missing_docs)]
+ 
+ #![cfg_attr(all(feature = "mesalock_sgx",
+                 not(target_env = "sgx")), no_std)]
+@@ -145,6 +145,7 @@ pub use reader::{StreamingDecoder, Decoded, DecodingError};
+ /// StreamingDecoder configuration parameters
+ pub use reader::{ColorOutput, MemoryLimit, Extensions};
+ pub use reader::{Reader, Decoder};
++pub use reader::InterlaceIterator;
+ 
+ pub use encoder::{Encoder, ExtensionData, Repeat};
+ 
+diff --git a/src/reader/mod.rs b/src/reader/mod.rs
+index 808a99d..3f81091 100644
+--- a/src/reader/mod.rs
++++ b/src/reader/mod.rs
+@@ -373,10 +373,10 @@ impl<R> Reader<R> where R: Read {
+     }
+ }
+ 
+-struct InterlaceIterator {
+-    len: usize,
+-    next: usize,
+-    pass: usize
++pub struct InterlaceIterator {
++    pub len: usize,
++    pub next: usize,
++    pub pass: usize
+ }
+ 
+ impl iter::Iterator for InterlaceIterator {

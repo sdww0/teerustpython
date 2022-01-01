@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "rust-url-sgx-test/app",
+    "rust-url-sgx-test/enclave",
+]

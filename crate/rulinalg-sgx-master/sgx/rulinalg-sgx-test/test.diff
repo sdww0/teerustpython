@@ -1,0 +1,179 @@
+diff --git a/src/lib.rs b/src/lib.rs
+index 26e76af..cbe0495 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -83,8 +83,8 @@
+ //! Note finally that much of the `Matrix`/`MatrixSlice`/`MatrixSliceMut` functionality is contained behind
+ //! the `BaseMatrix`/`BaseMatrixMut` traits. This allows us to be generic over matrices or slices.
+ 
+-#![deny(missing_docs)]
+-#![warn(missing_debug_implementations)]
++//#![deny(missing_docs)]
++//#![warn(missing_debug_implementations)]
+ 
+ #![cfg_attr(all(feature = "mesalock_sgx",
+                 not(target_env = "sgx")), no_std)]
+@@ -111,7 +111,7 @@ pub mod vector;
+ pub mod ulp;
+ pub mod norm;
+ 
+-mod internal_utils;
++pub mod internal_utils;
+ 
+ #[cfg(test)]
+ mod testsupport;
+diff --git a/src/macros/mod.rs b/src/macros/mod.rs
+index 91f48b5..a1c585e 100644
+--- a/src/macros/mod.rs
++++ b/src/macros/mod.rs
+@@ -15,7 +15,7 @@ mod assert_vector_eq;
+ #[macro_use]
+ mod assert_scalar_eq;
+ 
+-mod comparison;
++pub mod comparison;
+ 
+ pub use self::comparison::{
+     AbsoluteElementwiseComparator,
+diff --git a/src/matrix/decomposition/cholesky.rs b/src/matrix/decomposition/cholesky.rs
+index cc623ab..f169b8b 100644
+--- a/src/matrix/decomposition/cholesky.rs
++++ b/src/matrix/decomposition/cholesky.rs
+@@ -327,7 +327,7 @@ impl<T> Matrix<T>
+ 
+ /// Solves the square system L^T x = b,
+ /// where L is lower triangular
+-fn transpose_back_substitution<T>(l: &Matrix<T>, b: Vector<T>)
++pub fn transpose_back_substitution<T>(l: &Matrix<T>, b: Vector<T>)
+     -> Result<Vector<T>, Error> where T: Float {
+     assert!(l.rows() == l.cols(), "Matrix L must be square.");
+     assert!(l.rows() == b.size(), "L and b must be dimensionally compatible.");
+diff --git a/src/matrix/decomposition/householder.rs b/src/matrix/decomposition/householder.rs
+index cb6ba8d..37342f3 100644
+--- a/src/matrix/decomposition/householder.rs
++++ b/src/matrix/decomposition/householder.rs
+@@ -23,8 +23,8 @@ use libnum::Float;
+ /// but with modifications that among other things makes
+ /// the implementation compliant with LAPACK.
+ pub struct HouseholderReflection<T> {
+-    v: Vector<T>,
+-    tau: T
++    pub v: Vector<T>,
++    pub tau: T
+ }
+ 
+ impl<T: Float> HouseholderReflection<T> {
+diff --git a/src/matrix/decomposition/lu.rs b/src/matrix/decomposition/lu.rs
+index fdc8a43..84cb636 100644
+--- a/src/matrix/decomposition/lu.rs
++++ b/src/matrix/decomposition/lu.rs
+@@ -129,8 +129,8 @@ pub struct LUP<T> {
+ /// ```
+ #[derive(Debug, Clone)]
+ pub struct PartialPivLu<T> {
+-    lu: Matrix<T>,
+-    p: PermutationMatrix<T>
++    pub lu: Matrix<T>,
++    pub p: PermutationMatrix<T>
+ }
+ 
+ impl<T: Clone + One + Zero> Decomposition for PartialPivLu<T> {
+@@ -622,7 +622,7 @@ fn gaussian_elimination<T: Float>(lu: &mut Matrix<T>, index: usize) {
+ /// to the strictly lower triangular part of L.
+ ///
+ /// This is equivalent to solving the system Lx = b.
+-fn lu_forward_substitution<T: Float>(lu: &Matrix<T>, b: Vector<T>) -> Vector<T> {
++pub fn lu_forward_substitution<T: Float>(lu: &Matrix<T>, b: Vector<T>) -> Vector<T> {
+     assert!(lu.rows() == lu.cols(), "LU matrix must be square.");
+     assert!(b.size() == lu.rows(), "LU matrix and RHS vector must be compatible.");
+     let mut x = b;
+diff --git a/src/matrix/decomposition/mod.rs b/src/matrix/decomposition/mod.rs
+index 9d41b65..ed728c0 100644
+--- a/src/matrix/decomposition/mod.rs
++++ b/src/matrix/decomposition/mod.rs
+@@ -125,14 +125,14 @@
+ // (http://www.cs.utexas.edu/users/inderjit/public_papers/HLA_SVD.pdf)
+ 
+ use std::prelude::v1::*;
+-mod qr;
+-mod cholesky;
++pub mod qr;
++pub mod cholesky;
+ mod bidiagonal;
+-mod svd;
++pub mod svd;
+ mod hessenberg;
+-mod lu;
++pub mod lu;
+ mod eigen;
+-mod householder;
++pub mod householder;
+ 
+ use std::any::Any;
+ 
+@@ -142,7 +142,7 @@ use vector::Vector;
+ use utils;
+ use error::{Error, ErrorKind};
+ 
+-use self::householder::HouseholderReflection;
++pub use self::householder::HouseholderReflection;
+ 
+ pub use self::householder::HouseholderComposition;
+ pub use self::lu::{PartialPivLu, LUP, FullPivLu, LUPQ};
+diff --git a/src/matrix/decomposition/svd.rs b/src/matrix/decomposition/svd.rs
+index f5c9ab6..8271a61 100644
+--- a/src/matrix/decomposition/svd.rs
++++ b/src/matrix/decomposition/svd.rs
+@@ -44,7 +44,7 @@ fn correct_svd_signs<T>(mut b: Matrix<T>,
+     (b, u, v)
+ }
+ 
+-fn sort_svd<T>(mut b: Matrix<T>,
++pub fn sort_svd<T>(mut b: Matrix<T>,
+                mut u: Matrix<T>,
+                mut v: Matrix<T>)
+                -> (Matrix<T>, Matrix<T>, Matrix<T>)
+diff --git a/src/matrix/mod.rs b/src/matrix/mod.rs
+index 75baaa0..3a75749 100644
+--- a/src/matrix/mod.rs
++++ b/src/matrix/mod.rs
+@@ -24,7 +24,7 @@ mod impl_ops;
+ mod iter;
+ mod mat_mul;
+ mod slice;
+-mod permutation_matrix;
++pub mod permutation_matrix;
+ mod impl_permutation_mul;
+ 
+ pub use self::base::{BaseMatrix, BaseMatrixMut};
+@@ -46,7 +46,7 @@ pub enum Axes {
+ pub struct Matrix<T> {
+     rows: usize,
+     cols: usize,
+-    data: Vec<T>,
++    pub data: Vec<T>,
+ }
+ 
+ /// A `MatrixSlice`
+diff --git a/src/matrix/permutation_matrix.rs b/src/matrix/permutation_matrix.rs
+index 176d470..f59e7fd 100644
+--- a/src/matrix/permutation_matrix.rs
++++ b/src/matrix/permutation_matrix.rs
+@@ -436,7 +436,7 @@ fn validate_permutation_right_mul_dimensions<T, M>(lhs: &M, p: &PermutationMatri
+              are not compatible.");
+ }
+ 
+-fn validate_permutation(perm: &[usize]) -> Result<(), Error> {
++pub fn validate_permutation(perm: &[usize]) -> Result<(), Error> {
+     // Recall that a permutation array of size n is valid if:
+     // 1. All elements are in the range [0, n)
+     // 2. All elements are unique
+@@ -477,7 +477,7 @@ fn validate_permutation(perm: &[usize]) -> Result<(), Error> {
+ ///
+ /// - O(1) memory usage.
+ /// - O(n) worst case number of calls to `swap`.
+-fn permute_by_swap<S>(perm: &mut [usize], mut swap: S) where S: FnMut(usize, usize) -> () {
++pub fn permute_by_swap<S>(perm: &mut [usize], mut swap: S) where S: FnMut(usize, usize) -> () {
+     // Please see https://en.wikipedia.org/wiki/Cyclic_permutation
+     // for some explanation to the terminology used here.
+     // Some useful resources I found on the internet:

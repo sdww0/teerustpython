@@ -1,0 +1,47 @@
+diff --git a/src/baseline.rs b/src/baseline.rs
+index fbc4136..9fce246 100644
+--- a/src/baseline.rs
++++ b/src/baseline.rs
+@@ -27,7 +27,7 @@ impl State {
+     }
+ }
+ 
+-pub(crate) fn update_fast_16(prev: u32, mut buf: &[u8]) -> u32 {
++pub fn update_fast_16(prev: u32, mut buf: &[u8]) -> u32 {
+     const UNROLL: usize = 4;
+     const BYTES_AT_ONCE: usize = 16 * UNROLL;
+ 
+@@ -58,7 +58,7 @@ pub(crate) fn update_fast_16(prev: u32, mut buf: &[u8]) -> u32 {
+     update_slow(!crc, buf)
+ }
+ 
+-pub(crate) fn update_slow(prev: u32, buf: &[u8]) -> u32 {
++pub fn update_slow(prev: u32, buf: &[u8]) -> u32 {
+     let mut crc = !prev;
+ 
+     for &byte in buf.iter() {
+diff --git a/src/lib.rs b/src/lib.rs
+index 5b46c4f..13dd9f9 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -34,7 +34,7 @@ extern crate sgx_tstd as std;
+ #[cfg(all(feature = "mesalock_sgx", target_env = "sgx", feature = "std"))]
+ extern crate core;
+ 
+-#[deny(missing_docs)]
++//#[deny(missing_docs)]
+ #[cfg(test)]
+ #[macro_use]
+ extern crate quickcheck;
+@@ -48,9 +48,9 @@ extern crate cfg_if;
+ use core::fmt;
+ use core::hash;
+ 
+-mod baseline;
++pub mod baseline;
+ mod combine;
+-mod specialized;
++pub mod specialized;
+ mod table;
+ 
+ #[derive(Clone)]

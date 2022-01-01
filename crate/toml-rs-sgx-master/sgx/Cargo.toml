@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "toml-rs-sgx-test/app",
+    "toml-rs-sgx-test/enclave",
+]

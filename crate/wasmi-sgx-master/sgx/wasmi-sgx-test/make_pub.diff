@@ -1,0 +1,91 @@
+diff --git a/src/isa.rs b/src/isa.rs
+index 1981706..513eebd 100644
+--- a/src/isa.rs
++++ b/src/isa.rs
+@@ -121,7 +121,8 @@ pub struct BrTargets<'a> {
+ }
+ 
+ impl<'a> BrTargets<'a> {
+-    pub(crate) fn from_internal(targets: &'a [InstructionInternal]) -> Self {
++    //pub(crate) fn from_internal(targets: &'a [InstructionInternal]) -> Self {
++    pub fn from_internal(targets: &'a [InstructionInternal]) -> Self {
+         BrTargets { stream: targets }
+     }
+ 
+@@ -349,7 +350,8 @@ pub enum Instruction<'a> {
+ /// When returning instructions we convert to `Instruction`, whose `BrTable` variant internally
+ /// borrows the list of instructions and returns targets by reading it.
+ #[derive(Copy, Debug, Clone, PartialEq, Eq)]
+-pub(crate) enum InstructionInternal {
++//pub(crate) enum InstructionInternal {
++pub enum InstructionInternal {
+     GetLocal(u32),
+     SetLocal(u32),
+     TeeLocal(u32),
+diff --git a/src/lib.rs b/src/lib.rs
+index d5ee0ab..0d13f59 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -94,7 +94,7 @@
+ //! }
+ //! ```
+ 
+-#![warn(missing_docs)]
++//#![warn(missing_docs)]
+ //#![cfg_attr(not(feature = "std"), no_std)]
+ ////// alloc is required in no_std
+ //#![cfg_attr(not(feature = "std"), feature(alloc, alloc_prelude))]
+@@ -410,13 +410,13 @@ impl From<validation::Error> for Error {
+ 
+ mod func;
+ mod global;
+-mod host;
++pub mod host;
+ mod imports;
+-mod isa;
+-mod memory;
+-mod module;
++pub mod isa;
++pub mod memory;
++pub mod module;
+ pub mod nan_preserving_float;
+-mod prepare;
++pub mod prepare;
+ mod runner;
+ mod table;
+ mod types;
+diff --git a/src/memory/mod.rs b/src/memory/mod.rs
+index 89bd442..0a24027 100644
+--- a/src/memory/mod.rs
++++ b/src/memory/mod.rs
+@@ -34,7 +34,7 @@ pub const LINEAR_MEMORY_PAGE_SIZE: Bytes = Bytes(65536);
+ /// [`MemoryInstance`]: struct.MemoryInstance.html
+ ///
+ #[derive(Clone, Debug)]
+-pub struct MemoryRef(Arc<MemoryInstance>);
++pub struct MemoryRef(pub Arc<MemoryInstance>);
+ 
+ impl ::core::ops::Deref for MemoryRef {
+     type Target = MemoryInstance;
+@@ -138,7 +138,7 @@ impl MemoryInstance {
+     }
+ 
+     /// Create new linear memory instance.
+-    fn new(initial: Pages, maximum: Option<Pages>) -> Result<Self, Error> {
++    pub fn new(initial: Pages, maximum: Option<Pages>) -> Result<Self, Error> {
+         let limits = ResizableLimits::new(initial.0 as u32, maximum.map(|p| p.0 as u32));
+ 
+         let initial_size: Bytes = initial.into();
+diff --git a/src/nan_preserving_float.rs b/src/nan_preserving_float.rs
+index 994c91a..1131931 100644
+--- a/src/nan_preserving_float.rs
++++ b/src/nan_preserving_float.rs
+@@ -29,7 +29,7 @@ macro_rules! float {
+     };
+     ($for:ident, $rep:ident, $is:ident, $sign_bit:expr) => {
+         #[derive(Copy, Clone)]
+-        pub struct $for($rep);
++        pub struct $for(pub $rep);
+ 
+         impl_binop!($for, $is, Add, add);
+         impl_binop!($for, $is, Sub, sub);

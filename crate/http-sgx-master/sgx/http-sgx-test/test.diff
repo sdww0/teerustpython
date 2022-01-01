@@ -1,0 +1,81 @@
+diff --git a/src/lib.rs b/src/lib.rs
+index 62ee3b6..504015f 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -157,7 +157,7 @@
+ //! assert_eq!(uri.query(), None);
+ //! ```
+ 
+-#![deny(warnings, missing_docs, missing_debug_implementations)]
++//#![deny(warnings, missing_docs, missing_debug_implementations)]
+ 
+ #![cfg_attr(all(feature = "mesalock_sgx",
+                 not(target_env = "sgx")), no_std)]
+diff --git a/src/uri/authority.rs b/src/uri/authority.rs
+index bf650ec..184175d 100644
+--- a/src/uri/authority.rs
++++ b/src/uri/authority.rs
+@@ -165,7 +165,7 @@ impl Authority {
+     //
+     // This should be used by functions that allow a user to parse
+     // an `Authority` by itself.
+-    fn parse_non_empty(s: &[u8]) -> Result<usize, InvalidUri> {
++    pub fn parse_non_empty(s: &[u8]) -> Result<usize, InvalidUri> {
+         if s.is_empty() {
+             return Err(ErrorKind::Empty.into());
+         }
+diff --git a/src/uri/mod.rs b/src/uri/mod.rs
+index ade6aa1..354cd81 100644
+--- a/src/uri/mod.rs
++++ b/src/uri/mod.rs
+@@ -123,7 +123,7 @@ pub struct Parts {
+ 
+ /// An error resulting from a failed attempt to construct a URI.
+ #[derive(Debug)]
+-pub struct InvalidUri(ErrorKind);
++pub struct InvalidUri(pub ErrorKind);
+ 
+ /// An error resulting from a failed attempt to construct a URI.
+ #[derive(Debug)]
+@@ -134,7 +134,7 @@ pub struct InvalidUriBytes(InvalidUri);
+ pub struct InvalidUriParts(InvalidUri);
+ 
+ #[derive(Debug, Eq, PartialEq)]
+-enum ErrorKind {
++pub enum ErrorKind {
+     InvalidUriChar,
+     InvalidScheme,
+     InvalidAuthority,
+@@ -151,7 +151,7 @@ enum ErrorKind {
+ // u16::MAX is reserved for None
+ const MAX_LEN: usize = (u16::MAX - 1) as usize;
+ 
+-const URI_CHARS: [u8; 256] = [
++pub const URI_CHARS: [u8; 256] = [
+     //  0      1      2      3      4      5      6      7      8      9
+         0,     0,     0,     0,     0,     0,     0,     0,     0,     0, //   x
+         0,     0,     0,     0,     0,     0,     0,     0,     0,     0, //  1x
+diff --git a/src/uri/port.rs b/src/uri/port.rs
+index d3177a7..248b614 100644
+--- a/src/uri/port.rs
++++ b/src/uri/port.rs
+@@ -4,8 +4,8 @@ use super::{ErrorKind, InvalidUri};
+ 
+ /// The port component of a URI.
+ pub struct Port<T> {
+-    port: u16,
+-    repr: T,
++    pub port: u16,
++    pub repr: T,
+ }
+ 
+ impl<T> Port<T> {
+@@ -34,7 +34,7 @@ where
+     /// Converts a `str` to a port number.
+     ///
+     /// The supplied `str` must be a valid u16.
+-    pub(crate) fn from_str(bytes: T) -> Result<Self, InvalidUri> {
++    pub fn from_str(bytes: T) -> Result<Self, InvalidUri> {
+         bytes
+             .as_ref()
+             .parse::<u16>()
