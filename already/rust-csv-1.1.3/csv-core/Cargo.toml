@@ -27,7 +27,7 @@ bench = false
 # libc = [""]
 [dependencies]
 memchr = { path="/root/sgx/teerustpython/already/memchr-2.3.3", default-features = false }
-sgx_tstd                     = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
+sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 # memchr = { version="2.3.0", default-features = false }
 

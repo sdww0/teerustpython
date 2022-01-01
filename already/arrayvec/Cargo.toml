@@ -41,8 +41,8 @@ harness = false
 name = "arraystring"
 harness = false
 [dependencies]
-serde            = { git = "https://github.com/mesalock-linux/serde-sgx" }
-sgx_tstd                     = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
+serde            = { path = "/root/sgx/teerustpython/crate/serde-sgx-master/serde" }
+sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 
 [dev-dependencies.bencher]

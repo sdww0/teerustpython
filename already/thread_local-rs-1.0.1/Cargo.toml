@@ -14,5 +14,5 @@ travis-ci = { repository = "Amanieu/thread_local-rs" }
 
 [dependencies]
 lazy_static    = { version = "1.4.0", features = ["spin_no_std"] }
-sgx_tstd                     = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
+sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 

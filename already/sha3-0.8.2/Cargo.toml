@@ -28,7 +28,7 @@ block-buffer =  {path = "/root/sgx/teerustpython/already/block-buffer-0.7.3"}
 byte-tools = {path = "/root/sgx/teerustpython/already/byte-tools-0.3.1"}
 keccak = {path = "/root/sgx/teerustpython/already/keccak-0.1.0"}
 opaque-debug = "0.2.3"
-sgx_tstd                     = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
+sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 digest = {path = "/root/sgx/teerustpython/already/traits-digest-v0.8.1/digest"}
 

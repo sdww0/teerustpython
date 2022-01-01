@@ -21,10 +21,10 @@ streams.
 members = ['systest']
 
 [dependencies]
-sgx_tstd                     = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
+sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 
-sgx_libc                       = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
+sgx_libc = { path = "/root/sgx/sgx_libc"}
 cfg-if = "0.1.6"
 miniz-sys = { path = "miniz-sys", version = "0.1.11", optional = true }
 libz-sys = { path="/root/sgx/teerustpython/already/libz-sys-1.0.25", optional = true }

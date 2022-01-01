@@ -10,7 +10,7 @@ description = "A regular expression parser."
 workspace = ".."
 
 [dependencies]
-sgx_tstd                     = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
+sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 
 

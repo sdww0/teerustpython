@@ -10,6 +10,6 @@ repository = "https://github.com/RustPython/mt19937"
 
 [dependencies]
 rand_core             = { path = "/root/sgx/teerustpython/already/rand_core" }
-sgx_tstd                     = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
+sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 

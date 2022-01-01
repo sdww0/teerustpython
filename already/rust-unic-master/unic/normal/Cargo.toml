@@ -15,7 +15,7 @@ exclude = ["tests/conformance_tests.rs"]
 
 [dependencies]
 unic-ucd-normal = { path = "../ucd/normal/", version = "0.9.0" }
-sgx_tstd                     = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
+sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 
 [dev-dependencies]

@@ -15,8 +15,8 @@ sgx_backtrace                  = { git = "https://github.com/apache/teaclave-sgx
 sgx_backtrace_sys              = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
 sgx_build_helper               = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
 sgx_cov                        = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
-sgx_libc                       = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
-sgx_rand                       = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
+sgx_libc = { path = "/root/sgx/sgx_libc"}
+sgx_rand = { path = "/root/sgx/sgx_libc"}
 sgx_rand_derive                = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
 sgx_serialize                  = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
 sgx_serialize_derive           = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
@@ -29,7 +29,7 @@ sgx_tprotected_fs              = { git = "https://github.com/apache/teaclave-sgx
 sgx_trts                       = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
 sgx_tse                        = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
 sgx_tseal                      = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
-sgx_tstd                     = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
+sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 sgx_tunittest                  = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
 sgx_types                      = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
@@ -88,7 +88,7 @@ rustface         = { git = "https://github.com/mesalock-linux/rustface-sgx" }
 rustls           = { git = "https://github.com/mesalock-linux/rustls", branch = "mesalock_sgx-client-cert-verifier-patch" }
 rusty-machine    = { git = "https://github.com/mesalock-linux/rusty-machine-sgx" }
 sct              = { git = "https://github.com/mesalock-linux/sct.rs", branch = "mesalock_sgx" }
-serde            = { git = "https://github.com/mesalock-linux/serde-sgx" }
+serde            = { path = "/root/sgx/teerustpython/crate/serde-sgx-master/serde" }
 serde_cbor       = { git = "https://github.com/mesalock-linux/cbor-sgx" }
 serde_derive     = { git = "https://github.com/mesalock-linux/serde-sgx" }
 serde_json       = { git = "https://github.com/mesalock-linux/serde-json-sgx" }

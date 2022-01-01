@@ -15,7 +15,7 @@ build = "build.rs"
 
 [dependencies]
 serde_derive = { version = "=1.0.118", optional = true, path = "../serde_derive" }
-sgx_tstd = { rev = "v1.1.3", git = "https://github.com/apache/teaclave-sgx-sdk.git", optional = true }
+sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 [dev-dependencies]
 serde_derive = { version = "1.0", path = "../serde_derive" }
