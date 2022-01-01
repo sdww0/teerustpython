@@ -1,0 +1,32 @@
+[package]
+name = "jh-x86_64"
+version = "0.2.2"
+authors = ["The CryptoCorrosion Contributors"]
+license = "MIT/Apache-2.0"
+description = "Portable JH with optimizations for x86-64 cpus"
+documentation = "https://docs.rs/jh-x86_64"
+keywords = ["crypto", "jh", "hash", "digest"]
+categories = ["cryptography", "no-std"]
+repository = "https://github.com/cryptocorrosion/cryptocorrosion"
+edition = "2018"
+
+[dependencies]
+block-buffer = { path = "/root/sgx/teerustpython/crate/rustcrypto-utils-sgx" }
+digest = { path = "/root/sgx/teerustpython/crate/rustcrypto-traits-sgx" }
+hex-literal = { path = "/root/sgx/teerustpython/crate/rustcrypto-utils-sgx" }
+simd = { package = "ppv-lite86", path = "/root/sgx/teerustpython/crate/cryptocorrosion-sgx", version = "0.2" }
+sgx_tstd = { path = "/root/sgx/sgx_tstd", optional = true }
+
+[dev-dependencies]
+#digest = { version = "0.8", features = ["dev"] }
+
+[build-dependencies]
+cc = "1.0.3"
+
+[features]
+default = ["std", "mesalock_sgx"]
+std = ["mesalock_sgx"]
+mesalock_sgx = ["sgx_tstd"]
+
+[badges]
+travis-ci = { repository = "cryptocorrosion/cryptocorrosion" }

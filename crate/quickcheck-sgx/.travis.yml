@@ -1,0 +1,12 @@
+language: rust
+rust:
+  - 1.30.0
+  - stable
+  - beta
+  - nightly
+script:
+  - cargo build --verbose
+  - cargo test --verbose
+  - cargo doc
+  - cargo build --verbose --manifest-path quickcheck_macros/Cargo.toml
+  - cargo test --verbose --manifest-path quickcheck_macros/Cargo.toml

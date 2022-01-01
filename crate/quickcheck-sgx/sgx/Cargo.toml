@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "quickcheck-sgx-test/app",
+    "quickcheck-sgx-test/enclave",
+]
+    
