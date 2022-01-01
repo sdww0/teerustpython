@@ -6,7 +6,7 @@ edition = "2018"
 
 [dependencies]
 # SGX helper
-profiler_builtins              = { git = "https://github.com/mesalock-linux/sgx-fake-profiler-builtins" }
+profiler_builtins              = { path = "/root/sgx/teerustpython/crate/sgx-fake-profiler-builtins" }
 
 # Rust SGX SDK
 sgx_align_struct_attribute     = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
@@ -37,76 +37,76 @@ sgx_unwind                     = { git = "https://github.com/apache/teaclave-sgx
 sgx_urts                       = { git = "https://github.com/apache/teaclave-sgx-sdk", rev = "v1.1.3" }
 
 # SGX crates
-adler32          = { git = "https://github.com/mesalock-linux/adler32-rs-sgx" }
-aho-corasick     = { git = "https://github.com/mesalock-linux/aho-corasick-sgx" }
-anyhow           = { git = "https://github.com/mesalock-linux/anyhow-sgx" }
-array_tool       = { git = "https://github.com/mesalock-linux/array_tool-sgx" }
-base64           = { git = "https://github.com/mesalock-linux/rust-base64-sgx" }
-bincode          = { git = "https://github.com/mesalock-linux/bincode-sgx" }
-byteorder        = { git = "https://github.com/mesalock-linux/byteorder-sgx" }
-bytes            = { git = "https://github.com/mesalock-linux/bytes-sgx" }
-chrono           = { git = "https://github.com/mesalock-linux/chrono-sgx" }
-color_quant      = { git = "https://github.com/mesalock-linux/color_quant-sgx" }
-crc              = { git = "https://github.com/mesalock-linux/crc-rs-sgx" }
-crc32fast        = { git = "https://github.com/mesalock-linux/rust-crc32fast-sgx" }
-deflate          = { git = "https://github.com/mesalock-linux/deflate-rs-sgx", branch = "dev" }
-env_logger       = { git = "https://github.com/mesalock-linux/env_logger-sgx" }
-gbdt             = { git = "https://github.com/mesalock-linux/gbdt-rs", branch = "mesatee-sgx", features = ["input", "enable_training"] }
-getrandom        = { git = "https://github.com/mesalock-linux/getrandom-sgx" }
-gif              = { git = "https://github.com/mesalock-linux/image-gif-sgx" }
-gzip-header      = { git = "https://github.com/mesalock-linux/gzip-header-sgx" }
-heapsize         = { git = "https://github.com/mesalock-linux/heapsize-sgx" }
-hex              = { git = "https://github.com/mesalock-linux/rust-hex-sgx" }
-http             = { git = "https://github.com/mesalock-linux/http-sgx" }
-image            = { git = "https://github.com/mesalock-linux/image-sgx" }
-inflate          = { git = "https://github.com/mesalock-linux/inflate-sgx" }
-integer-encoding = { git = "https://github.com/mesalock-linux/integer-encoding-rs-sgx" }
-iovec            = { git = "https://github.com/mesalock-linux/iovec-sgx" }
-itoa             = { git = "https://github.com/mesalock-linux/itoa-sgx" }
-jpeg-decoder     = { git = "https://github.com/mesalock-linux/jpeg-decoder-sgx" }
-jsonwebtoken     = { git = "https://github.com/mesalock-linux/jsonwebtoken-sgx" }
-linked-hash-map  = { git = "https://github.com/mesalock-linux/linked-hash-map-sgx" }
-log              = { git = "https://github.com/mesalock-linux/log-sgx" }
-lzw              = { git = "https://github.com/mesalock-linux/lzw-sgx" }
-matrixmultiply   = { git = "https://github.com/mesalock-linux/matrixmultiply-sgx" }
-md5              = { git = "https://github.com/mesalock-linux/md5-sgx" }
-mio              = { git = "https://github.com/mesalock-linux/mio-sgx", tag = "sgx_1.1.3" }
-net2             = { git = "https://github.com/mesalock-linux/net2-rs-sgx" }
-num-bigint       = { git = "https://github.com/mesalock-linux/num-bigint-sgx" }
-num-traits       = { git = "https://github.com/mesalock-linux/num-traits-sgx" }
-parity-wasm      = { git = "https://github.com/mesalock-linux/parity-wasm-sgx" }
-percent-encoding = { git = "https://github.com/mesalock-linux/rust-url-sgx" }
-png              = { git = "https://github.com/mesalock-linux/image-png-sgx" }
-prost            = { git = "https://github.com/mesalock-linux/prost-sgx" }
-quick-error      = { git = "https://github.com/mesalock-linux/quick-error-sgx" }
-rand             = { git = "https://github.com/mesalock-linux/rand-sgx", tag = "v0.7.3_sgx1.1.3" }
-rdrand           = { git = "https://github.com/mesalock-linux/rust_rdrand-sgx" }
-regex            = { git = "https://github.com/mesalock-linux/regex-sgx" }
-ring             = { git = "https://github.com/mesalock-linux/ring-sgx", tag = "v0.16.5" }
-rulinalg         = { git = "https://github.com/mesalock-linux/rulinalg-sgx" }
-rustface         = { git = "https://github.com/mesalock-linux/rustface-sgx" }
-rustls           = { git = "https://github.com/mesalock-linux/rustls", branch = "mesalock_sgx-client-cert-verifier-patch" }
-rusty-machine    = { git = "https://github.com/mesalock-linux/rusty-machine-sgx" }
-sct              = { git = "https://github.com/mesalock-linux/sct.rs", branch = "mesalock_sgx" }
+adler32          = { path = "/root/sgx/teerustpython/crate/adler32-rs-sgx" }
+aho-corasick     = { path = "/root/sgx/teerustpython/crate/aho-corasick-sgx" }
+anyhow           = { path = "/root/sgx/teerustpython/crate/anyhow-sgx" }
+array_tool       = { path = "/root/sgx/teerustpython/crate/array_tool-sgx" }
+base64           = { path = "/root/sgx/teerustpython/crate/rust-base64-sgx" }
+bincode          = { path = "/root/sgx/teerustpython/crate/bincode-sgx" }
+byteorder        = { path = "/root/sgx/teerustpython/crate/byteorder-sgx" }
+bytes            = { path = "/root/sgx/teerustpython/crate/bytes-sgx" }
+chrono           = { path = "/root/sgx/teerustpython/crate/chrono-sgx" }
+color_quant      = { path = "/root/sgx/teerustpython/crate/color_quant-sgx" }
+crc              = { path = "/root/sgx/teerustpython/crate/crc-rs-sgx" }
+crc32fast        = { path = "/root/sgx/teerustpython/crate/rust-crc32fast-sgx" }
+deflate          = { path = "/root/sgx/teerustpython/crate/deflate-rs-sgx", branch = "dev" }
+env_logger       = { path = "/root/sgx/teerustpython/crate/env_logger-sgx" }
+gbdt             = { path = "/root/sgx/teerustpython/crate/gbdt-rs", branch = "mesatee-sgx", features = ["input", "enable_training"] }
+getrandom        = { path = "/root/sgx/teerustpython/crate/getrandom-sgx" }
+gif              = { path = "/root/sgx/teerustpython/crate/image-gif-sgx" }
+gzip-header      = { path = "/root/sgx/teerustpython/crate/gzip-header-sgx" }
+heapsize         = { path = "/root/sgx/teerustpython/crate/heapsize-sgx" }
+hex              = { path = "/root/sgx/teerustpython/crate/rust-hex-sgx" }
+http             = { path = "/root/sgx/teerustpython/crate/http-sgx" }
+image            = { path = "/root/sgx/teerustpython/crate/image-sgx" }
+inflate          = { path = "/root/sgx/teerustpython/crate/inflate-sgx" }
+integer-encoding = { path = "/root/sgx/teerustpython/crate/integer-encoding-rs-sgx" }
+iovec            = { path = "/root/sgx/teerustpython/crate/iovec-sgx" }
+itoa             = { path = "/root/sgx/teerustpython/crate/itoa-sgx" }
+jpeg-decoder     = { path = "/root/sgx/teerustpython/crate/jpeg-decoder-sgx" }
+jsonwebtoken     = { path = "/root/sgx/teerustpython/crate/jsonwebtoken-sgx" }
+linked-hash-map  = { path = "/root/sgx/teerustpython/crate/linked-hash-map-sgx" }
+log              = { path = "/root/sgx/teerustpython/crate/log-sgx" }
+lzw              = { path = "/root/sgx/teerustpython/crate/lzw-sgx" }
+matrixmultiply   = { path = "/root/sgx/teerustpython/crate/matrixmultiply-sgx" }
+md5              = { path = "/root/sgx/teerustpython/crate/md5-sgx" }
+mio              = { path = "/root/sgx/teerustpython/crate/mio-sgx", tag = "sgx_1.1.3" }
+net2             = { path = "/root/sgx/teerustpython/crate/net2-rs-sgx" }
+num-bigint       = { path = "/root/sgx/teerustpython/crate/num-bigint-sgx" }
+num-traits       = { path = "/root/sgx/teerustpython/crate/num-traits-sgx" }
+parity-wasm      = { path = "/root/sgx/teerustpython/crate/parity-wasm-sgx" }
+percent-encoding = { path = "/root/sgx/teerustpython/crate/rust-url-sgx" }
+png              = { path = "/root/sgx/teerustpython/crate/image-png-sgx" }
+prost            = { path = "/root/sgx/teerustpython/crate/prost-sgx" }
+quick-error      = { path = "/root/sgx/teerustpython/crate/quick-error-sgx" }
+rand             = { path = "/root/sgx/teerustpython/crate/rand-sgx", tag = "v0.7.3_sgx1.1.3" }
+rdrand           = { path = "/root/sgx/teerustpython/crate/rust_rdrand-sgx" }
+regex            = { path = "/root/sgx/teerustpython/crate/regex-sgx" }
+ring             = { path = "/root/sgx/teerustpython/crate/ring-sgx", tag = "v0.16.5" }
+rulinalg         = { path = "/root/sgx/teerustpython/crate/rulinalg-sgx" }
+rustface         = { path = "/root/sgx/teerustpython/crate/rustface-sgx" }
+rustls           = { path = "/root/sgx/teerustpython/crate/rustls", branch = "mesalock_sgx-client-cert-verifier-patch" }
+rusty-machine    = { path = "/root/sgx/teerustpython/crate/rusty-machine-sgx" }
+sct              = { path = "/root/sgx/teerustpython/crate/sct.rs", branch = "mesalock_sgx" }
 serde            = { path = "/root/sgx/teerustpython/crate/serde-sgx-master/serde" }
-serde_cbor       = { git = "https://github.com/mesalock-linux/cbor-sgx" }
-serde_derive     = { git = "https://github.com/mesalock-linux/serde-sgx" }
-serde_json       = { git = "https://github.com/mesalock-linux/serde-json-sgx" }
-sha-1            = { git = "https://github.com/mesalock-linux/hashes-sgx" }
-sha1             = { git = "https://github.com/mesalock-linux/rust-sha1-sgx" }
-sha2             = { git = "https://github.com/mesalock-linux/hashes-sgx" }
-snap             = { git = "https://github.com/mesalock-linux/rust-snappy-sgx" }
-thiserror        = { git = "https://github.com/mesalock-linux/thiserror-sgx" }
-threadpool       = { git = "https://github.com/mesalock-linux/rust-threadpool-sgx" }
-tiff             = { git = "https://github.com/mesalock-linux/image-tiff-sgx" }
-toml             = { git = "https://github.com/mesalock-linux/toml-rs-sgx" }
-url              = { git = "https://github.com/mesalock-linux/rust-url-sgx" }
-uuid             = { git = "https://github.com/mesalock-linux/uuid-sgx" }
-wabt             = { git = "https://github.com/mesalock-linux/wabt-rs-sgx", branch = "v0.9-core" }
-wasmi            = { git = "https://github.com/mesalock-linux/wasmi-sgx" }
-webpki           = { git = "https://github.com/mesalock-linux/webpki", branch = "mesalock_sgx" }
-webpki-roots     = { git = "https://github.com/mesalock-linux/webpki-roots", branch = "mesalock_sgx" }
-yasna            = { git = "https://github.com/mesalock-linux/yasna.rs-sgx" }
+serde_cbor       = { path = "/root/sgx/teerustpython/crate/cbor-sgx" }
+serde_derive     = { path = "/root/sgx/teerustpython/crate/serde-sgx" }
+serde_json       = { path = "/root/sgx/teerustpython/crate/serde-json-sgx" }
+sha-1            = { path = "/root/sgx/teerustpython/crate/hashes-sgx" }
+sha1             = { path = "/root/sgx/teerustpython/crate/rust-sha1-sgx" }
+sha2             = { path = "/root/sgx/teerustpython/crate/hashes-sgx" }
+snap             = { path = "/root/sgx/teerustpython/crate/rust-snappy-sgx" }
+thiserror        = { path = "/root/sgx/teerustpython/crate/thiserror-sgx" }
+threadpool       = { path = "/root/sgx/teerustpython/crate/rust-threadpool-sgx" }
+tiff             = { path = "/root/sgx/teerustpython/crate/image-tiff-sgx" }
+toml             = { path = "/root/sgx/teerustpython/crate/toml-rs-sgx" }
+url              = { path = "/root/sgx/teerustpython/crate/rust-url-sgx" }
+uuid             = { path = "/root/sgx/teerustpython/crate/uuid-sgx" }
+wabt             = { path = "/root/sgx/teerustpython/crate/wabt-rs-sgx", branch = "v0.9-core" }
+wasmi            = { path = "/root/sgx/teerustpython/crate/wasmi-sgx" }
+webpki           = { path = "/root/sgx/teerustpython/crate/webpki", branch = "mesalock_sgx" }
+webpki-roots     = { path = "/root/sgx/teerustpython/crate/webpki-roots", branch = "mesalock_sgx" }
+yasna            = { path = "/root/sgx/teerustpython/crate/yasna.rs-sgx" }
 
 # no_std crates
 assert_matches = { version = "1.3.0" }

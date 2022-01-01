@@ -35,7 +35,7 @@ sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 version = "0.1.9"
 
 [dependencies.serde]
-version = "1.0"
+path = "/root/sgx/teerustpython/crate/serde-sgx"
 optional = true 
 
 [dev-dependencies.bincode]

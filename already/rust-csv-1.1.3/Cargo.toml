@@ -26,14 +26,14 @@ bench = false
 [dependencies]
 bstr = { path="/root/sgx/teerustpython/already/bstr-0.2.12", features = ["serde1"] }
 csv-core = { path = "csv-core", version = "0.1.6" }
-itoa             = { git = "https://github.com/mesalock-linux/itoa-sgx" }
+itoa             = { path = "/root/sgx/teerustpython/crate/itoa-sgx" }
 ryu = "1"
-serde            = { git = "https://github.com/mesalock-linux/serde-sgx" }
+serde            = { path = "/root/sgx/teerustpython/crate/serde-sgx" }
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 
 [dev-dependencies]
-serde = { git = "https://github.com/mesalock-linux/serde-sgx", features = ["derive"] }
+serde = { path = "/root/sgx/teerustpython/crate/serde-sgx", features = ["derive"] }
 
 [profile.release]
 debug = true

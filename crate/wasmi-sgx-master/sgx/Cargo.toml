@@ -1,7 +1,0 @@
-[workspace]
-members = [
-    "validation-sgx-test/app",
-    "validation-sgx-test/enclave",
-    "wasmi-sgx-test/app",
-    "wasmi-sgx-test/enclave",
-]

@@ -1,5 +1,0 @@
-target
-examples
-*.sublime-*
-#.*
-Cargo.lock

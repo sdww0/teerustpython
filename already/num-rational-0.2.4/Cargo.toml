@@ -22,20 +22,20 @@ sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 [dependencies.num-bigint]
 optional = true
-git = "https://github.com/mesalock-linux/num-bigint-sgx"
+path = "/root/sgx/teerustpython/crate/num-bigint-sgx"
 # default-features = false
 
 [dependencies.num-integer]
-git = "https://github.com/mesalock-linux/num-integer-sgx"
+path = "/root/sgx/teerustpython/crate/num-integer-sgx"
 default-features = false
 
 [dependencies.num-traits]
-git = "https://github.com/mesalock-linux/num-traits-sgx"
+path = "/root/sgx/teerustpython/crate/num-traits-sgx"
 default-features = false
 
 [dependencies.serde]
 optional = true
-git = "https://github.com/mesalock-linux/serde-sgx" 
+path = "/root/sgx/teerustpython/crate/serde-sgx" 
 default-features = false
 
 [features]

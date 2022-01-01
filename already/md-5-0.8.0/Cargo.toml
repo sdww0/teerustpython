@@ -27,7 +27,7 @@ name = "md5"
 path = "/root/sgx/teerustpython/already/block-buffer-0.7.3"
 
 [dependencies]
-digest = {path="/root/sgx/teerustpython/already/traits-digest-v0.8.1/digest"}
+digest = {path = "/root/sgx/teerustpython/crate/rustcrypto-traits-sgx/"}
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 [dependencies.md5-asm]
@@ -37,7 +37,7 @@ optional = true
 [dependencies.opaque-debug]
 version = "0.2"
 [dev-dependencies]
-digest = {path="/root/sgx/teerustpython/already/traits-digest-v0.8.1/digest"}
+digest = {path = "/root/sgx/teerustpython/crate/rustcrypto-traits-sgx/"}
 [dev-dependencies.hex-literal]
 version = "0.1"
 

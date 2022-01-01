@@ -11,11 +11,11 @@ license = "MIT"
 [dependencies]
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
-bincode          = { git = "https://github.com/mesalock-linux/bincode-sgx" }
+bincode          = { path = "/root/sgx/teerustpython/crate/bincode-sgx" }
 bitflags = {path = "/root/sgx/teerustpython/already/bitflags-1.2.1"}
 #lz4-compress = "0.1.1"
 lzzzz = {path = "/root/sgx/teerustpython/already/lzzzz-master"}
-num-bigint = {  git = "https://github.com/mesalock-linux/num-bigint-sgx", features = ["serde"] }
+num-bigint = {  path = "/root/sgx/teerustpython/crate/num-bigint-sgx", features = ["serde"] }
 num-complex = { path = "/root/sgx/teerustpython/already/num-complex", features = ["serde"] }
-serde = { git = "https://github.com/mesalock-linux/serde-sgx", features = ["derive"] }
+serde = { path = "/root/sgx/teerustpython/crate/serde-sgx/serde", features = ["derive"] }
 itertools      = { path = "/root/sgx/teerustpython/already/itertools-master", default-features=false}

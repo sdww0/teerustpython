@@ -20,44 +20,44 @@ ssl = ["openssl", "openssl-sys", "openssl-probe"]
 # Crypto:
 digest = {path="/root/sgx/teerustpython/already/traits-digest-v0.8.1/digest"}
 md-5 = {path="/root/sgx/teerustpython/already/md-5-0.8.0"}
-sha-1            = { git = "https://github.com/mesalock-linux/hashes-sgx" }
-sha2             = { git = "https://github.com/mesalock-linux/hashes-sgx" }
+sha-1            = { path = "/root/sgx/teerustpython/crate/hashes-sgx" }
+sha2             = { path = "/root/sgx/teerustpython/crate/hashes-sgx" }
 sha3 = {path="/root/sgx/teerustpython/already/sha3-0.8.2"}
 blake2 = {path="/root/sgx/teerustpython/already/hashes-blake2-v0.8.0/blake2"}
 # this is no_std
 volatile = "0.2"
 
 num-complex = { path="/root/sgx/teerustpython/already/num-complex", features = ["serde"] }
-num-bigint = { git = "https://github.com/mesalock-linux/num-bigint-sgx", features = ["serde"] }
-num-traits       = { git = "https://github.com/mesalock-linux/num-traits-sgx" }
+num-bigint = { path = "/root/sgx/teerustpython/crate/num-bigint-sgx", features = ["serde"] }
+num-traits       = { path = "/root/sgx/teerustpython/crate/num-traits-sgx" }
 
-num-integer = { git = "https://github.com/mesalock-linux/num-integer-sgx"}
+num-integer = { path = "/root/sgx/teerustpython/crate/num-integer-sgx"}
 
 num-rational = { path="/root/sgx/teerustpython/already/num-rational-0.2.4"}
 num-iter = { path="/root/sgx/teerustpython/already/num-iter-0.1.40"}
-rand = { git = "https://github.com/mesalock-linux/rand-sgx", tag = "v0.7.3_sgx1.1.3" }
+rand = { path = "/root/sgx/teerustpython/crate/rand-sgx", tag = "v0.7.3_sgx1.1.3" }
 rand_core = {path="/root/sgx/teerustpython/already/rand_core"}
 getrandom = { version = "0.1", features = ["wasm-bindgen"] }
 mt19937 = {path="/root/sgx/teerustpython/already/mt19937"}
-log              = { git = "https://github.com/mesalock-linux/log-sgx" }
+log              = { path = "/root/sgx/teerustpython/crate/log-sgx" }
 rustpython-derive = {path = "../derive", version = "0.1.1"}
 rustpython-parser = {path = "../parser", optional = true, version = "0.1.1"}
 rustpython-compiler = {path = "../compiler", optional = true, version = "0.1.1"}
 rustpython-bytecode = { path = "../bytecode", version = "0.1.1"}
-serde = { git = "https://github.com/mesalock-linux/serde-sgx", features = ["derive"] }
-byteorder        = { git = "https://github.com/mesalock-linux/byteorder-sgx" }
-regex            = { git = "https://github.com/mesalock-linux/regex-sgx" }
+serde = { path = "/root/sgx/teerustpython/crate/serde-sgx", features = ["derive"] }
+byteorder        = { path = "/root/sgx/teerustpython/crate/byteorder-sgx" }
+regex            = { path = "/root/sgx/teerustpython/crate/regex-sgx" }
 # rustc_version_runtime = "0.1.*"
 statrs = {path="/root/sgx/teerustpython/already/statrs-0.12.0"}
 caseless = {path="/root/sgx/teerustpython/already/caseless-0.2.1"}
-chrono = {git = "https://github.com/mesalock-linux/chrono-sgx"  }
+chrono = {path = "/root/sgx/teerustpython/crate/chrono-sgx"  }
 once_cell = {path="/root/sgx/teerustpython/already/once_cell-1.3.1"}
 lexical = {path="/root/sgx/teerustpython/already/rust-lexical-main/lexical"}
 itertools      = { path="/root/sgx/teerustpython/already/itertools-master"}
-hex              = { git = "https://github.com/mesalock-linux/rust-hex-sgx" }
+hex              = { path = "/root/sgx/teerustpython/crate/rust-hex-sgx" }
 hexf-parse = {path="/root/sgx/teerustpython/already/hexf-parse-0.1.0"}
 indexmap = {path="/root/sgx/teerustpython/already/indexmap"}
-crc              = { git = "https://github.com/mesalock-linux/crc-rs-sgx" }
+crc              = { path = "/root/sgx/teerustpython/crate/crc-rs-sgx" }
 maplit = {path="/root/sgx/teerustpython/already/maplit-1.0.2"}
 bitflags = {path="/root/sgx/teerustpython/already/bitflags-1.2.1"}
 sgx_libc = { path = "/root/sgx/sgx_libc"}
@@ -68,7 +68,7 @@ sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 arr_macro = "0.1.2"
 csv = {path="/root/sgx/teerustpython/already/rust-csv-1.1.3"}
 paste = "0.1"
-base64           = { git = "https://github.com/mesalock-linux/rust-base64-sgx" }
+base64           = { path = "/root/sgx/teerustpython/crate/rust-base64-sgx" }
 is-macro = "0.1"
 result-like = {path="/root/sgx/teerustpython/already/result-like-0.2.1"}
 # foreign-types-shared = "0.1"
@@ -104,8 +104,8 @@ exitcode = {path="/root/sgx/teerustpython/already/exitcode-1.1.2"}
 # uname = "0.1.1"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-crc32fast        = { git = "https://github.com/mesalock-linux/rust-crc32fast-sgx" }
-adler32          = { git = "https://github.com/mesalock-linux/adler32-rs-sgx" }
+crc32fast        = { path = "/root/sgx/teerustpython/crate/rust-crc32fast-sgx" }
+adler32          = { path = "/root/sgx/teerustpython/crate/adler32-rs-sgx" }
 gethostname = {path="/root/sgx/teerustpython/already/gethostname-0.2.1"}
 # subprocess = "0.2.2"
 socket2 = {path="/root/sgx/teerustpython/already/socket2-0.3.12"}

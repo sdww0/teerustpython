@@ -29,6 +29,6 @@ version = "1.0"
 default-features = false
 
 [dependencies]
-serde            = { git = "https://github.com/mesalock-linux/serde-sgx" }
+serde            = { path = "/root/sgx/teerustpython/crate/serde-sgx" }
 [features]
 nightly = []

@@ -13,7 +13,7 @@ itertools = {path = "/root/sgx/teerustpython/already/itertools-master"}
 rustpython-bytecode = { path = "../bytecode", version = "0.1.2" }
 rustpython-parser = { path = "../parser", version = "0.1.2" }
 num-complex = { path = "/root/sgx/teerustpython/already/num-complex", features = ["serde"] }
-log              = { git = "https://github.com/mesalock-linux/log-sgx" }
+log              = { path = "/root/sgx/teerustpython/crate/log-sgx" }
 arrayvec = {path = "/root/sgx/teerustpython/already/arrayvec"}
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 

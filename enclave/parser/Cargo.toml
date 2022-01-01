@@ -15,9 +15,9 @@ lalrpop="0.17"
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 lalrpop-util= {path="/root/sgx/teerustpython/already/lalrpop-0.17.2/lalrpop-util"}
-log              = { git = "https://github.com/mesalock-linux/log-sgx" }
-num-bigint       = { git = "https://github.com/mesalock-linux/num-bigint-sgx" }
-num-traits       = { git = "https://github.com/mesalock-linux/num-traits-sgx" }
+log              = { path = "/root/sgx/teerustpython/crate/log-sgx" }
+num-bigint       = { path = "/root/sgx/teerustpython/crate/num-bigint-sgx" }
+num-traits       = { path = "/root/sgx/teerustpython/crate/num-traits-sgx" }
 unic-emoji-char = {path="/root/sgx/teerustpython/already/rust-unic-master/unic/emoji/char"}
 unic-ucd-ident  = {path="/root/sgx/teerustpython/already/rust-unic-master/unic/ucd/ident"}
 unicode_names2 = {path="/root/sgx/teerustpython/already/unicode_names2-0.4.0"}
