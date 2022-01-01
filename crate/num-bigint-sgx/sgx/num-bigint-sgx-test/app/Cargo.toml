@@ -5,6 +5,6 @@ authors = ["Baidu"]
 build = "build.rs"
 
 [dependencies]
-sgx_types = { rev = "v1.1.3", git = "https://github.com/apache/teaclave-sgx-sdk.git" }
-sgx_urts = { rev = "v1.1.3", git = "https://github.com/apache/teaclave-sgx-sdk.git" }
+sgx_types = { path = "/root/sgx/sgx_types" }
+sgx_urts = { path = "/root/sgx/sgx_urts" }
 dirs = "1.0.2"

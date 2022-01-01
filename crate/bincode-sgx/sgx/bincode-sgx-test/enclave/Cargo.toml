@@ -12,12 +12,12 @@ default = []
 
 [dependencies]
 bincode = { path = "../../.." }
-serde_derive = { git = "https://github.com/mesalock-linux/serde-sgx" }
-#serde_bytes = { git = "https://github.com/mesalock-linux/serde-bytes-sgx" }
-serde = { git = "https://github.com/mesalock-linux/serde-sgx" }
-byteorder = { git = "https://github.com/mesalock-linux/byteorder-sgx" }
+serde_derive = { path = "/root/sgx/teerustpython/crate/serde-sgx" }
+#serde_bytes = { path = "/root/sgx/teerustpython/crate/serde-bytes-sgx" }
+serde = { path = "/root/sgx/teerustpython/crate/serde-sgx" }
+byteorder = { path = "/root/sgx/teerustpython/crate/byteorder-sgx" }
 
 [target.'cfg(not(target_env = "sgx"))'.dependencies]
-sgx_types = { rev = "v1.1.3", git = "https://github.com/apache/teaclave-sgx-sdk.git" }
-sgx_tstd = { rev = "v1.1.3", git = "https://github.com/apache/teaclave-sgx-sdk.git" }
-sgx_tunittest = {rev = "v1.1.3", git = "https://github.com/apache/teaclave-sgx-sdk.git" }
+sgx_types = { path = "/root/sgx/sgx_types" }
+sgx_tstd = { path = "/root/sgx/sgx_tstd" }
+sgx_tunittest = {path = "/root/sgx/sgx_tunittest" }

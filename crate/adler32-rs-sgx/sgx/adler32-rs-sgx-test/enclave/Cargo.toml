@@ -12,9 +12,9 @@ default = []
 
 [dependencies]
 adler32 = { path = "../../.." }
-sgx_rand = { rev = "v1.1.3", git = "https://github.com/apache/teaclave-sgx-sdk.git" }
+sgx_rand = { path = "/root/sgx/sgx_rand" }
 
 [target.'cfg(not(target_env = "sgx"))'.dependencies]
-sgx_types = { rev = "v1.1.3", git = "https://github.com/apache/teaclave-sgx-sdk.git" }
-sgx_tstd = { rev = "v1.1.3", git = "https://github.com/apache/teaclave-sgx-sdk.git" }
-sgx_tunittest = {rev = "v1.1.3", git = "https://github.com/apache/teaclave-sgx-sdk.git" }
+sgx_types = { path = "/root/sgx/sgx_types" }
+sgx_tstd = { path = "/root/sgx/sgx_tstd" }
+sgx_tunittest = {path = "/root/sgx/sgx_tunittest" }

@@ -18,13 +18,13 @@ skein-hash = { path = "../../../hashes/skein" }
 #crypto-simd = { path = "../../../utils-simd/crypto-simd" }
 ppv-lite86 = { path = "../../../utils-simd/ppv-lite86" }
 c2-chacha = { path = "../../../stream-ciphers/chacha" }
-hex-literal = { git = "https://github.com/mesalock-linux/rustcrypto-utils-sgx" }
+hex-literal = { path = "/root/sgx/teerustpython/crate/rustcrypto-utils-sgx" }
 threefish-cipher = { path = "../../../block-ciphers/threefish" }
-block-cipher-trait = { git = "https://github.com/mesalock-linux/rustcrypto-traits-sgx" }
-digest = { git = "https://github.com/mesalock-linux/rustcrypto-traits-sgx", features = ["dev"] }
+block-cipher-trait = { path = "/root/sgx/teerustpython/crate/rustcrypto-traits-sgx" }
+digest = { path = "/root/sgx/teerustpython/crate/rustcrypto-traits-sgx", features = ["dev"] }
 
 
 [target.'cfg(not(target_env = "sgx"))'.dependencies]
-sgx_types = { rev = "v1.1.3", git = "https://github.com/apache/teaclave-sgx-sdk.git" }
-sgx_tstd = { rev = "v1.1.3", git = "https://github.com/apache/teaclave-sgx-sdk.git" }
-sgx_tunittest = {rev = "v1.1.3", git = "https://github.com/apache/teaclave-sgx-sdk.git" }
+sgx_types = { path = "/root/sgx/sgx_types" }
+sgx_tstd = { path = "/root/sgx/sgx_tstd" }
+sgx_tunittest = {path = "/root/sgx/sgx_tunittest" }

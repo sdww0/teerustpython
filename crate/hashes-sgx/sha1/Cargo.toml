@@ -13,12 +13,12 @@ categories = ["cryptography", "no-std"]
 name = "sha1"
 
 [dependencies]
-digest = { git = "https://github.com/mesalock-linux/rustcrypto-traits-sgx" }
-block-buffer = { git = "https://github.com/mesalock-linux/rustcrypto-utils-sgx" }
+digest = { path = "/root/sgx/teerustpython/crate/rustcrypto-traits-sgx" }
+block-buffer = { path = "/root/sgx/teerustpython/crate/rustcrypto-utils-sgx" }
 opaque-debug = "0.2"
 fake-simd = "0.1"
 sha1-asm = { version = "0.4", optional = true }
-sgx_tstd = { rev = "v1.1.3", git = "https://github.com/apache/teaclave-sgx-sdk.git", optional = true }
+sgx_tstd = { path = "/root/sgx/sgx_tstd", optional = true }
 
 [dev-dependencies]
 #digest = { version = "0.8", features = ["dev"] }

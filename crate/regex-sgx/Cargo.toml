@@ -108,19 +108,19 @@ pattern = []
 [dependencies.aho-corasick]
 #version = "0.7.6"
 optional = true
-git = "https://github.com/mesalock-linux/aho-corasick-sgx"
+path = "/root/sgx/teerustpython/crate/aho-corasick-sgx"
 
 # For skipping along search text quickly when a leading byte is known.
 [dependencies.memchr]
 #version = "2.2.1"
 optional = true
-git = "https://github.com/mesalock-linux/rust-memchr-sgx"
+path = "/root/sgx/teerustpython/crate/rust-memchr-sgx"
 
 # For managing regex caches quickly across multiple threads.
 [dependencies.thread_local]
 #version = "0.3.6"
 optional = true
-git = "https://github.com/mesalock-linux/thread_local-rs-sgx"
+path = "/root/sgx/teerustpython/crate/thread_local-rs-sgx"
 
 # For parsing regular expressions.
 [dependencies.regex-syntax]

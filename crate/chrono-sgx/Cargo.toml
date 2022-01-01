@@ -33,11 +33,11 @@ __internal_bench = []
 mesalock_sgx = ["std", "sgx_tstd"]
 
 [dependencies]
-serde = { version = "1", git = "https://github.com/mesalock-linux/serde-sgx", optional = true }
-num-integer = { git = "https://github.com/mesalock-linux/num-integer-sgx" }
-num-traits = { git = "https://github.com/mesalock-linux/num-traits-sgx" }
+serde = { path = "/root/sgx/teerustpython/crate/serde-sgx", optional = true }
+num-integer = { path = "/root/sgx/teerustpython/crate/num-integer-sgx" }
+num-traits = { path = "/root/sgx/teerustpython/crate/num-traits-sgx" }
 rustc-serialize = { version = "0.3.20", optional = true }
-sgx_tstd = { rev = "v1.1.3", git = "https://github.com/apache/teaclave-sgx-sdk.git", optional = true }
+sgx_tstd = { path = "/root/sgx/sgx_tstd", optional = true }
 
 [target.'cfg(all(target_arch = "wasm32", not(any(target_os = "emscripten", target_os = "wasi"))))'.dependencies]
 #wasm-bindgen = { version = "0.2", optional = true }
