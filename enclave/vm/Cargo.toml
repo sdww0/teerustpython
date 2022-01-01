@@ -18,7 +18,7 @@ ssl = ["openssl", "openssl-sys", "openssl-probe"]
 
 [dependencies]
 # Crypto:
-digest = {path="/root/sgx/teerustpython/already/traits-digest-v0.8.1/digest"}
+digest = {path="/root/sgx/teerustpython/already/crate/rustcrypto-traits-sgx"}
 md-5 = {path="/root/sgx/teerustpython/already/md-5-0.8.0"}
 sha-1            = { path = "/root/sgx/teerustpython/crate/hashes-sgx" }
 sha2             = { path = "/root/sgx/teerustpython/crate/hashes-sgx" }

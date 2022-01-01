@@ -30,12 +30,12 @@ keccak = {path = "/root/sgx/teerustpython/already/keccak-0.1.0"}
 opaque-debug = "0.2.3"
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
-digest = {path = "/root/sgx/teerustpython/already/traits-digest-v0.8.1/digest"}
+digest = {path = "/root/sgx/teerustpython/crate/rustcrypto-traits-sgx"}
 
 
 
 [dev-dependencies]
-digest = {path = "/root/sgx/teerustpython/already/traits-digest-v0.8.1/digest"}
+digest = {path = "/root/sgx/teerustpython/crate/rustcrypto-traits-sgx"}
 
 [dev-dependencies.hex-literal]
 version = "0.1"
