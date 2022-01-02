@@ -9,7 +9,7 @@ repository = "https://github.com/RustCrypto/utils"
 categories = ["no-std"]
 
 [dependencies]
-byteorder = { path = "/root/sgx/teerustpython/crate/byteorder-sgx" }
+byteorder = { path = "/root/sgx/samplecode/teerustpython/crate/byteorder-sgx" }
 
 [dev-dependencies]
 #hex = "0.3"

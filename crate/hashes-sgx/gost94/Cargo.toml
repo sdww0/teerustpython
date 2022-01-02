@@ -10,8 +10,8 @@ keywords = ["crypto", "gost94", "gost", "hash", "digest"]
 categories = ["cryptography", "no-std"]
 
 [dependencies]
-digest = { path = "/root/sgx/teerustpython/crate/rustcrypto-traits-sgx" }
-block-buffer = { path = "/root/sgx/teerustpython/crate/rustcrypto-utils-sgx" }
+digest = { path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-traits-sgx/digest" }
+block-buffer = { path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-utils-sgx/block-buffer" }
 opaque-debug = "0.2"
 sgx_tstd = { path = "/root/sgx/sgx_tstd", optional = true }
 

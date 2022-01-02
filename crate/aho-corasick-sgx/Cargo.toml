@@ -33,7 +33,7 @@ std = ["memchr/use_std"]
 mesalock_sgx = ["sgx_tstd", "memchr/mesalock_sgx"]
 
 [dependencies]
-memchr = { path = "/root/sgx/teerustpython/crate/rust-memchr-sgx", version = "2.2.0", default-features = false }
+memchr = { path = "/root/sgx/samplecode/teerustpython/crate/rust-memchr-sgx", version = "2.2.0", default-features = false }
 sgx_tstd = { path = "/root/sgx/sgx_tstd", optional = true }
 
 [dev-dependencies]

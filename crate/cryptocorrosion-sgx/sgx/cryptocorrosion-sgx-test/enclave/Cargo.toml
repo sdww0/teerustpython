@@ -18,10 +18,10 @@ skein-hash = { path = "../../../hashes/skein" }
 #crypto-simd = { path = "../../../utils-simd/crypto-simd" }
 ppv-lite86 = { path = "../../../utils-simd/ppv-lite86" }
 c2-chacha = { path = "../../../stream-ciphers/chacha" }
-hex-literal = { path = "/root/sgx/teerustpython/crate/rustcrypto-utils-sgx" }
+hex-literal = { path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-utils-sgx/hex-literal" }
 threefish-cipher = { path = "../../../block-ciphers/threefish" }
-block-cipher-trait = { path = "/root/sgx/teerustpython/crate/rustcrypto-traits-sgx" }
-digest = { path = "/root/sgx/teerustpython/crate/rustcrypto-traits-sgx", features = ["dev"] }
+block-cipher-trait = { path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-traits-sgx/block-cipher-trait" }
+digest = { path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-traits-sgx/digest", features = ["dev"] }
 
 
 [target.'cfg(not(target_env = "sgx"))'.dependencies]

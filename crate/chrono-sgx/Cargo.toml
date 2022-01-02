@@ -33,9 +33,9 @@ __internal_bench = []
 mesalock_sgx = ["std", "sgx_tstd"]
 
 [dependencies]
-serde = { path = "/root/sgx/teerustpython/crate/serde-sgx", optional = true }
-num-integer = { path = "/root/sgx/teerustpython/crate/num-integer-sgx" }
-num-traits = { path = "/root/sgx/teerustpython/crate/num-traits-sgx" }
+serde = { path = "/root/sgx/samplecode/teerustpython/crate/serde-sgx/serde", optional = true }
+num-integer = { path = "/root/sgx/samplecode/teerustpython/crate/num-integer-sgx" }
+num-traits = { path = "/root/sgx/samplecode/teerustpython/crate/num-traits-sgx" }
 rustc-serialize = { version = "0.3.20", optional = true }
 sgx_tstd = { path = "/root/sgx/sgx_tstd", optional = true }
 

@@ -15,7 +15,7 @@ travis-ci = { repository = "rust-random/getrandom" }
 appveyor = { repository = "rust-random/getrandom" }
 
 [dependencies]
-log = { path = "/root/sgx/teerustpython/crate/log-sgx", default-features = false }
+log = { path = "/root/sgx/samplecode/teerustpython/crate/log-sgx", default-features = false }
 cfg-if = "0.1.2"
 
 [target.'cfg(not(all(target_env = "sgx", target_vendor = "mesalock")))'.dependencies]

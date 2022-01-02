@@ -25,15 +25,15 @@ ssl = ["rustpython-vm/ssl"]
 [dependencies]
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
-sgx_types = { path = "/root/sgx/sgx_types",rev="v1.1.3" }
-log              = { path = "/root/sgx/teerustpython/crate/log-sgx" }
-env_logger       = { path = "/root/sgx/teerustpython/crate/env_logger-sgx" }
+sgx_types = { path = "/root/sgx/sgx_types" }
+log              = { path = "/root/sgx/samplecode/teerustpython/crate/log-sgx" }
+env_logger       = { path = "/root/sgx/samplecode/teerustpython/crate/env_logger-sgx" }
 #clap = "2.33"
 rustpython-compiler = {path = "compiler", version = "0.1.1"}
 rustpython-parser = {path = "parser", version = "0.1.1"}
 rustpython-vm = {path = "vm", version = "0.1.1"}
-# dirs-next = { path="/root/sgx/teerustpython/already/dirsnext-v1.0.1" }
-num-traits       = { path = "/root/sgx/teerustpython/crate/num-traits-sgx" }
+# dirs-next = { path="/root/sgx/samplecode/teerustpython/already/dirsnext-v1.0.1" }
+num-traits       = { path = "/root/sgx/samplecode/teerustpython/crate/num-traits-sgx" }
 cfg-if = "0.1.9"
 
 flame = { version = "0.2", optional = true }

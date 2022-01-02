@@ -24,18 +24,18 @@ repository = "https://github.com/RustCrypto/hashes"
 
 
 [dependencies]
-block-buffer =  {path = "/root/sgx/teerustpython/already/block-buffer-0.7.3"}
-byte-tools = {path = "/root/sgx/teerustpython/already/byte-tools-0.3.1"}
-keccak = {path = "/root/sgx/teerustpython/already/keccak-0.1.0"}
+block-buffer =  {path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-utils-sgx/block-buffer"}
+byte-tools = {path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-utils-sgx/byte-tools"}
+keccak = {path = "/root/sgx/samplecode/teerustpython/already/keccak-0.1.0"}
 opaque-debug = "0.2.3"
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
-digest = {path = "/root/sgx/teerustpython/crate/rustcrypto-traits-sgx"}
+digest = {path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-traits-sgx/digest"}
 
 
 
 [dev-dependencies]
-digest = {path = "/root/sgx/teerustpython/crate/rustcrypto-traits-sgx"}
+digest = {path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-traits-sgx/digest"}
 
 [dev-dependencies.hex-literal]
 version = "0.1"

@@ -19,7 +19,7 @@ description = "Unicode caseless matching"
 license = "MIT"
 repository = "https://github.com/SimonSapin/rust-caseless"
 [dependencies]
-unicode-normalization = {path = "/root/sgx/teerustpython/already/unicode-normalization-0.1.12"}
+unicode-normalization = {path = "/root/sgx/samplecode/teerustpython/already/unicode-normalization-0.1.12"}
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 [build-dependencies.regex]

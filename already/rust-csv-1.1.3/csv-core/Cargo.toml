@@ -26,7 +26,7 @@ bench = false
 # libc = ["memchr/libc"]
 # libc = [""]
 [dependencies]
-memchr = { path="/root/sgx/teerustpython/already/memchr-2.3.3", default-features = false }
+memchr = { path="/root/sgx/samplecode/teerustpython/already/memchr-2.3.3", default-features = false }
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 # memchr = { version="2.3.0", default-features = false }

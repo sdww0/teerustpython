@@ -9,7 +9,7 @@ documentation = "https://docs.rs/mt19937"
 repository = "https://github.com/RustPython/mt19937"
 
 [dependencies]
-rand_core             = { path = "/root/sgx/teerustpython/crate/rand-sgx" }
+rand_core             = { path = "/root/sgx/samplecode/teerustpython/crate/rand-sgx/rand_core" }
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 

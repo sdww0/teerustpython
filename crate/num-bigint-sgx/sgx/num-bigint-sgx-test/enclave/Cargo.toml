@@ -12,9 +12,9 @@ default = []
 
 [dependencies]
 num-bigint = { path = "../../..", features = ["serde"] }
-serde_test = { path = "/root/sgx/teerustpython/crate/serde-sgx" }
-num-integer = { path = "/root/sgx/teerustpython/crate/num-integer-sgx" }
-num-traits = { path = "/root/sgx/teerustpython/crate/num-traits-sgx" }
+serde_test = { path = "/root/sgx/samplecode/teerustpython/crate/serde-sgx" }
+num-integer = { path = "/root/sgx/samplecode/teerustpython/crate/num-integer-sgx" }
+num-traits = { path = "/root/sgx/samplecode/teerustpython/crate/num-traits-sgx" }
 
 [target.'cfg(not(target_env = "sgx"))'.dependencies]
 sgx_types = { path = "/root/sgx/sgx_types" }

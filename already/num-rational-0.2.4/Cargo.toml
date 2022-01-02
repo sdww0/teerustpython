@@ -22,20 +22,20 @@ sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 [dependencies.num-bigint]
 optional = true
-path = "/root/sgx/teerustpython/crate/num-bigint-sgx"
+path = "/root/sgx/samplecode/teerustpython/crate/num-bigint-sgx"
 # default-features = false
 
 [dependencies.num-integer]
-path = "/root/sgx/teerustpython/crate/num-integer-sgx"
+path = "/root/sgx/samplecode/teerustpython/crate/num-integer-sgx"
 default-features = false
 
 [dependencies.num-traits]
-path = "/root/sgx/teerustpython/crate/num-traits-sgx"
+path = "/root/sgx/samplecode/teerustpython/crate/num-traits-sgx"
 default-features = false
 
 [dependencies.serde]
 optional = true
-path = "/root/sgx/teerustpython/crate/serde-sgx" 
+path = "/root/sgx/samplecode/teerustpython/crate/serde-sgx" 
 default-features = false
 
 [features]

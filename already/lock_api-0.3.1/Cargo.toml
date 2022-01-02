@@ -29,6 +29,6 @@ version = "1.0"
 default-features = false
 
 [dependencies]
-serde            = { path = "/root/sgx/teerustpython/crate/serde-sgx" }
+serde            = { path = "/root/sgx/samplecode/teerustpython/crate/serde-sgx/serde" }
 [features]
 nightly = []

@@ -18,109 +18,109 @@ ssl = ["openssl", "openssl-sys", "openssl-probe"]
 
 [dependencies]
 # Crypto:
-digest = {path="/root/sgx/teerustpython/crate/rustcrypto-traits-sgx"}
-md-5 = {path="/root/sgx/teerustpython/already/md-5-0.8.0"}
-sha-1            = { path = "/root/sgx/teerustpython/crate/hashes-sgx" }
-sha2             = { path = "/root/sgx/teerustpython/crate/hashes-sgx" }
-sha3 = {path="/root/sgx/teerustpython/already/sha3-0.8.2"}
-blake2 = {path="/root/sgx/teerustpython/already/hashes-blake2-v0.8.0/blake2"}
+digest = {path="/root/sgx/samplecode/teerustpython/crate/rustcrypto-traits-sgx/digest"}
+md-5 = {path="/root/sgx/samplecode/teerustpython/already/md-5-0.8.0"}
+sha-1            = { path = "/root/sgx/samplecode/teerustpython/crate/hashes-sgx/sha1" }
+sha2             = { path = "/root/sgx/samplecode/teerustpython/crate/hashes-sgx/sha2" }
+sha3 = {path="/root/sgx/samplecode/teerustpython/already/sha3-0.8.2"}
+blake2 = {path="/root/sgx/samplecode/teerustpython/already/hashes-blake2-v0.8.0/blake2"}
 # this is no_std
 volatile = "0.2"
 
-num-complex = { path="/root/sgx/teerustpython/already/num-complex", features = ["serde"] }
-num-bigint = { path = "/root/sgx/teerustpython/crate/num-bigint-sgx", features = ["serde"] }
-num-traits       = { path = "/root/sgx/teerustpython/crate/num-traits-sgx" }
+num-complex = { path="/root/sgx/samplecode/teerustpython/already/num-complex", features = ["serde"] }
+num-bigint = { path = "/root/sgx/samplecode/teerustpython/crate/num-bigint-sgx", features = ["serde"] }
+num-traits       = { path = "/root/sgx/samplecode/teerustpython/crate/num-traits-sgx" }
 
-num-integer = { path = "/root/sgx/teerustpython/crate/num-integer-sgx"}
+num-integer = { path = "/root/sgx/samplecode/teerustpython/crate/num-integer-sgx"}
 
-num-rational = { path="/root/sgx/teerustpython/already/num-rational-0.2.4"}
-num-iter = { path="/root/sgx/teerustpython/already/num-iter-0.1.40"}
-rand = { path = "/root/sgx/teerustpython/crate/rand-sgx", tag = "v0.7.3_sgx1.1.3" }
-rand_core = {path="/root/sgx/teerustpython/already/rand_core"}
+num-rational = { path="/root/sgx/samplecode/teerustpython/already/num-rational-0.2.4"}
+num-iter = { path="/root/sgx/samplecode/teerustpython/already/num-iter-0.1.40"}
+rand = { path = "/root/sgx/samplecode/teerustpython/crate/rand-sgx" }
+rand_core             = { path = "/root/sgx/samplecode/teerustpython/crate/rand-sgx/rand_core" }
 getrandom = { version = "0.1", features = ["wasm-bindgen"] }
-mt19937 = {path="/root/sgx/teerustpython/already/mt19937"}
-log              = { path = "/root/sgx/teerustpython/crate/log-sgx" }
+mt19937 = {path="/root/sgx/samplecode/teerustpython/already/mt19937"}
+log              = { path = "/root/sgx/samplecode/teerustpython/crate/log-sgx" }
 rustpython-derive = {path = "../derive", version = "0.1.1"}
 rustpython-parser = {path = "../parser", optional = true, version = "0.1.1"}
 rustpython-compiler = {path = "../compiler", optional = true, version = "0.1.1"}
 rustpython-bytecode = { path = "../bytecode", version = "0.1.1"}
-serde = { path = "/root/sgx/teerustpython/crate/serde-sgx", features = ["derive"] }
-byteorder        = { path = "/root/sgx/teerustpython/crate/byteorder-sgx" }
-regex            = { path = "/root/sgx/teerustpython/crate/regex-sgx" }
+serde = { path = "/root/sgx/samplecode/teerustpython/crate/serde-sgx/serde", features = ["derive"] }
+byteorder        = { path = "/root/sgx/samplecode/teerustpython/crate/byteorder-sgx" }
+regex            = { path = "/root/sgx/samplecode/teerustpython/crate/regex-sgx" }
 # rustc_version_runtime = "0.1.*"
-statrs = {path="/root/sgx/teerustpython/already/statrs-0.12.0"}
-caseless = {path="/root/sgx/teerustpython/already/caseless-0.2.1"}
-chrono = {path = "/root/sgx/teerustpython/crate/chrono-sgx"  }
-once_cell = {path="/root/sgx/teerustpython/already/once_cell-1.3.1"}
-lexical = {path="/root/sgx/teerustpython/already/rust-lexical-main/lexical"}
-itertools      = { path="/root/sgx/teerustpython/already/itertools-master"}
-hex              = { path = "/root/sgx/teerustpython/crate/rust-hex-sgx" }
-hexf-parse = {path="/root/sgx/teerustpython/already/hexf-parse-0.1.0"}
-indexmap = {path="/root/sgx/teerustpython/already/indexmap"}
-crc              = { path = "/root/sgx/teerustpython/crate/crc-rs-sgx" }
-maplit = {path="/root/sgx/teerustpython/already/maplit-1.0.2"}
-bitflags = {path="/root/sgx/teerustpython/already/bitflags-1.2.1"}
+statrs = {path="/root/sgx/samplecode/teerustpython/already/statrs-0.12.0"}
+caseless = {path="/root/sgx/samplecode/teerustpython/already/caseless-0.2.1"}
+chrono = {path = "/root/sgx/samplecode/teerustpython/crate/chrono-sgx"  }
+once_cell = {path="/root/sgx/samplecode/teerustpython/already/once_cell-1.3.1"}
+lexical = {path="/root/sgx/samplecode/teerustpython/already/rust-lexical-main/lexical"}
+itertools      = { path="/root/sgx/samplecode/teerustpython/already/itertools-master"}
+hex              = { path = "/root/sgx/samplecode/teerustpython/crate/rust-hex-sgx" }
+hexf-parse = {path="/root/sgx/samplecode/teerustpython/already/hexf-parse-0.1.0"}
+indexmap = {path="/root/sgx/samplecode/teerustpython/already/indexmap"}
+crc              = { path = "/root/sgx/samplecode/teerustpython/crate/crc-rs-sgx" }
+maplit = {path="/root/sgx/samplecode/teerustpython/already/maplit-1.0.2"}
+bitflags = {path="/root/sgx/samplecode/teerustpython/already/bitflags-1.2.1"}
 sgx_libc = { path = "/root/sgx/sgx_libc"}
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 
 # nix = "0.17"
 arr_macro = "0.1.2"
-csv = {path="/root/sgx/teerustpython/already/rust-csv-1.1.3"}
+csv = {path="/root/sgx/samplecode/teerustpython/already/rust-csv-1.1.3"}
 paste = "0.1"
-base64           = { path = "/root/sgx/teerustpython/crate/rust-base64-sgx" }
+base64           = { path = "/root/sgx/samplecode/teerustpython/crate/rust-base64-sgx" }
 is-macro = "0.1"
-result-like = {path="/root/sgx/teerustpython/already/result-like-0.2.1"}
+result-like = {path="/root/sgx/samplecode/teerustpython/already/result-like-0.2.1"}
 # foreign-types-shared = "0.1"
 num_enum = {version="0.4",default-features = false}
-smallbox = {path="/root/sgx/teerustpython/already/smallbox-0.8.0"}
-bstr = {path="/root/sgx/teerustpython/already/bstr-0.2.12"}
-crossbeam-utils = {path="/root/sgx/teerustpython/already/crossbeam-utils-0.7.2"}
-generational-arena = {path="/root/sgx/teerustpython/already/generational-arena-0.2.3"}
-parking_lot = { path="/root/sgx/teerustpython/already/parking_lot-0.9.0" } # TODO: use published version
-thread_local = {path="/root/sgx/teerustpython/already/thread_local-rs-1.0.1"}
+smallbox = {path="/root/sgx/samplecode/teerustpython/already/smallbox-0.8.0"}
+bstr = {path="/root/sgx/samplecode/teerustpython/already/bstr-0.2.12"}
+crossbeam-utils = {path="/root/sgx/samplecode/teerustpython/already/crossbeam-utils-0.7.2"}
+generational-arena = {path="/root/sgx/samplecode/teerustpython/already/generational-arena-0.2.3"}
+parking_lot = { path="/root/sgx/samplecode/teerustpython/already/parking_lot-0.9.0" } # TODO: use published version
+thread_local = {path="/root/sgx/samplecode/teerustpython/already/thread_local-rs-1.0.1"}
 
 ## unicode stuff
-unicode_names2 = {path="/root/sgx/teerustpython/already/unicode_names2-0.4.0"}
+unicode_names2 = {path="/root/sgx/samplecode/teerustpython/already/unicode_names2-0.4.0"}
 # TODO: use unic for this; needed for title case:
 # https://github.com/RustPython/RustPython/pull/832#discussion_r275428939
-unicode-casing = {path="/root/sgx/teerustpython/already/unicode-casing-master"}
+unicode-casing = {path="/root/sgx/samplecode/teerustpython/already/unicode-casing-master"}
 # update version all at the same time
-unic-bidi          = {path="/root/sgx/teerustpython/already/rust-unic-master/unic/bidi"}
-unic-char-property = {path="/root/sgx/teerustpython/already/rust-unic-master/unic/char/property"}
-unic-normal        = {path="/root/sgx/teerustpython/already/rust-unic-master/unic/normal"}
-unic-ucd-category  = {path="/root/sgx/teerustpython/already/rust-unic-master/unic/ucd/category"}
-unic-ucd-age       = {path="/root/sgx/teerustpython/already/rust-unic-master/unic/ucd/age"}
-unic-ucd-ident     = {path="/root/sgx/teerustpython/already/rust-unic-master/unic/ucd/ident"}
+unic-bidi          = {path="/root/sgx/samplecode/teerustpython/already/rust-unic-master/unic/bidi"}
+unic-char-property = {path="/root/sgx/samplecode/teerustpython/already/rust-unic-master/unic/char/property"}
+unic-normal        = {path="/root/sgx/samplecode/teerustpython/already/rust-unic-master/unic/normal"}
+unic-ucd-category  = {path="/root/sgx/samplecode/teerustpython/already/rust-unic-master/unic/ucd/category"}
+unic-ucd-age       = {path="/root/sgx/samplecode/teerustpython/already/rust-unic-master/unic/ucd/age"}
+unic-ucd-ident     = {path="/root/sgx/samplecode/teerustpython/already/rust-unic-master/unic/ucd/ident"}
 
 flame = { version = "0.2", optional = true }
 flamer = { version = "0.3", optional = true }
 
 [target.'cfg(all(unix, not(any(target_os = "android", target_os = "redox"))))'.dependencies]
-pwd = {path="/root/sgx/teerustpython/already/pwd-master"}
+pwd = {path="/root/sgx/samplecode/teerustpython/already/pwd-master"}
 
 [target.'cfg(unix)'.dependencies]
-exitcode = {path="/root/sgx/teerustpython/already/exitcode-1.1.2"}
+exitcode = {path="/root/sgx/samplecode/teerustpython/already/exitcode-1.1.2"}
 # uname = "0.1.1"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-crc32fast        = { path = "/root/sgx/teerustpython/crate/rust-crc32fast-sgx" }
-adler32          = { path = "/root/sgx/teerustpython/crate/adler32-rs-sgx" }
-gethostname = {path="/root/sgx/teerustpython/already/gethostname-0.2.1"}
+crc32fast        = { path = "/root/sgx/samplecode/teerustpython/crate/rust-crc32fast-sgx" }
+adler32          = { path = "/root/sgx/samplecode/teerustpython/crate/adler32-rs-sgx" }
+gethostname = {path="/root/sgx/samplecode/teerustpython/already/gethostname-0.2.1"}
 # subprocess = "0.2.2"
-socket2 = {path="/root/sgx/teerustpython/already/socket2-0.3.12"}
+socket2 = {path="/root/sgx/samplecode/teerustpython/already/socket2-0.3.12"}
 # rustyline = "6.0"
 openssl = { version = "0.10", features = ["vendored"], optional = true }
 openssl-sys = { version = "0.9", optional = true }
 openssl-probe = { version = "0.1", optional = true }
 
 [target.'cfg(any(not(target_arch = "wasm32"), target_os = "wasi"))'.dependencies]
-num_cpus = {path="/root/sgx/teerustpython/already/num_cpus-1.12.0"}
+num_cpus = {path="/root/sgx/samplecode/teerustpython/already/num_cpus-1.12.0"}
 
 [target.'cfg(not(any(target_arch = "wasm32", target_os = "redox")))'.dependencies]
 # dns-lookup = "1.0"
-# flate2 = { path="/root/sgx/teerustpython/already/flate2-rs-1.0.14", features = ["zlib"], default-features = false }
-libz-sys = {path="/root/sgx/teerustpython/already/libz-sys-1.0.25"}
+# flate2 = { path="/root/sgx/samplecode/teerustpython/already/flate2-rs-1.0.14", features = ["zlib"], default-features = false }
+libz-sys = {path="/root/sgx/samplecode/teerustpython/already/libz-sys-1.0.25"}
 
 [target.'cfg(windows)'.dependencies]
 winreg = "0.7"

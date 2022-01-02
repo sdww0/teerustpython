@@ -43,6 +43,6 @@ exclude = ["/.travis.yml", "/deploy-docs.sh"]
 eders = [ "serde" ]
 
 [dependencies]
-serde = { path = "/root/sgx/teerustpython/crate/serde-sgx", features = [ "derive" ], optional = true }
+serde = { path = "/root/sgx/samplecode/teerustpython/crate/serde-sgx/serde", features = [ "derive" ], optional = true }
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 

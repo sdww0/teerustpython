@@ -11,10 +11,10 @@ repository = "https://github.com/cryptocorrosion/cryptocorrosion"
 edition = "2018"
 
 [dependencies]
-block-buffer = { path = "/root/sgx/teerustpython/crate/rustcrypto-utils-sgx" }
-digest = { path = "/root/sgx/teerustpython/crate/rustcrypto-traits-sgx" }
-hex-literal = { path = "/root/sgx/teerustpython/crate/rustcrypto-utils-sgx" }
-simd = { package = "ppv-lite86", path = "/root/sgx/teerustpython/crate/cryptocorrosion-sgx", version = "0.2" }
+block-buffer = { path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-utils-sgx/block-buffer" }
+digest = { path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-traits-sgx/digest" }
+hex-literal = { path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-utils-sgx/hex-literal" }
+simd = { package = "ppv-lite86", path = "/root/sgx/samplecode/teerustpython/crate/cryptocorrosion-sgx/utils-simd/ppv-lite86", version = "0.2" }
 sgx_tstd = { path = "/root/sgx/sgx_tstd", optional = true }
 
 [dev-dependencies]

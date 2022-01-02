@@ -7,6 +7,6 @@ repository = "https://github.com/nikomatsakis/ascii-canvas"
 license = "Apache-2.0/MIT"
 
 [dependencies]
-term = {path = "/root/sgx/teerustpython/already/term-0.5.0"}
+term = {path = "/root/sgx/samplecode/teerustpython/already/term-0.5.0"}
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 

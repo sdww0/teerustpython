@@ -10,9 +10,9 @@ keywords = ["block", "buffer"]
 categories = ["cryptography", "no-std"]
 
 [dependencies]
-byteorder = { path = "/root/sgx/teerustpython/crate/byteorder-sgx" }
-byte-tools = { path = "/root/sgx/teerustpython/crate/rustcrypto-utils-sgx" }
-block-padding = { path = "/root/sgx/teerustpython/crate/rustcrypto-utils-sgx" }
+byteorder = { path = "/root/sgx/samplecode/teerustpython/crate/byteorder-sgx" }
+byte-tools = { path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-utils-sgx/byte-tools" }
+block-padding = { path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-utils-sgx/block-padding" }
 generic-array = "0.12"
 
 [badges]

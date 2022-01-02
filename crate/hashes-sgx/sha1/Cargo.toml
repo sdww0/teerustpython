@@ -13,8 +13,8 @@ categories = ["cryptography", "no-std"]
 name = "sha1"
 
 [dependencies]
-digest = { path = "/root/sgx/teerustpython/crate/rustcrypto-traits-sgx" }
-block-buffer = { path = "/root/sgx/teerustpython/crate/rustcrypto-utils-sgx" }
+digest = { path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-traits-sgx/digest" }
+block-buffer = { path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-utils-sgx/block-buffer" }
 opaque-debug = "0.2"
 fake-simd = "0.1"
 sha1-asm = { version = "0.4", optional = true }

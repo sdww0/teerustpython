@@ -10,7 +10,7 @@ use std::format;
 use std::string::ToString;
 use std::eprintln;
 use std::borrow::ToOwned;
-
+use std::println;
 use crate::bytecode::CodeObject;
 use crate::exceptions::PyBaseExceptionRef;
 use crate::obj::objtraceback::{PyTraceback, PyTracebackRef};
@@ -24,12 +24,17 @@ use rustpython_compiler::compile;
 
 pub fn init_importlib(vm: &mut VirtualMachine, initialize_parameter: InitParameter) -> PyResult {
     flame_guard!("init importlib");
+    println!("test123123");
     let importlib = import_frozen(vm, "_frozen_importlib")?;
+    println!("test123123");
     let impmod = import_builtin(vm, "_imp")?;
+    println!("test123123");
     let install = vm.get_attribute(importlib.clone(), "_install")?;
+    println!("test123123");
     vm.invoke(&install, vec![vm.sys_module.clone(), impmod])?;
+    println!("test123123");
     vm.import_func = vm.get_attribute(importlib.clone(), "__import__")?;
-
+    
     match initialize_parameter {
         InitParameter::InitializeExternal if cfg!(feature = "rustpython-compiler") => {
             flame_guard!("install_external");

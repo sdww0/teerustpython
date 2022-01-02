@@ -26,8 +26,8 @@ mesalock_sgx = ["sgx_tstd"]
 name = "quickcheck"
 
 [dependencies]
-env_logger = { path = "/root/sgx/teerustpython/crate/env_logger-sgx", optional = true }
-log = { path = "/root/sgx/teerustpython/crate/log-sgx" }
-rand = { path = "/root/sgx/teerustpython/crate/rand-sgx" }
-rand_core = { path = "/root/sgx/teerustpython/crate/rand-sgx/rand_core" }
+env_logger = { path = "/root/sgx/samplecode/teerustpython/crate/env_logger-sgx", optional = true }
+log = { path = "/root/sgx/samplecode/teerustpython/crate/log-sgx" }
+rand = { path = "/root/sgx/samplecode/teerustpython/crate/rand-sgx" }
+rand_core             = { path = "/root/sgx/samplecode/teerustpython/crate/rand-sgx" }
 sgx_tstd = { path = "/root/sgx/sgx_tstd", optional = true }

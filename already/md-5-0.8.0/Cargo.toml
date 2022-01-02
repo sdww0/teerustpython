@@ -24,10 +24,10 @@ repository = "https://github.com/RustCrypto/hashes"
 [lib]
 name = "md5"
 [dependencies.block-buffer]
-path = "/root/sgx/teerustpython/already/block-buffer-0.7.3"
+path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-utils-sgx/block-buffer"
 
 [dependencies]
-digest = {path = "/root/sgx/teerustpython/crate/rustcrypto-traits-sgx/"}
+digest = {path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-traits-sgx/digest"}
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 [dependencies.md5-asm]
@@ -37,7 +37,7 @@ optional = true
 [dependencies.opaque-debug]
 version = "0.2"
 [dev-dependencies]
-digest = {path = "/root/sgx/teerustpython/crate/rustcrypto-traits-sgx/"}
+digest = {path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-traits-sgx/digest"}
 [dev-dependencies.hex-literal]
 version = "0.1"
 

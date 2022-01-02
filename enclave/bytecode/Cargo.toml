@@ -11,11 +11,11 @@ license = "MIT"
 [dependencies]
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
-bincode          = { path = "/root/sgx/teerustpython/crate/bincode-sgx" }
-bitflags = {path = "/root/sgx/teerustpython/already/bitflags-1.2.1"}
-#lz4-compress = "0.1.1"
-lzzzz = {path = "/root/sgx/teerustpython/already/lzzzz-master"}
-num-bigint = {  path = "/root/sgx/teerustpython/crate/num-bigint-sgx", features = ["serde"] }
-num-complex = { path = "/root/sgx/teerustpython/already/num-complex", features = ["serde"] }
-serde = { path = "/root/sgx/teerustpython/crate/serde-sgx/serde", features = ["derive"] }
-itertools      = { path = "/root/sgx/teerustpython/already/itertools-master", default-features=false}
+bincode          = { path = "/root/sgx/samplecode/teerustpython/crate/bincode-sgx" }
+bitflags = {path = "/root/sgx/samplecode/teerustpython/already/bitflags-1.2.1"}
+lz4-compress = {path = "/root/sgx/samplecode/teerustpython/already/lz4"}
+# lzzzz = {path = "/root/sgx/samplecode/teerustpython/already/lzzzz-master"}
+num-bigint = {  path = "/root/sgx/samplecode/teerustpython/crate/num-bigint-sgx", features = ["serde"] }
+num-complex = { path = "/root/sgx/samplecode/teerustpython/already/num-complex", features = ["serde"] }
+serde = { path = "/root/sgx/samplecode/teerustpython/crate/serde-sgx/serde", features = ["derive"] }
+itertools      = { path = "/root/sgx/samplecode/teerustpython/already/itertools-master", default-features=false}

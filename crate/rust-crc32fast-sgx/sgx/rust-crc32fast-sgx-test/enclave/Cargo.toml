@@ -12,7 +12,7 @@ default = []
 
 [dependencies]
 crc32fast = { path = "../../.." }
-quickcheck = { path = "/root/sgx/teerustpython/crate/quickcheck-sgx" }
+quickcheck = { path = "/root/sgx/samplecode/teerustpython/crate/quickcheck-sgx" }
 
 [target.'cfg(not(target_env = "sgx"))'.dependencies]
 sgx_types = { path = "/root/sgx/sgx_types" }

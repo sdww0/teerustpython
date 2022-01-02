@@ -12,10 +12,10 @@ default = []
 
 [dependencies]
 bincode = { path = "../../.." }
-serde_derive = { path = "/root/sgx/teerustpython/crate/serde-sgx" }
-#serde_bytes = { path = "/root/sgx/teerustpython/crate/serde-bytes-sgx" }
-serde = { path = "/root/sgx/teerustpython/crate/serde-sgx" }
-byteorder = { path = "/root/sgx/teerustpython/crate/byteorder-sgx" }
+serde_derive = { path = "/root/sgx/samplecode/teerustpython/crate/serde-sgx" }
+#serde_bytes = { path = "/root/sgx/samplecode/teerustpython/crate/serde-bytes-sgx" }
+serde = { path = "/root/sgx/samplecode/teerustpython/crate/serde-sgx/serde" }
+byteorder = { path = "/root/sgx/samplecode/teerustpython/crate/byteorder-sgx" }
 
 [target.'cfg(not(target_env = "sgx"))'.dependencies]
 sgx_types = { path = "/root/sgx/sgx_types" }

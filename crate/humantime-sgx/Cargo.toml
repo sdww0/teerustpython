@@ -14,7 +14,7 @@ categories = ["date-and-time"]
 exclude = ["/sgx/*"]
 
 [dependencies]
-quick-error = { path = "/root/sgx/teerustpython/crate/quick-error-sgx" }
+quick-error = { path = "/root/sgx/samplecode/teerustpython/crate/quick-error-sgx" }
 sgx_tstd = { path = "/root/sgx/sgx_tstd", optional = true }
 
 [features]

@@ -9,7 +9,7 @@
 //!
 //! ::std::process::exit(exitcode::OK);
 //! ```
-
+#![no_std]
 /// Alias for the numeric type that holds system exit codes.
 
 pub type ExitCode = i32;

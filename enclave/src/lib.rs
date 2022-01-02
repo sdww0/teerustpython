@@ -43,13 +43,14 @@ pub extern "C" fn say_something(some_string: *const u8, some_len: usize) -> sgx_
     // let matches = parse_arguments(app);
     let mut settings = create_settings(/*&matches*/);
 
+
     // We only include the standard library bytecode in WASI when initializing
     if cfg!(target_os = "wasi") {
         settings.initialization_parameter = InitParameter::InitializeInternal;
     }
 
     let vm = VirtualMachine::new(settings);
-
+       println!("test");
     let res = run_rustpython(&vm/*, &matches*/);
 
     // #[cfg(feature = "flame-it")]
@@ -273,8 +274,8 @@ fn create_settings(/*matches: &ArgMatches*/) -> PySettings {
     // } else {
     //     vec!["".to_owned()]
     // };
-
-    // settings.argv = argv;
+    let argv = vec!["".to_owned()];
+    settings.argv = argv;
 
     settings
 }

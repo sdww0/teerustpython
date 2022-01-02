@@ -16,6 +16,6 @@ edition = "2018"
 name = "miniz_oxide"
 
 [dependencies]
-adler32          = { path = "/root/sgx/teerustpython/crate/adler32-rs-sgx" }
+adler32          = { path = "/root/sgx/samplecode/teerustpython/crate/adler32-rs-sgx" }
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 

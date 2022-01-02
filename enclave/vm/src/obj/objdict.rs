@@ -611,23 +611,30 @@ macro_rules! dict_iterator {
                 }
             }
 
-            // #[pymethod(name = "__next__")]
-            // #[allow(clippy::redundant_closure_call)]
-            // fn next(&self, vm: &VirtualMachine) -> PyResult {
-            //     if self.dict.entries.has_changed_size(&self.size) {
-            //         return Err(
-            //             vm.new_runtime_error("dictionary changed size during iteration".to_owned())
-            //         );
-            //     }
-            //     let mut position = self.position.load();
-            //     match self.dict.entries.next_entry(&mut position) {
-            //         Some((key, value)) => {
-            //             self.position.store(position);
-            //             Ok($result_fn(vm, key, value))
-            //         }
-            //         None => Err(objiter::new_stop_iteration(vm)),
-            //     }
-            // }
+            #[pymethod(name = "__next__")]
+            #[allow(clippy::redundant_closure_call)]
+            fn next(&self, vm: &VirtualMachine) -> PyResult {
+                if self.dict.entries.has_changed_size(&self.size) {
+                    return Err(
+                        vm.new_runtime_error("dictionary changed size during iteration".to_owned())
+                    );
+                }
+                let mut position = self.position.load();
+                match self.dict.entries.next_entry(&mut position) {
+                    Some((key, value)) => {
+                        self.position.store(position);
+                        if ($class_name =="dict_keys"){
+                            Ok(key)
+                        }else if($class_name== "dict_items"){
+                            Ok(vm.ctx.new_tuple(vec![key, value]))
+                        }else{
+                            Ok(value)
+                        }
+                        // Ok($result_fn(vm, key, value))
+                    }
+                    None => Err(objiter::new_stop_iteration(vm)),
+                }
+            }
 
             #[pymethod(name = "__iter__")]
             fn iter(zelf: PyRef<Self>) -> PyRef<Self> {

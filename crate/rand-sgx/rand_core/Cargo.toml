@@ -25,8 +25,8 @@ serde1 = ["serde"] # enables serde for BlockRng wrapper
 mesalock_sgx = ["alloc", "sgx_tstd"]
 
 [dependencies]
-serde = {  path = "/root/sgx/teerustpython/crate/serde-sgx", features = ["derive"], optional = true }
-getrandom = { path = "/root/sgx/teerustpython/crate/getrandom-sgx", optional = true }
+serde = {  path = "/root/sgx/samplecode/teerustpython/crate/serde-sgx/serde", features = ["derive"], optional = true }
+getrandom = { path = "/root/sgx/samplecode/teerustpython/crate/getrandom-sgx", optional = true }
 sgx_tstd = {  path = "/root/sgx/sgx_tstd", optional = true }
 
 [package.metadata.docs.rs]

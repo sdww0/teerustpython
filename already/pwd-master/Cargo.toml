@@ -18,4 +18,4 @@ sgx_libc = { path = "/root/sgx/sgx_libc"}
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 
-failure = {path="/root/sgx/teerustpython/already/failure-master"}
+failure = {path="/root/sgx/samplecode/teerustpython/already/failure-master"}

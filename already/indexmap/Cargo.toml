@@ -38,7 +38,7 @@ bench = false
 sgx_alloc                      = { path = "/root/sgx/sgx_alloc" }
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
-serde            = { path = "/root/sgx/teerustpython/crate/serde-sgx" ,optional = true}
+serde            = { path = "/root/sgx/samplecode/teerustpython/crate/serde-sgx/serde" ,optional=true}
 [dependencies.rayon]
 version = "1.0"
 optional = true

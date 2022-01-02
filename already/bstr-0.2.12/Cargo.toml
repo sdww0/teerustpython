@@ -31,15 +31,15 @@ bench = false
 
 [dependencies]
 lazy_static    = { version = "1.4.0", features = ["spin_no_std"] ,optional=true}
-memchr = {path = "/root/sgx/teerustpython/already/memchr-2.3.3",default-features=false}
-serde            = { path = "/root/sgx/teerustpython/crate/serde-sgx" ,optional=true}
+memchr = {path = "/root/sgx/samplecode/teerustpython/already/memchr-2.3.3",default-features=false}
+serde            = { path = "/root/sgx/samplecode/teerustpython/crate/serde-sgx/serde",optional=true }
 cfg-if         = "0.1.9"
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 
 
 [dependencies.regex-automata]
-path = "/root/sgx/teerustpython/already/regex-automata-0.1.9"
+path = "/root/sgx/samplecode/teerustpython/already/regex-automata-0.1.9"
 optional = true
 # default-features = false
 

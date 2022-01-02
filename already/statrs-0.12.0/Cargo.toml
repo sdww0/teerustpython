@@ -27,6 +27,6 @@ repository = "https://github.com/boxtown/statrs"
 name = "statrs"
 path = "src/lib.rs"
 [dependencies]
-rand             = { path = "/root/sgx/teerustpython/crate/rand-sgx" }
+rand             = { path = "/root/sgx/samplecode/teerustpython/crate/rand-sgx" }
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 

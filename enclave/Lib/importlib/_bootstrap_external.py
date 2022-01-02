@@ -131,22 +131,23 @@ def _write_atomic(path, data, mode=0o666):
     """Best-effort function to write data to a path atomically.
     Be prepared to handle a FileExistsError if concurrent writing of the
     temporary file is attempted."""
+    pass
     # id() is used to generate a pseudo-random filename.
-    path_tmp = '{}.{}'.format(path, id(path))
-    fd = _os.open(path_tmp,
-                  _os.O_EXCL | _os.O_CREAT | _os.O_WRONLY, mode & 0o666)
-    try:
-        # We first write data to a temporary file, and then use os.replace() to
-        # perform an atomic rename.
-        with _io.FileIO(fd, 'wb') as file:
-            file.write(data)
-        _os.replace(path_tmp, path)
-    except OSError:
-        try:
-            _os.unlink(path_tmp)
-        except OSError:
-            pass
-        raise
+    # path_tmp = '{}.{}'.format(path, id(path))
+    # fd = _os.open(path_tmp,
+    #               _os.O_EXCL | _os.O_CREAT | _os.O_WRONLY, mode & 0o666)
+    # try:
+    #     # We first write data to a temporary file, and then use os.replace() to
+    #     # perform an atomic rename.
+    #     with _io.FileIO(fd, 'wb') as file:
+    #         file.write(data)
+    #     _os.replace(path_tmp, path)
+    # except OSError:
+    #     try:
+    #         _os.unlink(path_tmp)
+    #     except OSError:
+    #         pass
+    #     raise
 
 
 _code_type = type(_write_atomic.__code__)
@@ -971,10 +972,10 @@ class FileLoader:
         """Return the path to the source file as found by the finder."""
         return self.path
 
-    def get_data(self, path):
-        """Return the data from path as raw bytes."""
-        with _io.FileIO(path, 'r') as file:
-            return file.read()
+    # def get_data(self, path):
+    #     """Return the data from path as raw bytes."""
+    #     with _io.FileIO(path, 'r') as file:
+    #         return file.read()
 
     # ResourceReader ABC API.
 
@@ -984,9 +985,9 @@ class FileLoader:
             return self
         return None
 
-    def open_resource(self, resource):
-        path = _path_join(_path_split(self.path)[0], resource)
-        return _io.FileIO(path, 'r')
+    # def open_resource(self, resource):
+    #     path = _path_join(_path_split(self.path)[0], resource)
+    #     return _io.FileIO(path, 'r')
 
     def resource_path(self, resource):
         if not self.is_resource(resource):
@@ -1567,7 +1568,7 @@ def _setup(_bootstrap_module):
 
     # Directly load built-in modules needed during bootstrap.
     self_module = sys.modules[__name__]
-    for builtin_name in ('_io', '_warnings', 'builtins', 'marshal'):
+    for builtin_name in ( '_warnings', 'builtins', 'marshal'):
         if builtin_name not in sys.modules:
             builtin_module = _bootstrap._builtin_from_name(builtin_name)
         else:

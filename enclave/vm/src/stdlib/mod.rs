@@ -83,7 +83,7 @@ pub fn get_module_inits() -> HashMap<String, StdlibInitFunc> {
         "_functools".to_owned() => Box::new(functools::make_module),
         // "hashlib".to_owned() => Box::new(hashlib::make_module),
         // "itertools".to_owned() => Box::new(itertools::make_module),
-        // "_io".to_owned() => Box::new(io::make_module),
+        "_io".to_owned() => Box::new(io::make_module),
         "_json".to_owned() => Box::new(json::make_module),
         "marshal".to_owned() => Box::new(marshal::make_module),
         "math".to_owned() => Box::new(math::make_module),
@@ -117,8 +117,8 @@ pub fn get_module_inits() -> HashMap<String, StdlibInitFunc> {
         modules.insert("symtable".to_owned(), Box::new(symtable::make_module));
     }
 
-    // #[cfg(any(unix, windows, target_os = "wasi"))]
-    // modules.insert(os::MODULE_NAME.to_owned(), Box::new(os::make_module));
+    #[cfg(any(unix, windows, target_os = "wasi"))]
+    modules.insert(os::MODULE_NAME.to_owned(), Box::new(os::make_module));
 
     // disable some modules on WASM
     #[cfg(not(target_arch = "wasm32"))]

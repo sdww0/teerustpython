@@ -10,8 +10,8 @@ keywords = ["crypto", "threefish", "gost", "block-cipher"]
 
 [dependencies]
 generic-array = "0.12"
-byteorder = { path = "/root/sgx/teerustpython/crate/byteorder-sgx" }
-block-cipher-trait = { path = "/root/sgx/teerustpython/crate/rustcrypto-traits-sgx" }
+byteorder = { path = "/root/sgx/samplecode/teerustpython/crate/byteorder-sgx" }
+block-cipher-trait = { path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-traits-sgx/block-cipher-trait" }
 
 [dev-dependencies]
 hex-literal = "0.2"

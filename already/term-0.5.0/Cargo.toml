@@ -18,7 +18,7 @@ travis-ci = { repository = "Stebalien/term" }
 appveyor = { repository = "Stebalien/term" }
 
 [dependencies]
-byteorder = {path = "/root/sgx/teerustpython/already/byteorder-1.2.1"}
+byteorder = {path = "/root/sgx/samplecode/teerustpython/already/byteorder-1.2.1"}
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 

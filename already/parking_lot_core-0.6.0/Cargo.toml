@@ -23,7 +23,7 @@ repository = "https://github.com/Amanieu/parking_lot"
 [dependencies]
 sgx_backtrace                  = { path = "/root/sgx/sgx_backtrace" , optional = true }
 cfg-if         = "0.1.9"
-smallvec = {path = "/root/sgx/teerustpython/already/smallvec-1.3.0"}
+smallvec = {path = "/root/sgx/samplecode/teerustpython/already/smallvec-1.3.0"}
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 [dependencies.petgraph]

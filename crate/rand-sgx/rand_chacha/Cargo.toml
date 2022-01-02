@@ -20,7 +20,7 @@ appveyor = { repository = "rust-random/rand" }
 
 [dependencies]
 rand_core = { path = "../rand_core", version = "0.5" }
-ppv-lite86 = { default-features = false, features = ["simd"], path = "/root/sgx/teerustpython/crate/cryptocorrosion-sgx" }
+ppv-lite86 = { default-features = false, features = ["simd"], path = "/root/sgx/samplecode/teerustpython/crate/cryptocorrosion-sgx/utils-simd/ppv-lite86" }
 sgx_tstd = { path = "/root/sgx/sgx_tstd", optional = true }
 
 [features]

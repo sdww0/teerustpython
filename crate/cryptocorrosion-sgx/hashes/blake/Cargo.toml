@@ -9,10 +9,10 @@ keywords = ["crypto", "blake", "hash", "digest"]
 categories = ["cryptography", "no-std"]
 
 [dependencies]
-block-buffer = { path = "/root/sgx/teerustpython/crate/rustcrypto-utils-sgx" }
-digest = { path = "/root/sgx/teerustpython/crate/rustcrypto-traits-sgx" }
+block-buffer = { path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-utils-sgx/block-buffer" }
+digest = { path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-traits-sgx/digest" }
 lazy_static = { version = "1.2", features = ["spin_no_std"], optional = true }
-simd = { package = "ppv-lite86", path = "/root/sgx/teerustpython/crate/cryptocorrosion-sgx", version = "0.2.0", optional = true }
+simd = { package = "ppv-lite86", path = "/root/sgx/samplecode/teerustpython/crate/cryptocorrosion-sgx/utils-simd/ppv-lite86", version = "0.2.0", optional = true }
 sgx_tstd = { path = "/root/sgx/sgx_tstd", optional = true }
 
 [features]

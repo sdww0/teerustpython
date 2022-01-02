@@ -9,10 +9,10 @@ keywords = ["crypto", "skein", "hash", "digest"]
 categories = ["cryptography", "no-std"]
 
 [dependencies]
-block-buffer = { path = "/root/sgx/teerustpython/crate/rustcrypto-utils-sgx" }
-block-padding = { path = "/root/sgx/teerustpython/crate/rustcrypto-utils-sgx" }
-digest = { path = "/root/sgx/teerustpython/crate/rustcrypto-traits-sgx" }
-threefish-cipher = { path = "/root/sgx/teerustpython/crate/cryptocorrosion-sgx" }
+block-buffer = { path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-utils-sgx/block-buffer" }
+block-padding = { path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-utils-sgx/block-padding" }
+digest = { path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-traits-sgx/digest" }
+threefish-cipher = { path = "/root/sgx/samplecode/teerustpython/crate/cryptocorrosion-sgx/block-ciphers/threefish" }
 
 [dev-dependencies]
 #digest = { version = "0.8", features = ["dev"] }

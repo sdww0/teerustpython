@@ -11,7 +11,7 @@ categories = ["cryptography", "no-std"]
 
 [dependencies]
 generic-array = "0.12"
-blobby = { path = "/root/sgx/teerustpython/crate/rustcrypto-utils-sgx", optional = true }
+blobby = { path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-utils-sgx/blobby", optional = true }
 sgx_tstd = { path = "/root/sgx/sgx_tstd", optional = true }
 
 [features]

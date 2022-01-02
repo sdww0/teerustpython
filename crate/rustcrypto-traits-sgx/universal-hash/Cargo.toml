@@ -12,7 +12,7 @@ edition = "2018"
 
 [dependencies]
 generic-array = "0.12"
-subtle = { path = "/root/sgx/teerustpython/crate/subtle-sgx", default-features = false }
+subtle = { path = "/root/sgx/samplecode/teerustpython/crate/subtle-sgx", default-features = false }
 
 [features]
 std = []

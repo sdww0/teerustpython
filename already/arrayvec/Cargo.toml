@@ -41,7 +41,7 @@ harness = false
 name = "arraystring"
 harness = false
 [dependencies]
-serde            = { path = "/root/sgx/teerustpython/crate/serde-sgx" }
+serde            = { path = "/root/sgx/samplecode/teerustpython/crate/serde-sgx/serde" }
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 

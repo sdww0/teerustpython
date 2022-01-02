@@ -15,6 +15,7 @@ use std::boxed::Box;
 use std::vec;
 use std::format;
 use std::string::ToString;
+use std::println;
 use std::borrow::ToOwned;
 use arr_macro::arr;
 use crossbeam_utils::atomic::AtomicCell;
@@ -180,7 +181,6 @@ impl VirtualMachine {
         // set __spec__, __loader__, etc. attributes
         let new_module =
             |dict| PyObject::new(PyModule {}, ctx.types.module_type.clone(), Some(dict));
-
         // Hard-core modules:
         let builtins_dict = ctx.new_dict();
         let builtins = new_module(builtins_dict.clone());
@@ -195,7 +195,7 @@ impl VirtualMachine {
 
         let stdlib_inits = stdlib::get_module_inits();
         let frozen = frozen::get_module_inits();
-
+        
         let mut vm = VirtualMachine {
             builtins: builtins.clone(),
             sys_module: sysmod.clone(),
@@ -225,6 +225,7 @@ impl VirtualMachine {
             vm.new_str("builtins".to_owned()),
             vm.get_none(),
         );
+        println!("test1");
         objmodule::init_module_dict(
             &vm,
             &sysmod_dict,
@@ -247,34 +248,42 @@ impl VirtualMachine {
 
                 builtins::make_module(self, self.builtins.clone());
                 sysmodule::make_module(self, self.sys_module.clone(), self.builtins.clone());
-
+                println!("std1");
                 let mut inner_init = || -> PyResult<()> {
-                    #[cfg(not(target_arch = "wasm32"))]
-                    import::import_builtin(self, "signal")?;
+                    
+                    // #[cfg(not(target_arch = "wasm32"))]
+                    // import::import_builtin(self, "signal")?;
 
                     import::init_importlib(self, initialize_parameter)?;
-
+                    println!("std3");
                     #[cfg(any(not(target_arch = "wasm32"), target_os = "wasi"))]
                     {
                         // this isn't fully compatible with CPython; it imports "io" and sets
                         // builtins.open to io.OpenWrapper, but this is easier, since it doesn't
                         // require the Python stdlib to be present
                         let io = self.import("_io", &[], 0)?;
+                        
                         let io_open = self.get_attribute(io.clone(), "open")?;
+                        println!("std2");
                         let set_stdio = |name, fd, mode: &str| {
+                            println!("std1");
                             let stdio = self.invoke(
                                 &io_open,
                                 vec![self.new_int(fd), self.new_str(mode.to_owned())],
                             )?;
+                            println!("std1");
                             self.set_attr(
                                 &self.sys_module,
                                 format!("__{}__", name), // e.g. __stdin__
                                 stdio.clone(),
                             )?;
+                            println!("std4");
                             self.set_attr(&self.sys_module, name, stdio)?;
                             Ok(())
                         };
+                        
                         set_stdio("stdin", 0, "r")?;
+                        println!("std2");
                         set_stdio("stdout", 1, "w")?;
                         set_stdio("stderr", 2, "w")?;
 
@@ -582,8 +591,10 @@ impl VirtualMachine {
             //     exceptions::print_exception(self, exc);
             //     "exception backtrace above"
             // } else {
-            let after =     "run with RUST_BACKTRACE=1 to see Python backtrace";
+            // let after =     "run with RUST_BACKTRACE=1 to see Python backtrace";
             // };
+            exceptions::print_exception(self, exc);
+            let after = "exception backtrace above";
             panic!("{}; {}", msg, after)
         }
         #[cfg(all(target_arch = "wasm32", not(target_os = "wasi")))]

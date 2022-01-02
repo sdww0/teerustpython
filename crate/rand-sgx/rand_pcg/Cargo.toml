@@ -23,7 +23,7 @@ serde1 = ["serde"]
 
 [dependencies]
 rand_core = { path = "../rand_core", version = "0.5" }
-serde = { path = "/root/sgx/teerustpython/crate/serde-sgx", features = ["derive"], optional = true }
+serde = { path = "/root/sgx/samplecode/teerustpython/crate/serde-sgx/serde", features = ["derive"], optional = true }
 
 [dev-dependencies]
 # This is for testing serde, unfortunately we can't specify feature-gated dev

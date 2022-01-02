@@ -8,12 +8,12 @@ license = "MIT"
 edition = "2018"
 
 [dependencies]
-indexmap = {path = "/root/sgx/teerustpython/already/indexmap"}
-itertools = {path = "/root/sgx/teerustpython/already/itertools-master"}
+indexmap = {path = "/root/sgx/samplecode/teerustpython/already/indexmap"}
+itertools = {path = "/root/sgx/samplecode/teerustpython/already/itertools-master"}
 rustpython-bytecode = { path = "../bytecode", version = "0.1.2" }
 rustpython-parser = { path = "../parser", version = "0.1.2" }
-num-complex = { path = "/root/sgx/teerustpython/already/num-complex", features = ["serde"] }
-log              = { path = "/root/sgx/teerustpython/crate/log-sgx" }
-arrayvec = {path = "/root/sgx/teerustpython/already/arrayvec"}
+num-complex = { path = "/root/sgx/samplecode/teerustpython/already/num-complex", features = ["serde"] }
+log              = { path = "/root/sgx/samplecode/teerustpython/crate/log-sgx" }
+arrayvec = {path = "/root/sgx/samplecode/teerustpython/already/arrayvec"}
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 

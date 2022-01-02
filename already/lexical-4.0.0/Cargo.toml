@@ -120,10 +120,10 @@ harness = false
 name = "ftoa"
 harness = false
 [dependencies]
-rand             = { path = "/root/sgx/teerustpython/crate/rand-sgx"}
+rand             = { path = "/root/sgx/samplecode/teerustpython/crate/rand-sgx"}
 cfg-if         = "0.1.9"
-serde            = { path = "/root/sgx/teerustpython/crate/serde-sgx" }
-serde_derive     = { path = "/root/sgx/teerustpython/crate/serde-sgx" ,optional = true}
+serde            = { path = "/root/sgx/samplecode/teerustpython/crate/serde-sgx/serde" }
+serde_derive     = { path = "/root/sgx/samplecode/teerustpython/crate/serde-sgx/serde_derive" ,optional = true}
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 [dependencies.lexical-core]

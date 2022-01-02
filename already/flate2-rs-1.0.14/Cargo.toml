@@ -27,15 +27,15 @@ sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 sgx_libc = { path = "/root/sgx/sgx_libc"}
 cfg-if = "0.1.6"
 miniz-sys = { path = "miniz-sys", version = "0.1.11", optional = true }
-libz-sys = { path="/root/sgx/teerustpython/already/libz-sys-1.0.25", optional = true }
+libz-sys = { path="/root/sgx/samplecode/teerustpython/already/libz-sys-1.0.25", optional = true }
 cloudflare-zlib-sys = { version = "0.2.0", optional = true }
 tokio-io = { version = "0.1.11", optional = true }
 futures = { version = "0.1.25", optional = true }
-miniz_oxide = { path = "/root/sgx/teerustpython/already/miniz_oxide-0.3.6/miniz_oxide", optional = true}
-crc32fast        = { path = "/root/sgx/teerustpython/crate/rust-crc32fast-sgx" }
+miniz_oxide = { path = "/root/sgx/samplecode/teerustpython/already/miniz_oxide-0.3.6/miniz_oxide", optional = true}
+crc32fast        = { path = "/root/sgx/samplecode/teerustpython/crate/rust-crc32fast-sgx" }
 
 [target.'cfg(all(target_arch = "wasm32", not(target_os = "emscripten")))'.dependencies]
-miniz_oxide = { path = "/root/sgx/teerustpython/already/miniz_oxide-0.3.6/miniz_oxide"}
+miniz_oxide = { path = "/root/sgx/samplecode/teerustpython/already/miniz_oxide-0.3.6/miniz_oxide"}
 
 [dev-dependencies]
 rand = "0.7"

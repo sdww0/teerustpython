@@ -12,7 +12,7 @@ default = []
 
 [dependencies]
 num-integer = { path = "../../..", features = ["i128"] }
-num-traits = { path = "/root/sgx/teerustpython/crate/num-traits-sgx" }
+num-traits = { path = "/root/sgx/samplecode/teerustpython/crate/num-traits-sgx" }
 
 [target.'cfg(not(target_env = "sgx"))'.dependencies]
 sgx_types = { path = "/root/sgx/sgx_types" }

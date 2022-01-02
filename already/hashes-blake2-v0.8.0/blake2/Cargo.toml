@@ -11,17 +11,17 @@ categories = ["cryptography", "no-std"]
 
 [dependencies]
 # digest = "0.8"
-digest = {path = "/root/sgx/teerustpython/crate/rustcrypto-traits-sgx"}
+digest = {path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-traits-sgx/digest"}
 byte-tools = "0.3"
 # crypto-mac = "0.7"
-crypto-mac = {path = "/root/sgx/teerustpython/crate/rustcrypto-traits-sgx"}
+crypto-mac = {path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-traits-sgx/crypto-mac"}
 opaque-debug = "0.2"
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 
 [dev-dependencies]
-digest = { path = "/root/sgx/teerustpython/crate/rustcrypto-traits-sgx", features = ["dev"] }
-crypto-mac = {path = "/root/sgx/teerustpython/crate/rustcrypto-traits-sgx", features = ["dev"] }
+digest = { path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-traits-sgx/digest", features = ["dev"] }
+crypto-mac = {path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-traits-sgx/crypto-mac", features = ["dev"] }
 hex-literal = "0.1"
 
 [features]

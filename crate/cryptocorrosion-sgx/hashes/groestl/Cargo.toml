@@ -11,8 +11,8 @@ repository = "https://github.com/cryptocorrosion/hashes"
 edition = "2018"
 
 [dependencies]
-block-buffer = { path = "/root/sgx/teerustpython/crate/rustcrypto-utils-sgx" }
-digest = { path = "/root/sgx/teerustpython/crate/rustcrypto-traits-sgx" }
+block-buffer = { path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-utils-sgx/block-buffer" }
+digest = { path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-traits-sgx/digest" }
 lazy_static = { version = "1.2", features = ["spin_no_std"], optional = true }
 sgx_tstd = { path = "/root/sgx/sgx_tstd", optional = true }
 

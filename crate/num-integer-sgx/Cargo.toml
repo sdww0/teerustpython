@@ -17,7 +17,7 @@ exclude = ["/ci/*", "/.travis.yml", "/bors.toml", "/sgx/*"]
 features = ["std"]
 
 [dependencies.num-traits]
-path = "/root/sgx/teerustpython/crate/num-traits-sgx"
+path = "/root/sgx/samplecode/teerustpython/crate/num-traits-sgx"
 
 [dependencies]
 sgx_tstd = { path = "/root/sgx/sgx_tstd", optional = true }

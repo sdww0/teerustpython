@@ -12,10 +12,10 @@ readme = "README.md"
 documentation = "https://docs.rs/c2-chacha"
 
 [dependencies]
-byteorder = { path = "/root/sgx/teerustpython/crate/byteorder-sgx", optional = true }
+byteorder = { path = "/root/sgx/samplecode/teerustpython/crate/byteorder-sgx", optional = true }
 #lazy_static = { version = "1.2", features = ["spin_no_std"], default-features = false, optional = true }
-ppv-lite86 = { package = "ppv-lite86", path = "/root/sgx/teerustpython/cryptocorrosion-sgx", default-features = false }
-stream-cipher = { version = "0.3", path = "/root/sgx/teerustpython/rustcrypto-traits-sgx", optional = true }
+ppv-lite86 = { package = "ppv-lite86", path = "/root/sgx/samplecode/teerustpython/cryptocorrosion-sgx/utils-simd/ppv-lite86", default-features = false }
+stream-cipher = { version = "0.3", path = "/root/sgx/samplecode/teerustpython/rustcrypto-traits-sgx/stream-cipher", optional = true }
 
 [dev-dependencies]
 #hex-literal = "0.2"

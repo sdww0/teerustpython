@@ -11,10 +11,10 @@ crate-type = ["staticlib"]
 default = []
 
 [dependencies]
-#serde = { path = "/root/sgx/teerustpython/crate/serde-sgx", features = ["rc", "unstable"] }
-#serde_derive = { path = "/root/sgx/teerustpython/crate/serde-sgx" }
-#serde_test = { path = "/root/sgx/teerustpython/crate/serde-sgx" }
-fnv = { path = "/root/sgx/teerustpython/crate/rust-fnv-sgx" }
+#serde = { path = "/root/sgx/samplecode/teerustpython/crate/serde-sgx", features = ["rc", "unstable"] }
+#serde_derive = { path = "/root/sgx/samplecode/teerustpython/crate/serde-sgx" }
+#serde_test = { path = "/root/sgx/samplecode/teerustpython/crate/serde-sgx" }
+fnv = { path = "/root/sgx/samplecode/teerustpython/crate/rust-fnv-sgx" }
 serde = { path = "../../../serde", features = ["rc", "unstable"] }
 serde_derive = { path = "../../../serde_derive" }
 serde_test = { path = "../../../serde_test" }

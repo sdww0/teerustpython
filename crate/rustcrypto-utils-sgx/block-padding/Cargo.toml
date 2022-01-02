@@ -10,7 +10,7 @@ keywords = ["padding", "pkcs7", "ansix923", "iso7816"]
 categories = ["cryptography", "no-std"]
 
 [dependencies]
-byte-tools = { path = "/root/sgx/teerustpython/crate/rustcrypto-utils-sgx" }
+byte-tools = { path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-utils-sgx/byte-tools" }
 
 [badges]
 travis-ci = { repository = "RustCrypto/utils" }

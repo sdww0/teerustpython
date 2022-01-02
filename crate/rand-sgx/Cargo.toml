@@ -57,8 +57,8 @@ rand_pcg = { path = "rand_pcg", version = "0.2", optional = true }
 # Do not depend on 'getrandom_package' directly; use the 'getrandom' feature!
 # This is a dependency because: we forward wasm feature flags
 # This is renamed because: we need getrandom to depend on rand_core/getrandom
-getrandom_package = { path = "/root/sgx/teerustpython/crate/getrandom-sgx", package = "getrandom", optional = true }
-log = { path = "/root/sgx/teerustpython/crate/log-sgx", optional = true }
+getrandom_package = { path = "/root/sgx/samplecode/teerustpython/crate/getrandom-sgx", package = "getrandom", optional = true }
+log = { path = "/root/sgx/samplecode/teerustpython/crate/log-sgx", optional = true }
 sgx_tstd = { path = "/root/sgx/sgx_tstd", optional = true }
 
 [dependencies.packed_simd]

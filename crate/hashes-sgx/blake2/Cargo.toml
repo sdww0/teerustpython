@@ -10,9 +10,9 @@ keywords = ["crypto", "blake2", "hash", "digest"]
 categories = ["cryptography", "no-std"]
 
 [dependencies]
-digest = { path = "/root/sgx/teerustpython/crate/rustcrypto-traits-sgx" }
-byte-tools = { path = "/root/sgx/teerustpython/crate/rustcrypto-utils-sgx" }
-crypto-mac = { path = "/root/sgx/teerustpython/crate/rustcrypto-traits-sgx" }
+digest = { path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-traits-sgx/digest" }
+byte-tools = { path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-utils-sgx/byte-tools" }
+crypto-mac = { path = "/root/sgx/samplecode/teerustpython/crate/rustcrypto-traits-sgx/crypto-mac" }
 opaque-debug = "0.2"
 sgx_tstd = { path = "/root/sgx/sgx_tstd", optional = true }
 

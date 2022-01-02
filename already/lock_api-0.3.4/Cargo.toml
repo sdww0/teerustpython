@@ -25,8 +25,8 @@ version = "0.4"
 optional = true
 
 [dependencies]
-scopeguard = {path = "/root/sgx/teerustpython/already/scopeguard-1.1.0"}
-serde            = { path = "/root/sgx/teerustpython/crate/serde-sgx" }
+scopeguard = {path = "/root/sgx/samplecode/teerustpython/already/scopeguard-1.1.0"}
+serde            = { path = "/root/sgx/samplecode/teerustpython/crate/serde-sgx/serde" }
 
 [features]
 nightly = []

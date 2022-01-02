@@ -22,18 +22,17 @@ sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 
 [dependencies.num-traits]
-path = "/root/sgx/teerustpython/crate/num-traits-sgx"
+path = "/root/sgx/samplecode/teerustpython/crate/num-traits-sgx"
 default-features = false
 
 [dependencies.serde]
 optional = true
-path = "/root/sgx/teerustpython/crate/serde-sgx"
+path = "/root/sgx/samplecode/teerustpython/crate/serde-sgx/serde"
 default-features = false
 
 [dependencies.rand]
 optional = true
-path = "/root/sgx/teerustpython/crate/rand-sgx"
-rev = "v1.1.3"
+path = "/root/sgx/samplecode/teerustpython/crate/rand-sgx"
 default-features = false
 
 [features]

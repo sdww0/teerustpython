@@ -13,7 +13,7 @@ categories = ["internationalization", "text-processing", "parsing", "rendering"]
 exclude = []
 
 [dependencies]
-matches = {path = "/root/sgx/teerustpython/already/matches-0.1.8"}
+matches = {path = "/root/sgx/samplecode/teerustpython/already/matches-0.1.8"}
 unic-char-property = { path = "../../char/property/", version = "0.9.0" }
 unic-char-range = { path = "../../char/range", version = "0.9.0" }
 unic-ucd-version = { path = "../version/", version = "0.9.0" }
