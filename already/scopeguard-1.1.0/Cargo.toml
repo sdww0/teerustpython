@@ -23,6 +23,10 @@ repository = "https://github.com/bluss/scopeguard"
 [package.metadata.release]
 no-dev-version = true
 
+[dependencies]
+sgx_tstd = { path = "/root/sgx/sgx_tstd"}
+
+
 [features]
 default = ["use_std"]
 use_std = []

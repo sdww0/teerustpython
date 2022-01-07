@@ -24,15 +24,10 @@ use rustpython_compiler::compile;
 
 pub fn init_importlib(vm: &mut VirtualMachine, initialize_parameter: InitParameter) -> PyResult {
     flame_guard!("init importlib");
-    println!("test123123");
     let importlib = import_frozen(vm, "_frozen_importlib")?;
-    println!("test123123");
     let impmod = import_builtin(vm, "_imp")?;
-    println!("test123123");
     let install = vm.get_attribute(importlib.clone(), "_install")?;
-    println!("test123123");
     vm.invoke(&install, vec![vm.sys_module.clone(), impmod])?;
-    println!("test123123");
     vm.import_func = vm.get_attribute(importlib.clone(), "__import__")?;
     
     match initialize_parameter {
@@ -49,17 +44,17 @@ pub fn init_importlib(vm: &mut VirtualMachine, initialize_parameter: InitParamet
                 magic = rand::thread_rng().gen::<[u8; 4]>().to_vec();
             }
             vm.set_attr(&importlib_external, "MAGIC_NUMBER", vm.ctx.new_bytes(magic))?;
-            let zipimport_res = (|| -> PyResult<()> {
-                let zipimport = vm.import("zipimport", &[], 0)?;
-                let zipimporter = vm.get_attribute(zipimport, "zipimporter")?;
-                let path_hooks = vm.get_attribute(vm.sys_module.clone(), "path_hooks")?;
-                let path_hooks = objlist::PyListRef::try_from_object(vm, path_hooks)?;
-                path_hooks.insert(0, zipimporter);
-                Ok(())
-            })();
-            if zipimport_res.is_err() {
-                eprintln!("couldn't init zipimport")
-            }
+            // let zipimport_res = (|| -> PyResult<()> {
+            //     let zipimport = vm.import("zipimport", &[], 0)?;
+            //     let zipimporter = vm.get_attribute(zipimport, "zipimporter")?;
+            //     let path_hooks = vm.get_attribute(vm.sys_module.clone(), "path_hooks")?;
+            //     let path_hooks = objlist::PyListRef::try_from_object(vm, path_hooks)?;
+            //     path_hooks.insert(0, zipimporter);
+            //     Ok(())
+            // })();
+            // if zipimport_res.is_err() {
+            //     eprintln!("couldn't init zipimport")
+            // }
         }
         InitParameter::NoInitialize => {
             panic!("Import library initialize should be InitializeInternal or InitializeExternal");

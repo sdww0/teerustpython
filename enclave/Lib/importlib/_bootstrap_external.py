@@ -972,10 +972,10 @@ class FileLoader:
         """Return the path to the source file as found by the finder."""
         return self.path
 
-    # def get_data(self, path):
-    #     """Return the data from path as raw bytes."""
-    #     with _io.FileIO(path, 'r') as file:
-    #         return file.read()
+    def get_data(self, path):
+        """Return the data from path as raw bytes."""
+        with _io.FileIO(path, 'r') as file:
+            return file.read()
 
     # ResourceReader ABC API.
 
@@ -1274,7 +1274,8 @@ class PathFinder:
         """
         if path == '':
             try:
-                path = _os.getcwd()
+                # path = _os.getcwd()
+                path = "/root/sgx/samplecode/teerustpython/enclave"
             except FileNotFoundError:
                 # Don't cache the failure as the cwd can easily change to
                 # a valid directory later on.
@@ -1568,7 +1569,7 @@ def _setup(_bootstrap_module):
 
     # Directly load built-in modules needed during bootstrap.
     self_module = sys.modules[__name__]
-    for builtin_name in ( '_warnings', 'builtins', 'marshal'):
+    for builtin_name in ('_io', '_warnings', 'builtins', 'marshal'):
         if builtin_name not in sys.modules:
             builtin_module = _bootstrap._builtin_from_name(builtin_name)
         else:
@@ -1598,8 +1599,8 @@ def _setup(_bootstrap_module):
     setattr(self_module, '_pathseps_with_colon', {f':{s}' for s in path_separators})
 
     # Directly load the _thread module (needed during bootstrap).
-    thread_module = _bootstrap._builtin_from_name('_thread')
-    setattr(self_module, '_thread', thread_module)
+    # thread_module = _bootstrap._builtin_from_name('_thread')
+    # setattr(self_module, '_thread', thread_module)
 
     # Directly load the _weakref module (needed during bootstrap).
     weakref_module = _bootstrap._builtin_from_name('_weakref')

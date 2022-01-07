@@ -50,7 +50,6 @@ pub extern "C" fn say_something(some_string: *const u8, some_len: usize) -> sgx_
     }
 
     let vm = VirtualMachine::new(settings);
-       println!("test");
     let res = run_rustpython(&vm/*, &matches*/);
 
     // #[cfg(feature = "flame-it")]
@@ -379,11 +378,13 @@ fn run_rustpython(vm: &VirtualMachine/*, matches: &ArgMatches*/) -> PyResult<()>
     //         shell::run_shell(&vm, scope)?;
     //     }
     // } else {
-        println!(
-            "Welcome to the magnificent SGX Rust Python  interpreter \u{1f631} \u{1f596}"
-        );
-        shell::run_shell(&vm, scope)?;
+
     // }
+    println!(
+        "Welcome to the magnificent SGX Rust Python  interpreter \u{1f631} \u{1f596}"
+    );
+    run_script(&vm, scope.clone(), "./test.py")?;
+    shell::run_shell(&vm, scope)?;
 
     Ok(())
 }
@@ -413,50 +414,50 @@ fn run_module(vm: &VirtualMachine, module: &str) -> PyResult<()> {
     Ok(())
 }
 
-// fn run_script(vm: &VirtualMachine, scope: Scope, script_file: &str) -> PyResult<()> {
-//     debug!("Running file {}", script_file);
-//     // Parse an ast from it:
-//     let file_path = PathBuf::from(script_file);
-//     let file_path = if file_path.is_file() {
-//         file_path
-//     } else if file_path.is_dir() {
-//         let main_file_path = file_path.join("__main__.py");
-//         if main_file_path.is_file() {
-//             main_file_path
-//         } else {
-//             error!(
-//                 "can't find '__main__' module in '{}'",
-//                 file_path.to_str().unwrap()
-//             );
-//             process::exit(1);
-//         }
-//     } else {
-//         error!(
-//             "can't open file '{}': No such file or directory",
-//             file_path.to_str().unwrap()
-//         );
-//         process::exit(1);
-//     };
+fn run_script(vm: &VirtualMachine, scope: Scope, script_file: &str) -> PyResult<()> {
+    debug!("Running file {}", script_file);
+    // Parse an ast from it:
+    let file_path = PathBuf::from(script_file);
+    let file_path = if file_path.is_file() {
+        file_path
+    } else if file_path.is_dir() {
+        let main_file_path = file_path.join("__main__.py");
+        if main_file_path.is_file() {
+            main_file_path
+        } else {
+            error!(
+                "can't find '__main__' module in '{}'",
+                file_path.to_str().unwrap()
+            );
+            return Ok(());
+        }
+    } else {
+        error!(
+            "can't open file '{}': No such file or directory",
+            file_path.to_str().unwrap()
+        );
+        return Ok(());
+    };
 
-//     let dir = file_path.parent().unwrap().to_str().unwrap().to_owned();
-//     let sys_path = vm.get_attribute(vm.sys_module.clone(), "path").unwrap();
-//     vm.call_method(&sys_path, "insert", vec![vm.new_int(0), vm.new_str(dir)])?;
+    let dir = file_path.parent().unwrap().to_str().unwrap().to_owned();
+    let sys_path = vm.get_attribute(vm.sys_module.clone(), "path").unwrap();
+    vm.call_method(&sys_path, "insert", vec![vm.new_int(0), vm.new_str(dir)])?;
 
-//     match util::read_file(&file_path) {
-//         Ok(source) => {
-//             _run_string(vm, scope, &source, file_path.to_str().unwrap().to_owned())?;
-//         }
-//         Err(err) => {
-//             error!(
-//                 "Failed reading file '{}': {:?}",
-//                 file_path.to_str().unwrap(),
-//                 err.kind()
-//             );
-//             process::exit(1);
-//         }
-//     }
-//     Ok(())
-// }
+    match util::read_file(&file_path) {
+        Ok(source) => {
+            _run_string(vm, scope, &source, file_path.to_str().unwrap().to_owned())?;
+        }
+        Err(err) => {
+            error!(
+                "Failed reading file '{}': {:?}",
+                file_path.to_str().unwrap(),
+                err.kind()
+            );
+            return Ok(());
+        }
+    }
+    Ok(())
+}
 
 #[test]
 fn test_run_script() {

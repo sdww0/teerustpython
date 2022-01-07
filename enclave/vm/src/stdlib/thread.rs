@@ -26,8 +26,8 @@
 // use std::io::Write;
 // use std::time::Duration;
 // use std::{fmt, thread};
-// use std::thread::Thread;
-// use std::thread::Builder;
+// use std::thread::SgxThread as Thread;
+// // use std::thread::Builder;
 // use std::thread_local;
 // use std::borrow::ToOwned;
 
@@ -214,7 +214,7 @@
 //     thread_to_id(&thread::current())
 // }
 
-// fn thread_to_id(t: &thread::Thread) -> u64 {
+// fn thread_to_id(t: &Thread) -> u64 {
 //     // TODO: use id.as_u64() once it's stable, until then, ThreadId is just a wrapper
 //     // around NonZeroU64, so this is safe
 //     unsafe { std::mem::transmute(t.id()) }
@@ -224,49 +224,49 @@
 //     PyLock { mu: RawMutex::INIT }
 // }
 
-// fn thread_start_new_thread(
-//     func: PyCallable,
-//     args: PyTupleRef,
-//     kwargs: OptionalArg<PyDictRef>,
-//     vm: &VirtualMachine,
-// ) -> PyResult<u64> {
-//     let thread_vm = vm.new_thread();
-//     let mut thread_builder = thread::Builder::new();
-//     let stacksize = vm.state.stacksize.load();
-//     if stacksize != 0 {
-//         thread_builder = thread_builder.stack_size(stacksize);
-//     }
-//     let res = thread_builder.spawn(move || {
-//         let vm = &thread_vm;
-//         let args = Args::from(args.as_slice().to_owned());
-//         let kwargs = KwArgs::from(kwargs.map_or_else(Default::default, |k| k.to_attributes()));
-//         if let Err(exc) = func.invoke(PyFuncArgs::from((args, kwargs)), vm) {
-//             // TODO: sys.unraisablehook
-//             let stderr = std::io::stderr();
-//             let mut stderr = stderr.lock();
-//             let repr = vm.to_repr(&func.into_object()).ok();
-//             let repr = repr
-//                 .as_ref()
-//                 .map_or("<object repr() failed>", |s| s.as_str());
-//             writeln!(stderr, "Exception ignored in thread started by: {}", repr)
-//                 .and_then(|()| exceptions::write_exception(&mut stderr, vm, &exc))
-//                 .ok();
-//         }
-//         SENTINELS.with(|sents| {
-//             for lock in sents.replace(Default::default()) {
-//                 if lock.mu.is_locked() {
-//                     unsafe { lock.mu.unlock() };
-//                 }
-//             }
-//         });
-//         vm.state.thread_count.fetch_sub(1);
-//     });
-//     res.map(|handle| {
-//         vm.state.thread_count.fetch_add(1);
-//         thread_to_id(&handle.thread())
-//     })
-//     .map_err(|err| super::os::convert_io_error(vm, err))
-// }
+// // fn thread_start_new_thread(
+// //     func: PyCallable,
+// //     args: PyTupleRef,
+// //     kwargs: OptionalArg<PyDictRef>,
+// //     vm: &VirtualMachine,
+// // ) -> PyResult<u64> {
+// //     let thread_vm = vm.new_thread();
+// //     let mut thread_builder = thread::Builder::new();
+// //     let stacksize = vm.state.stacksize.load();
+// //     if stacksize != 0 {
+// //         thread_builder = thread_builder.stack_size(stacksize);
+// //     }
+// //     let res = thread_builder.spawn(move || {
+// //         let vm = &thread_vm;
+// //         let args = Args::from(args.as_slice().to_owned());
+// //         let kwargs = KwArgs::from(kwargs.map_or_else(Default::default, |k| k.to_attributes()));
+// //         if let Err(exc) = func.invoke(PyFuncArgs::from((args, kwargs)), vm) {
+// //             // TODO: sys.unraisablehook
+// //             let stderr = std::io::stderr();
+// //             let mut stderr = stderr.lock();
+// //             let repr = vm.to_repr(&func.into_object()).ok();
+// //             let repr = repr
+// //                 .as_ref()
+// //                 .map_or("<object repr() failed>", |s| s.as_str());
+// //             writeln!(stderr, "Exception ignored in thread started by: {}", repr)
+// //                 .and_then(|()| exceptions::write_exception(&mut stderr, vm, &exc))
+// //                 .ok();
+// //         }
+// //         SENTINELS.with(|sents| {
+// //             for lock in sents.replace(Default::default()) {
+// //                 if lock.mu.is_locked() {
+// //                     unsafe { lock.mu.unlock() };
+// //                 }
+// //             }
+// //         });
+// //         vm.state.thread_count.fetch_sub(1);
+// //     });
+// //     res.map(|handle| {
+// //         vm.state.thread_count.fetch_add(1);
+// //         thread_to_id(&handle.thread())
+// //     })
+// //     .map_err(|err| super::os::convert_io_error(vm, err))
+// // }
 
 // thread_local!(static SENTINELS: RefCell<Vec<PyLockRef>> = RefCell::default());
 
@@ -367,7 +367,7 @@
 //         "_local" => PyLocal::make_class(ctx),
 //         "get_ident" => ctx.new_function(thread_get_ident),
 //         "allocate_lock" => ctx.new_function(thread_allocate_lock),
-//         "start_new_thread" => ctx.new_function(thread_start_new_thread),
+//         // "start_new_thread" => ctx.new_function(thread_start_new_thread),
 //         "_set_sentinel" => ctx.new_function(thread_set_sentinel),
 //         "stack_size" => ctx.new_function(thread_stack_size),
 //         "_count" => ctx.new_function(thread_count),

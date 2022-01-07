@@ -1,6 +1,6 @@
 #![cfg_attr(not(any(test, feature = "use_std")), no_std)]
 #![doc(html_root_url = "https://docs.rs/scopeguard/1/")]
-
+#![no_std]
 //! A scope guard will run a given closure when it goes out of scope,
 //! even if the code between panics.
 //! (as long as panic doesn't abort)
@@ -188,9 +188,9 @@
 //! upgrade policy, where in a later 1.x version, we will raise the minimum
 //! required Rust version.
 
-#[cfg(not(any(test, feature = "use_std")))]
-extern crate core as std;
-
+// #[cfg(not(any(test, feature = "use_std")))]
+// extern crate core as std;
+extern crate sgx_tstd as std;
 use std::fmt;
 use std::marker::PhantomData;
 use std::mem::{self, ManuallyDrop};

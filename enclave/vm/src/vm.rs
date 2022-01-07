@@ -225,7 +225,6 @@ impl VirtualMachine {
             vm.new_str("builtins".to_owned()),
             vm.get_none(),
         );
-        println!("test1");
         objmodule::init_module_dict(
             &vm,
             &sysmod_dict,
@@ -248,14 +247,12 @@ impl VirtualMachine {
 
                 builtins::make_module(self, self.builtins.clone());
                 sysmodule::make_module(self, self.sys_module.clone(), self.builtins.clone());
-                println!("std1");
                 let mut inner_init = || -> PyResult<()> {
                     
                     // #[cfg(not(target_arch = "wasm32"))]
                     // import::import_builtin(self, "signal")?;
 
                     import::init_importlib(self, initialize_parameter)?;
-                    println!("std3");
                     #[cfg(any(not(target_arch = "wasm32"), target_os = "wasi"))]
                     {
                         // this isn't fully compatible with CPython; it imports "io" and sets
@@ -264,26 +261,21 @@ impl VirtualMachine {
                         let io = self.import("_io", &[], 0)?;
                         
                         let io_open = self.get_attribute(io.clone(), "open")?;
-                        println!("std2");
                         let set_stdio = |name, fd, mode: &str| {
-                            println!("std1");
                             let stdio = self.invoke(
                                 &io_open,
                                 vec![self.new_int(fd), self.new_str(mode.to_owned())],
                             )?;
-                            println!("std1");
                             self.set_attr(
                                 &self.sys_module,
                                 format!("__{}__", name), // e.g. __stdin__
                                 stdio.clone(),
                             )?;
-                            println!("std4");
                             self.set_attr(&self.sys_module, name, stdio)?;
                             Ok(())
                         };
-                        
+                    
                         set_stdio("stdin", 0, "r")?;
-                        println!("std2");
                         set_stdio("stdout", 1, "w")?;
                         set_stdio("stderr", 2, "w")?;
 
