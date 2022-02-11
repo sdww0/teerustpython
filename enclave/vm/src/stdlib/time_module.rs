@@ -1,25 +1,25 @@
-// //! The python `time` module.
-// /// See also:
-// /// https://docs.python.org/3/library/time.html
-// use std::fmt;
-// use std::time::{Duration, SystemTime, UNIX_EPOCH};
-// use std::string::String;
-// use std::vec::Vec;
-// use std::boxed::Box;
-// use std::vec;
-// use std::format;
-// use std::string::ToString;
-// use std::borrow::ToOwned;
-// use std::untrusted::time::SystemTimeEx;
-// use chrono::naive::{NaiveDate, NaiveDateTime, NaiveTime};
-// use chrono::{Datelike, Timelike};
+//! The python `time` module.
+/// See also:
+/// https://docs.python.org/3/library/time.html
+use std::fmt;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::vec;
+use std::format;
+use std::string::ToString;
+use std::borrow::ToOwned;
+use std::untrusted::time::SystemTimeEx;
+use chrono::naive::{NaiveDate, NaiveDateTime, NaiveTime};
+use chrono::{Datelike, Timelike};
 
-// use crate::function::OptionalArg;
-// use crate::obj::objstr::PyStringRef;
-// use crate::obj::objtuple::PyTupleRef;
-// use crate::obj::objtype::PyClassRef;
-// use crate::pyobject::{Either, PyClassImpl, PyObjectRef, PyResult, TryFromObject};
-// use crate::vm::VirtualMachine;
+use crate::function::OptionalArg;
+use crate::obj::objstr::PyStringRef;
+use crate::obj::objtuple::PyTupleRef;
+use crate::obj::objtype::PyClassRef;
+use crate::pyobject::{Either, PyClassImpl, PyObjectRef, PyResult, TryFromObject};
+use crate::vm::VirtualMachine;
 
 // #[cfg(unix)]
 // fn time_sleep(dur: Duration, vm: &VirtualMachine) -> PyResult<()> {
@@ -39,62 +39,62 @@
 //     Ok(())
 // }
 
-// #[cfg(not(unix))]
-// fn time_sleep(dur: Duration) {
-//     std::thread::sleep(dur);
-// }
+#[cfg(not(unix))]
+fn time_sleep(dur: Duration) {
+    std::thread::sleep(dur);
+}
 
-// #[cfg(any(not(target_arch = "wasm32"), target_os = "wasi"))]
-// pub fn get_time() -> f64 {
-//     match SystemTime::now().duration_since(UNIX_EPOCH) {
-//         Ok(v) => v.as_secs_f64(),
-//         Err(err) => panic!("Time error: {:?}", err),
-//     }
-// }
+#[cfg(any(not(target_arch = "wasm32"), target_os = "wasi"))]
+pub fn get_time() -> f64 {
+    match SystemTime::now().duration_since(UNIX_EPOCH) {
+        Ok(v) => v.as_secs_f64(),
+        Err(err) => panic!("Time error: {:?}", err),
+    }
+}
 
-// #[cfg(all(target_arch = "wasm32", not(target_os = "wasi")))]
-// pub fn get_time() -> f64 {
-//     use wasm_bindgen::prelude::*;
-//     #[wasm_bindgen]
-//     extern "C" {
-//         type Date;
-//         #[wasm_bindgen(static_method_of = Date)]
-//         fn now() -> f64;
-//     }
-//     // Date.now returns unix time in milliseconds, we want it in seconds
-//     Date::now() / 1000.0
-// }
+#[cfg(all(target_arch = "wasm32", not(target_os = "wasi")))]
+pub fn get_time() -> f64 {
+    use wasm_bindgen::prelude::*;
+    #[wasm_bindgen]
+    extern "C" {
+        type Date;
+        #[wasm_bindgen(static_method_of = Date)]
+        fn now() -> f64;
+    }
+    // Date.now returns unix time in milliseconds, we want it in seconds
+    Date::now() / 1000.0
+}
 
-// fn time_time(_vm: &VirtualMachine) -> f64 {
-//     get_time()
-// }
+fn time_time(_vm: &VirtualMachine) -> f64 {
+    get_time()
+}
 
-// fn time_monotonic(_vm: &VirtualMachine) -> f64 {
-//     // TODO: implement proper monotonic time!
-//     match SystemTime::now().duration_since(UNIX_EPOCH) {
-//         Ok(v) => v.as_secs_f64(),
-//         Err(err) => panic!("Time error: {:?}", err),
-//     }
-// }
+fn time_monotonic(_vm: &VirtualMachine) -> f64 {
+    // TODO: implement proper monotonic time!
+    match SystemTime::now().duration_since(UNIX_EPOCH) {
+        Ok(v) => v.as_secs_f64(),
+        Err(err) => panic!("Time error: {:?}", err),
+    }
+}
 
-// fn pyobj_to_naive_date_time(
-//     value: Either<f64, i64>,
-//     vm: &VirtualMachine,
-// ) -> PyResult<NaiveDateTime> {
-//     let timestamp = match value {
-//         Either::A(float) => {
-//             let secs = float.trunc() as i64;
-//             let nsecs = (float.fract() * 1e9) as u32;
-//             NaiveDateTime::from_timestamp_opt(secs, nsecs)
-//         }
-//         Either::B(int) => NaiveDateTime::from_timestamp_opt(int, 0),
-//     };
-//     timestamp.ok_or_else(|| {
-//         vm.new_overflow_error("timestamp out of range for platform time_t".to_owned())
-//     })
-// }
+fn pyobj_to_naive_date_time(
+    value: Either<f64, i64>,
+    vm: &VirtualMachine,
+) -> PyResult<NaiveDateTime> {
+    let timestamp = match value {
+        Either::A(float) => {
+            let secs = float.trunc() as i64;
+            let nsecs = (float.fract() * 1e9) as u32;
+            NaiveDateTime::from_timestamp_opt(secs, nsecs)
+        }
+        Either::B(int) => NaiveDateTime::from_timestamp_opt(int, 0),
+    };
+    timestamp.ok_or_else(|| {
+        vm.new_overflow_error("timestamp out of range for platform time_t".to_owned())
+    })
+}
 
-// /// https://docs.python.org/3/library/time.html?highlight=gmtime#time.gmtime
+/// https://docs.python.org/3/library/time.html?highlight=gmtime#time.gmtime
 // fn time_gmtime(secs: OptionalArg<Either<f64, i64>>, vm: &VirtualMachine) -> PyResult<PyObjectRef> {
 //     let default = chrono::offset::Utc::now().naive_utc();
 //     let instant = match secs {
@@ -114,13 +114,13 @@
 //     Ok(PyStructTime::new(vm, instant, -1).into_obj(vm))
 // }
 
-// fn time_mktime(t: PyStructTime, vm: &VirtualMachine) -> PyResult {
-//     let datetime = t.to_date_time(vm)?;
-//     let seconds_since_epoch = datetime.timestamp() as f64;
-//     Ok(vm.ctx.new_float(seconds_since_epoch))
-// }
+fn time_mktime(t: PyStructTime, vm: &VirtualMachine) -> PyResult {
+    let datetime = t.to_date_time(vm)?;
+    let seconds_since_epoch = datetime.timestamp() as f64;
+    Ok(vm.ctx.new_float(seconds_since_epoch))
+}
 
-// /// Construct a localtime from the optional seconds, or get the current local time.
+/// Construct a localtime from the optional seconds, or get the current local time.
 // fn optional_or_localtime(
 //     secs: OptionalArg<Either<f64, i64>>,
 //     vm: &VirtualMachine,
@@ -132,7 +132,7 @@
 //     })
 // }
 
-// const CFMT: &str = "%a %b %e %H:%M:%S %Y";
+const CFMT: &str = "%a %b %e %H:%M:%S %Y";
 
 // fn time_asctime(t: OptionalArg<PyStructTime>, vm: &VirtualMachine) -> PyResult {
 //     let default = chrono::offset::Local::now().naive_local();
@@ -163,127 +163,127 @@
 //     Ok(vm.ctx.new_str(formatted_time))
 // }
 
-// fn time_strptime(
-//     string: PyStringRef,
-//     format: OptionalArg<PyStringRef>,
-//     vm: &VirtualMachine,
-// ) -> PyResult {
-//     let format = match format {
-//         OptionalArg::Present(ref format) => format.as_str(),
-//         OptionalArg::Missing => "%a %b %H:%M:%S %Y",
-//     };
-//     let instant = NaiveDateTime::parse_from_str(string.as_str(), format)
-//         .map_err(|e| vm.new_value_error(format!("Parse error: {:?}", e)))?;
-//     Ok(PyStructTime::new(vm, instant, -1).into_obj(vm))
-// }
+fn time_strptime(
+    string: PyStringRef,
+    format: OptionalArg<PyStringRef>,
+    vm: &VirtualMachine,
+) -> PyResult {
+    let format = match format {
+        OptionalArg::Present(ref format) => format.as_str(),
+        OptionalArg::Missing => "%a %b %H:%M:%S %Y",
+    };
+    let instant = NaiveDateTime::parse_from_str(string.as_str(), format)
+        .map_err(|e| vm.new_value_error(format!("Parse error: {:?}", e)))?;
+    Ok(PyStructTime::new(vm, instant, -1).into_obj(vm))
+}
 
-// #[pystruct_sequence(name = "time.struct_time")]
-// #[allow(dead_code)]
-// struct PyStructTime {
-//     tm_year: PyObjectRef,
-//     tm_mon: PyObjectRef,
-//     tm_mday: PyObjectRef,
-//     tm_hour: PyObjectRef,
-//     tm_min: PyObjectRef,
-//     tm_sec: PyObjectRef,
-//     tm_wday: PyObjectRef,
-//     tm_yday: PyObjectRef,
-//     tm_isdst: PyObjectRef,
-// }
+#[pystruct_sequence(name = "time.struct_time")]
+#[allow(dead_code)]
+struct PyStructTime {
+    tm_year: PyObjectRef,
+    tm_mon: PyObjectRef,
+    tm_mday: PyObjectRef,
+    tm_hour: PyObjectRef,
+    tm_min: PyObjectRef,
+    tm_sec: PyObjectRef,
+    tm_wday: PyObjectRef,
+    tm_yday: PyObjectRef,
+    tm_isdst: PyObjectRef,
+}
 
-// impl fmt::Debug for PyStructTime {
-//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-//         write!(f, "struct_time()")
-//     }
-// }
+impl fmt::Debug for PyStructTime {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "struct_time()")
+    }
+}
 
-// impl PyStructTime {
-//     fn new(vm: &VirtualMachine, tm: NaiveDateTime, isdst: i32) -> Self {
-//         PyStructTime {
-//             tm_year: vm.ctx.new_int(tm.year()),
-//             tm_mon: vm.ctx.new_int(tm.month()),
-//             tm_mday: vm.ctx.new_int(tm.day()),
-//             tm_hour: vm.ctx.new_int(tm.hour()),
-//             tm_min: vm.ctx.new_int(tm.minute()),
-//             tm_sec: vm.ctx.new_int(tm.second()),
-//             tm_wday: vm.ctx.new_int(tm.weekday().num_days_from_monday()),
-//             tm_yday: vm.ctx.new_int(tm.ordinal()),
-//             tm_isdst: vm.ctx.new_int(isdst),
-//         }
-//     }
+impl PyStructTime {
+    fn new(vm: &VirtualMachine, tm: NaiveDateTime, isdst: i32) -> Self {
+        PyStructTime {
+            tm_year: vm.ctx.new_int(tm.year()),
+            tm_mon: vm.ctx.new_int(tm.month()),
+            tm_mday: vm.ctx.new_int(tm.day()),
+            tm_hour: vm.ctx.new_int(tm.hour()),
+            tm_min: vm.ctx.new_int(tm.minute()),
+            tm_sec: vm.ctx.new_int(tm.second()),
+            tm_wday: vm.ctx.new_int(tm.weekday().num_days_from_monday()),
+            tm_yday: vm.ctx.new_int(tm.ordinal()),
+            tm_isdst: vm.ctx.new_int(isdst),
+        }
+    }
 
-//     fn to_date_time(&self, vm: &VirtualMachine) -> PyResult<NaiveDateTime> {
-//         let invalid = || vm.new_value_error("invalid struct_time parameter".to_owned());
-//         macro_rules! field {
-//             ($field:ident) => {
-//                 TryFromObject::try_from_object(vm, self.$field.clone())?
-//             };
-//         }
-//         let dt = NaiveDateTime::new(
-//             NaiveDate::from_ymd_opt(field!(tm_year), field!(tm_mon), field!(tm_mday))
-//                 .ok_or_else(invalid)?,
-//             NaiveTime::from_hms_opt(field!(tm_hour), field!(tm_min), field!(tm_sec))
-//                 .ok_or_else(invalid)?,
-//         );
-//         Ok(dt)
-//     }
+    fn to_date_time(&self, vm: &VirtualMachine) -> PyResult<NaiveDateTime> {
+        let invalid = || vm.new_value_error("invalid struct_time parameter".to_owned());
+        macro_rules! field {
+            ($field:ident) => {
+                TryFromObject::try_from_object(vm, self.$field.clone())?
+            };
+        }
+        let dt = NaiveDateTime::new(
+            NaiveDate::from_ymd_opt(field!(tm_year), field!(tm_mon), field!(tm_mday))
+                .ok_or_else(invalid)?,
+            NaiveTime::from_hms_opt(field!(tm_hour), field!(tm_min), field!(tm_sec))
+                .ok_or_else(invalid)?,
+        );
+        Ok(dt)
+    }
 
-//     fn into_obj(self, vm: &VirtualMachine) -> PyObjectRef {
-//         self.into_struct_sequence(vm, vm.class("time", "struct_time"))
-//             .unwrap()
-//             .into_object()
-//     }
+    fn into_obj(self, vm: &VirtualMachine) -> PyObjectRef {
+        self.into_struct_sequence(vm, vm.class("time", "struct_time"))
+            .unwrap()
+            .into_object()
+    }
 
-//     fn tp_new(cls: PyClassRef, seq: PyObjectRef, vm: &VirtualMachine) -> PyResult<PyTupleRef> {
-//         Self::try_from_object(vm, seq)?.into_struct_sequence(vm, cls)
-//     }
-// }
+    fn tp_new(cls: PyClassRef, seq: PyObjectRef, vm: &VirtualMachine) -> PyResult<PyTupleRef> {
+        Self::try_from_object(vm, seq)?.into_struct_sequence(vm, cls)
+    }
+}
 
-// impl TryFromObject for PyStructTime {
-//     fn try_from_object(vm: &VirtualMachine, seq: PyObjectRef) -> PyResult<Self> {
-//         let seq = vm.extract_elements::<PyObjectRef>(&seq)?;
-//         if seq.len() != 9 {
-//             return Err(
-//                 vm.new_type_error("time.struct_time() takes a sequence of length 9".to_owned())
-//             );
-//         }
-//         let mut i = seq.into_iter();
-//         Ok(PyStructTime {
-//             tm_year: i.next().unwrap(),
-//             tm_mon: i.next().unwrap(),
-//             tm_mday: i.next().unwrap(),
-//             tm_hour: i.next().unwrap(),
-//             tm_min: i.next().unwrap(),
-//             tm_sec: i.next().unwrap(),
-//             tm_wday: i.next().unwrap(),
-//             tm_yday: i.next().unwrap(),
-//             tm_isdst: i.next().unwrap(),
-//         })
-//     }
-// }
+impl TryFromObject for PyStructTime {
+    fn try_from_object(vm: &VirtualMachine, seq: PyObjectRef) -> PyResult<Self> {
+        let seq = vm.extract_elements::<PyObjectRef>(&seq)?;
+        if seq.len() != 9 {
+            return Err(
+                vm.new_type_error("time.struct_time() takes a sequence of length 9".to_owned())
+            );
+        }
+        let mut i = seq.into_iter();
+        Ok(PyStructTime {
+            tm_year: i.next().unwrap(),
+            tm_mon: i.next().unwrap(),
+            tm_mday: i.next().unwrap(),
+            tm_hour: i.next().unwrap(),
+            tm_min: i.next().unwrap(),
+            tm_sec: i.next().unwrap(),
+            tm_wday: i.next().unwrap(),
+            tm_yday: i.next().unwrap(),
+            tm_isdst: i.next().unwrap(),
+        })
+    }
+}
 
-// pub fn make_module(vm: &VirtualMachine) -> PyObjectRef {
-//     let ctx = &vm.ctx;
+pub fn make_module(vm: &VirtualMachine) -> PyObjectRef {
+    let ctx = &vm.ctx;
 
-//     let struct_time_type = PyStructTime::make_class(ctx);
+    let struct_time_type = PyStructTime::make_class(ctx);
 
-//     // TODO: allow $[pyimpl]s for struct_sequences
-//     extend_class!(ctx, struct_time_type, {
-//         (slot new) => PyStructTime::tp_new,
-//     });
+    // TODO: allow $[pyimpl]s for struct_sequences
+    extend_class!(ctx, struct_time_type, {
+        (slot new) => PyStructTime::tp_new,
+    });
 
-//     py_module!(vm, "time", {
-//         "asctime" => ctx.new_function(time_asctime),
-//         "ctime" => ctx.new_function(time_ctime),
-//         "gmtime" => ctx.new_function(time_gmtime),
-//         "mktime" => ctx.new_function(time_mktime),
-//         "localtime" => ctx.new_function(time_localtime),
-//         "monotonic" => ctx.new_function(time_monotonic),
-//         "strftime" => ctx.new_function(time_strftime),
-//         "strptime" => ctx.new_function(time_strptime),
-//         "sleep" => ctx.new_function(time_sleep),
-//         "struct_time" => struct_time_type,
-//         "time" => ctx.new_function(time_time),
-//         "perf_counter" => ctx.new_function(time_time), // TODO: fix
-//     })
-// }
+    py_module!(vm, "time", {
+        // "asctime" => ctx.new_function(time_asctime),
+        // "ctime" => ctx.new_function(time_ctime),
+        // "gmtime" => ctx.new_function(time_gmtime),
+        "mktime" => ctx.new_function(time_mktime),
+        // "localtime" => ctx.new_function(time_localtime),
+        "monotonic" => ctx.new_function(time_monotonic),
+        // "strftime" => ctx.new_function(time_strftime),
+        "strptime" => ctx.new_function(time_strptime),
+        // "sleep" => ctx.new_function(time_sleep),
+        "struct_time" => struct_time_type,
+        "time" => ctx.new_function(time_time),
+        "perf_counter" => ctx.new_function(time_time), // TODO: fix
+    })
+}
