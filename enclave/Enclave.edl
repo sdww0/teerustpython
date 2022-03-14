@@ -20,15 +20,22 @@ enclave {
     from "sgx_stdio.edl" import *;
     from "sgx_backtrace.edl" import *;
     from "sgx_tstdc.edl" import *;
+    from "sgx_pthread.edl" import *;
+    from "sgx_net.edl" import *;
+    from "sgx_file.edl" import *;
+    from "sgx_env.edl" import *;
+    from "sgx_sys.edl" import *;
+
 
     trusted {
         /* define ECALLs here. */
 
         public sgx_status_t say_something();
+        //public sgx_status_t handle_new_thread();
     };
 
     untrusted {
-
+        //public void create_new_thread();
     };
 
 

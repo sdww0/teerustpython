@@ -37,6 +37,11 @@
 #![doc(html_root_url = "https://docs.rs/socket2/0.3")]
 #![deny(missing_docs)]
 
+#![no_std]
+extern crate sgx_tstd as std;
+#[cfg(any(unix, target_os = "redox"))]
+extern crate sgx_libc as libc;
+
 use crate::utils::NetInt;
 
 /// Macro to implement `fmt::Debug` for a type, printing the constant names

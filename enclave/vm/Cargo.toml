@@ -61,7 +61,8 @@ crc              = { path = "/root/sgx/samplecode/teerustpython/crate/crc-rs-sgx
 maplit = {path="/root/sgx/samplecode/teerustpython/already/maplit-1.0.2"}
 bitflags = {path="/root/sgx/samplecode/teerustpython/already/bitflags-1.2.1"}
 sgx_libc = { path = "/root/sgx/sgx_libc"}
-sgx_tstd = { path = "/root/sgx/sgx_tstd"}
+sgx_tstd = { path = "/root/sgx/sgx_tstd",features=['thread']}
+# sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 
 # nix = "0.17"
@@ -106,7 +107,7 @@ exitcode = {path="/root/sgx/samplecode/teerustpython/already/exitcode-1.1.2"}
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 crc32fast        = { path = "/root/sgx/samplecode/teerustpython/crate/rust-crc32fast-sgx" }
 adler32          = { path = "/root/sgx/samplecode/teerustpython/crate/adler32-rs-sgx" }
-gethostname = {path="/root/sgx/samplecode/teerustpython/already/gethostname-0.2.1"}
+# gethostname = {path="/root/sgx/samplecode/teerustpython/already/gethostname-0.2.1"}
 # subprocess = "0.2.2"
 socket2 = {path="/root/sgx/samplecode/teerustpython/already/socket2-0.3.12"}
 # rustyline = "6.0"

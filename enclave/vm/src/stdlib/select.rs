@@ -14,7 +14,8 @@
 // type RawFd = i32;
 
 // #[cfg(unix)]
-// use libc::{select, timeval};
+// // use libc::{select, timeval};
+// use libc::timeval;
 
 // #[cfg(windows)]
 // use winapi::um::winsock2::{select, timeval, WSAStartup, SOCKET as RawFd};

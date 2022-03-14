@@ -123,17 +123,17 @@ pub fn get_module_inits() -> HashMap<String, StdlibInitFunc> {
     // disable some modules on WASM
     #[cfg(not(target_arch = "wasm32"))]
     {
-        // modules.insert("_socket".to_owned(), Box::new(socket::make_module));
+        modules.insert("_socket".to_owned(), Box::new(socket::make_module));
         // modules.insert(
         //     "_multiprocessing".to_owned(),
         //     Box::new(multiprocessing::make_module),
         // );
         // modules.insert("signal".to_owned(), Box::new(signal::make_module));
         // modules.insert("select".to_owned(), Box::new(select::make_module));
-        // #[cfg(feature = "ssl")]
-        // modules.insert("_ssl".to_owned(), Box::new(ssl::make_module));
+        #[cfg(feature = "ssl")]
+        modules.insert("_ssl".to_owned(), Box::new(ssl::make_module));
         // modules.insert("_subprocess".to_owned(), Box::new(subprocess::make_module));
-        // modules.insert("_thread".to_owned(), Box::new(thread::make_module));
+        modules.insert("_thread".to_owned(), Box::new(thread::make_module));
         // #[cfg(not(target_os = "redox"))]
         // modules.insert("zlib".to_owned(), Box::new(zlib::make_module));
         modules.insert(

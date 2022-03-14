@@ -19,6 +19,7 @@
 #![deny(warnings, missing_docs, clippy::all)]
 #![no_std]
 extern crate sgx_tstd as std;
+extern crate sgx_libc as libc;
 
 use std::ffi::OsString;
 use std::io::Error;

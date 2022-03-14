@@ -20,7 +20,8 @@ use std::ops::Neg;
 use std::os::unix::net::{UnixDatagram, UnixListener, UnixStream};
 use std::os::unix::prelude::*;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::time::{Duration, Instant};
+use std::time::{Instant,Duration};
+use std::untrusted::time::InstantEx;
 
 use libc::{self, c_void, socklen_t, ssize_t};
 
@@ -178,14 +179,14 @@ impl Socket {
             // fallthrough to the fallback.
             #[cfg(target_os = "linux")]
             {
-                match cvt(libc::socket(family, ty | libc::SOCK_CLOEXEC, protocol)) {
+                match cvt(libc::ocall::socket(family, ty | libc::SOCK_CLOEXEC, protocol)) {
                     Ok(fd) => return Ok(Socket::from_raw_fd(fd)),
                     Err(ref e) if e.raw_os_error() == Some(libc::EINVAL) => {}
                     Err(e) => return Err(e),
                 }
             }
 
-            let fd = cvt(libc::socket(family, ty, protocol))?;
+            let fd = cvt(libc::ocall::socket(family, ty, protocol))?;
             let fd = Socket::from_raw_fd(fd);
             set_cloexec(fd.as_raw_fd())?;
             #[cfg(target_os = "macos")]
@@ -199,7 +200,7 @@ impl Socket {
     pub fn pair(family: c_int, ty: c_int, protocol: c_int) -> io::Result<(Socket, Socket)> {
         unsafe {
             let mut fds = [0, 0];
-            cvt(libc::socketpair(family, ty, protocol, fds.as_mut_ptr()))?;
+            cvt(libc::ocall::socketpair(family, ty, protocol, fds.as_mut_ptr()))?;
             let fds = (Socket::from_raw_fd(fds[0]), Socket::from_raw_fd(fds[1]));
             set_cloexec(fds.0.as_raw_fd())?;
             set_cloexec(fds.1.as_raw_fd())?;
@@ -215,15 +216,15 @@ impl Socket {
     }
 
     pub fn bind(&self, addr: &SockAddr) -> io::Result<()> {
-        unsafe { cvt(libc::bind(self.fd, addr.as_ptr(), addr.len() as _)).map(|_| ()) }
+        unsafe { cvt(libc::ocall::bind(self.fd, addr.as_ptr(), addr.len() as _)).map(|_| ()) }
     }
 
     pub fn listen(&self, backlog: i32) -> io::Result<()> {
-        unsafe { cvt(libc::listen(self.fd, backlog)).map(|_| ()) }
+        unsafe { cvt(libc::ocall::listen(self.fd, backlog)).map(|_| ()) }
     }
 
     pub fn connect(&self, addr: &SockAddr) -> io::Result<()> {
-        unsafe { cvt(libc::connect(self.fd, addr.as_ptr(), addr.len())).map(|_| ()) }
+        unsafe { cvt(libc::ocall::connect(self.fd, addr.as_ptr(), addr.len())).map(|_| ()) }
     }
 
     pub fn connect_timeout(&self, addr: &SockAddr, timeout: Duration) -> io::Result<()> {
@@ -273,7 +274,7 @@ impl Socket {
 
             let timeout = cmp::min(timeout, c_int::max_value() as u64) as c_int;
 
-            match unsafe { libc::poll(&mut pollfd, 1, timeout) } {
+            match unsafe { libc::ocall::poll(&mut pollfd, 1, timeout) } {
                 -1 => {
                     let err = io::Error::last_os_error();
                     if err.kind() != io::ErrorKind::Interrupted {
@@ -305,7 +306,7 @@ impl Socket {
         unsafe {
             let mut storage: libc::sockaddr_storage = mem::zeroed();
             let mut len = mem::size_of_val(&storage) as libc::socklen_t;
-            cvt(libc::getsockname(
+            cvt(libc::ocall::getsockname(
                 self.fd,
                 &mut storage as *mut _ as *mut _,
                 &mut len,
@@ -321,7 +322,7 @@ impl Socket {
         unsafe {
             let mut storage: libc::sockaddr_storage = mem::zeroed();
             let mut len = mem::size_of_val(&storage) as libc::socklen_t;
-            cvt(libc::getpeername(
+            cvt(libc::ocall::getpeername(
                 self.fd,
                 &mut storage as *mut _ as *mut _,
                 &mut len,
@@ -343,7 +344,7 @@ impl Socket {
         static CLOEXEC_FAILED: AtomicBool = AtomicBool::new(false);
         unsafe {
             if !CLOEXEC_FAILED.load(Ordering::Relaxed) {
-                match cvt(libc::fcntl(self.fd, F_DUPFD_CLOEXEC, 0)) {
+                match cvt(libc::ocall::fcntl_arg1(self.fd, F_DUPFD_CLOEXEC, 0)) {
                     Ok(fd) => {
                         let fd = Socket::from_raw_fd(fd);
                         if cfg!(target_os = "linux") {
@@ -357,7 +358,7 @@ impl Socket {
                     Err(e) => return Err(e),
                 }
             }
-            let fd = cvt(libc::fcntl(self.fd, libc::F_DUPFD, 0))?;
+            let fd = cvt(libc::ocall::fcntl_arg1(self.fd, libc::F_DUPFD, 0))?;
             let fd = Socket::from_raw_fd(fd);
             set_cloexec(fd.as_raw_fd())?;
             Ok(fd)
@@ -370,29 +371,29 @@ impl Socket {
         let mut len = mem::size_of_val(&storage) as socklen_t;
 
         let mut socket = None;
-        #[cfg(target_os = "linux")]
-        {
-            let res = cvt_r(|| unsafe {
-                libc::syscall(
-                    libc::SYS_accept4,
-                    self.fd as libc::c_long,
-                    &mut storage as *mut _ as libc::c_long,
-                    &mut len,
-                    libc::SOCK_CLOEXEC as libc::c_long,
-                ) as libc::c_int
-            });
-            match res {
-                Ok(fd) => socket = Some(Socket { fd: fd }),
-                Err(ref e) if e.raw_os_error() == Some(libc::ENOSYS) => {}
-                Err(e) => return Err(e),
-            }
-        }
+        // #[cfg(target_os = "linux")]
+        // {
+        //     let res = cvt_r(|| unsafe {
+        //         libc::syscall(
+        //             libc::SYS_accept4,
+        //             self.fd as libc::c_long,
+        //             &mut storage as *mut _ as libc::c_long,
+        //             &mut len,
+        //             libc::SOCK_CLOEXEC as libc::c_long,
+        //         ) as libc::c_int
+        //     });
+        //     match res {
+        //         Ok(fd) => socket = Some(Socket { fd: fd }),
+        //         Err(ref e) if e.raw_os_error() == Some(libc::ENOSYS) => {}
+        //         Err(e) => return Err(e),
+        //     }
+        // }
 
         let socket = match socket {
             Some(socket) => socket,
             None => unsafe {
                 let fd =
-                    cvt_r(|| libc::accept(self.fd, &mut storage as *mut _ as *mut _, &mut len))?;
+                    cvt_r(|| libc::ocall::accept(self.fd, &mut storage as *mut _ as *mut _, &mut len))?;
                 let fd = Socket::from_raw_fd(fd);
                 set_cloexec(fd.as_raw_fd())?;
                 fd
@@ -415,14 +416,14 @@ impl Socket {
 
     pub fn set_nonblocking(&self, nonblocking: bool) -> io::Result<()> {
         unsafe {
-            let previous = cvt(libc::fcntl(self.fd, libc::F_GETFL))?;
+            let previous = cvt(libc::ocall::fcntl_arg0(self.fd, libc::F_GETFL))?;
             let new = if nonblocking {
                 previous | libc::O_NONBLOCK
             } else {
                 previous & !libc::O_NONBLOCK
             };
             if new != previous {
-                cvt(libc::fcntl(self.fd, libc::F_SETFL, new))?;
+                cvt(libc::ocall::fcntl_arg1(self.fd, libc::F_SETFL, new))?;
             }
             Ok(())
         }
@@ -434,14 +435,14 @@ impl Socket {
             Shutdown::Read => libc::SHUT_RD,
             Shutdown::Both => libc::SHUT_RDWR,
         };
-        cvt(unsafe { libc::shutdown(self.fd, how) })?;
+        cvt(unsafe { libc::ocall::shutdown(self.fd, how) })?;
         Ok(())
     }
 
     pub fn recv(&self, buf: &mut [u8], flags: c_int) -> io::Result<usize> {
         unsafe {
             let n = cvt({
-                libc::recv(
+                libc::ocall::recv(
                     self.fd,
                     buf.as_mut_ptr() as *mut c_void,
                     cmp::min(buf.len(), max_len()),
@@ -455,7 +456,7 @@ impl Socket {
     pub fn peek(&self, buf: &mut [u8]) -> io::Result<usize> {
         unsafe {
             let n = cvt({
-                libc::recv(
+                libc::ocall::recv(
                     self.fd,
                     buf.as_mut_ptr() as *mut c_void,
                     cmp::min(buf.len(), max_len()),
@@ -476,7 +477,7 @@ impl Socket {
             let mut addrlen = mem::size_of_val(&storage) as socklen_t;
 
             let n = cvt({
-                libc::recvfrom(
+                libc::ocall::recvfrom(
                     self.fd,
                     buf.as_mut_ptr() as *mut c_void,
                     cmp::min(buf.len(), max_len()),
@@ -493,7 +494,7 @@ impl Socket {
     pub fn send(&self, buf: &[u8], flags: c_int) -> io::Result<usize> {
         unsafe {
             let n = cvt({
-                libc::send(
+                libc::ocall::send(
                     self.fd,
                     buf.as_ptr() as *const c_void,
                     cmp::min(buf.len(), max_len()),
@@ -507,7 +508,7 @@ impl Socket {
     pub fn send_to(&self, buf: &[u8], flags: c_int, addr: &SockAddr) -> io::Result<usize> {
         unsafe {
             let n = cvt({
-                libc::sendto(
+                libc::ocall::sendto(
                     self.fd,
                     buf.as_ptr() as *const c_void,
                     cmp::min(buf.len(), max_len()),
@@ -853,7 +854,7 @@ impl Socket {
         T: Copy,
     {
         let payload = &payload as *const T as *const c_void;
-        cvt(libc::setsockopt(
+        cvt(libc::ocall::setsockopt(
             self.fd,
             opt,
             val,
@@ -866,7 +867,7 @@ impl Socket {
     unsafe fn getsockopt<T: Copy>(&self, opt: c_int, val: c_int) -> io::Result<T> {
         let mut slot: T = mem::zeroed();
         let mut len = mem::size_of::<T>() as libc::socklen_t;
-        cvt(libc::getsockopt(
+        cvt(libc::ocall::getsockopt(
             self.fd,
             opt,
             val,
@@ -888,7 +889,7 @@ impl<'a> Read for &'a Socket {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         unsafe {
             let n = cvt({
-                libc::read(
+                libc::ocall::read(
                     self.fd,
                     buf.as_mut_ptr() as *mut c_void,
                     cmp::min(buf.len(), max_len()),
@@ -976,7 +977,7 @@ impl FromRawFd for crate::Socket {
 impl Drop for Socket {
     fn drop(&mut self) {
         unsafe {
-            let _ = libc::close(self.fd);
+            let _ = libc::ocall::close(self.fd);
         }
     }
 }
@@ -1099,10 +1100,10 @@ where
 
 fn set_cloexec(fd: c_int) -> io::Result<()> {
     unsafe {
-        let previous = cvt(libc::fcntl(fd, libc::F_GETFD))?;
+        let previous = cvt(libc::ocall::fcntl_arg0(fd, libc::F_GETFD))?;
         let new = previous | libc::FD_CLOEXEC;
         if new != previous {
-            cvt(libc::fcntl(fd, libc::F_SETFD, new))?;
+            cvt(libc::ocall::fcntl_arg1(fd, libc::F_SETFD, new))?;
         }
         Ok(())
     }

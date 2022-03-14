@@ -41,8 +41,7 @@ extern sgx_enclave_id_t global_eid;    /* global enclave id */
 #if defined(__cplusplus)
 extern "C" {
 #endif
-
-
+    void create_new_thread();
 #if defined(__cplusplus)
 }
 #endif

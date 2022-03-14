@@ -812,6 +812,7 @@ impl VirtualMachine {
 
         // This is only used in the vm for magic methods, which use a greatly simplified attribute lookup.
         let cls = obj.class();
+
         match cls.get_attr(method_name) {
             Some(func) => {
                 vm_trace!(
@@ -824,7 +825,11 @@ impl VirtualMachine {
                 let wrapped = self.call_if_get_descriptor(func, obj.clone())?;
                 self.invoke(&wrapped, args)
             }
-            None => Err(self.new_type_error(format!("Unsupported method: {}", method_name))),
+            None => {
+                println!("{}",cls);
+                println!("{}",obj);
+                Err(self.new_type_error(format!("Unsupported method: {}", method_name)))
+            },
         }
     }
 

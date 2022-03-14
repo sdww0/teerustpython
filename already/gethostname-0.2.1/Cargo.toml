@@ -25,6 +25,7 @@ license = "Apache-2.0"
 repository = "https://github.com/lunaryorn/gethostname.rs.git"
 [dependencies]
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
+sgx_libc = {path = "/root/sgx/sgx_libc"}
 
 [dev-dependencies.pretty_assertions]
 version = "^0.6.1"

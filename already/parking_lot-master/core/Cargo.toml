@@ -18,7 +18,7 @@ backtrace = { version = "0.3.60", optional = true }
 sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 
 [target.'cfg(unix)'.dependencies]
-libc = "0.2.95"
+sgx_libc = { path = "/root/sgx/sgx_libc"}
 
 [target.'cfg(target_os = "redox")'.dependencies]
 redox_syscall = "0.2.8"

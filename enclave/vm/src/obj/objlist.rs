@@ -732,21 +732,21 @@ impl PyList {
         elements.drain(range.start..(range.start + deleted));
     }
 
-    // #[pymethod]
-    // fn sort(&self, options: SortOptions, vm: &VirtualMachine) -> PyResult<()> {
-    //     // replace list contents with [] for duration of sort.
-    //     // this prevents keyfunc from messing with the list and makes it easy to
-    //     // check if it tries to append elements to it.
-    //     let mut elements = std::mem::take(self.borrow_elements_mut().deref_mut());
-    //     do_sort(vm, &mut elements, options.key, options.reverse)?;
-    //     std::mem::swap(self.borrow_elements_mut().deref_mut(), &mut elements);
+    #[pymethod]
+    fn sort(&self, options: SortOptions, vm: &VirtualMachine) -> PyResult<()> {
+        // replace list contents with [] for duration of sort.
+        // this prevents keyfunc from messing with the list and makes it easy to
+        // check if it tries to append elements to it.
+        let mut elements = std::mem::take(self.borrow_elements_mut().deref_mut());
+        do_sort(vm, &mut elements, options.key, options.reverse)?;
+        std::mem::swap(self.borrow_elements_mut().deref_mut(), &mut elements);
 
-    //     if !elements.is_empty() {
-    //         return Err(vm.new_value_error("list modified during sort".to_owned()));
-    //     }
+        if !elements.is_empty() {
+            return Err(vm.new_value_error("list modified during sort".to_owned()));
+        }
 
-    //     Ok(())
-    // }
+        Ok(())
+    }
 
     #[pyslot]
     fn tp_new(
