@@ -63,7 +63,7 @@ bitflags = {path="/root/sgx/samplecode/teerustpython/already/bitflags-1.2.1"}
 sgx_libc = { path = "/root/sgx/sgx_libc"}
 sgx_tstd = { path = "/root/sgx/sgx_tstd",features=['thread']}
 # sgx_tstd = { path = "/root/sgx/sgx_tstd"}
-
+ndarray = {version="0.10.4",default-features=false}
 
 # nix = "0.17"
 arr_macro = "0.1.2"

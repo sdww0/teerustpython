@@ -10,6 +10,7 @@ pub mod array;
 pub(crate) mod ast;
 mod binascii;
 mod collections;
+mod numpy;
 mod csv;
 mod dis;
 mod errno;
@@ -147,6 +148,9 @@ pub fn get_module_inits() -> HashMap<String, StdlibInitFunc> {
     // {
     //     modules.insert("pwd".to_owned(), Box::new(pwd::make_module));
     // }
+
+    // this is for intel sgx 
+    modules.insert("numpy".to_owned(),Box::new(numpy::make_module));
 
     // Windows-only
     #[cfg(windows)]

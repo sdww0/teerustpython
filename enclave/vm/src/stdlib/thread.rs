@@ -266,9 +266,6 @@ fn thread_start_new_thread(
         thread_to_id(&handle.thread())
     })
     .map_err(|err| super::os::convert_io_error(vm, err))
-    // Err(vm.new_attribute_error(format!(
-    //     "sgx thread now is not support",
-    // )));
 }
 
 thread_local!(static SENTINELS: RefCell<Vec<PyLockRef>> = RefCell::default());
