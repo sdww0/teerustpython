@@ -1,0 +1,1 @@
+sudo docker run -v /home/teecertlab/incubator-teaclave-sgx-sdk/:/root/sgx -ti baiduxlab/sgx-rust

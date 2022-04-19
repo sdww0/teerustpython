@@ -109,6 +109,7 @@ pub struct TypeZoo {
     pub weakproxy_type: PyClassRef,
     pub mappingproxy_type: PyClassRef,
     pub traceback_type: PyClassRef,
+    pub ndarray_type : PyClassRef,
     pub object_type: PyClassRef,
 }
 
@@ -185,6 +186,7 @@ impl TypeZoo {
         let slice_type = create_type("slice", &type_type, &object_type);
         let mappingproxy_type = create_type("mappingproxy", &type_type, &object_type);
         let traceback_type = create_type("traceback", &type_type, &object_type);
+        let ndarray_type = create_type("ndarray", &type_type, &object_type);
         let callable_iterator = create_type("callable_iterator", &type_type, &object_type);
 
         Self {
@@ -250,6 +252,7 @@ impl TypeZoo {
             weakproxy_type,
             type_type,
             traceback_type,
+            ndarray_type,
         }
     }
 }

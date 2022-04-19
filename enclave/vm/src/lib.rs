@@ -17,6 +17,7 @@
 #![no_std]
 extern crate sgx_tstd as std;
 extern crate sgx_libc as libc;
+extern crate ndarray;
 #[cfg(feature = "flame-it")]
 #[macro_use]
 extern crate flamer;
