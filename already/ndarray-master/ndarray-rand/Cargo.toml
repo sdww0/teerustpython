@@ -14,12 +14,13 @@ description = "Constructors for randomized arrays. `rand` integration for `ndarr
 keywords = ["multidimensional", "matrix", "rand", "ndarray"]
 
 [dependencies]
-ndarray = { version = "0.15", path = ".." }
-rand_distr = "0.4.0"
+ndarray = { version = "0.15", path = ".." ,default-features=false}
+rand_distr = {path = "/root/sgx/samplecode/teerustpython/crate/rand-sgx/rand_distr"}
 quickcheck = { version = "1.0", default-features = false, optional = true }
+sgx_tstd = {path = "/root/sgx/sgx_tstd"}
 
 [dependencies.rand]
-version = "0.8.0"
+path = "/root/sgx/samplecode/teerustpython/crate/rand-sgx"
 features = ["small_rng"]
 
 [dev-dependencies]

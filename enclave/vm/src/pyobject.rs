@@ -379,10 +379,6 @@ impl PyContext {
         self.types.type_type.clone()
     }
 
-    pub fn ndarray_type(&self) -> PyClassRef{
-        self.types.ndarray_type.clone()
-    }
-
     pub fn none(&self) -> PyObjectRef {
         self.none.clone().into_object()
     }

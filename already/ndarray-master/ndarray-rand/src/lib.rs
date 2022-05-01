@@ -29,6 +29,11 @@
 //! that the items are not compatible (e.g. that a type doesn't implement a
 //! necessary trait).
 
+#![no_std]
+
+extern crate sgx_tstd as std;
+use std::vec::Vec;
+
 use crate::rand::distributions::{Distribution, Uniform};
 use crate::rand::rngs::SmallRng;
 use crate::rand::seq::index;

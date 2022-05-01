@@ -10,7 +10,7 @@ test = false
 [dev-dependencies]
 approx = "0.4"
 defmac = "0.2"
-num-traits = "0.2"
+num-traits = { path = "/root/sgx/samplecode/teerustpython/crate/num-traits-sgx"}
 num-complex = { version = "0.4", default-features = false }
 
 [dependencies]

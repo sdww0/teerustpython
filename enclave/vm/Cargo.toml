@@ -64,7 +64,7 @@ sgx_libc = { path = "/root/sgx/sgx_libc"}
 sgx_tstd = { path = "/root/sgx/sgx_tstd",features=['thread']}
 # sgx_tstd = { path = "/root/sgx/sgx_tstd"}
 ndarray = {path = "/root/sgx/samplecode/teerustpython/already/ndarray-master",default-features=false}
-
+ndarray-rand = {path = "/root/sgx/samplecode/teerustpython/already/ndarray-master/ndarray-rand"}
 # nix = "0.17"
 arr_macro = "0.1.2"
 csv = {path="/root/sgx/samplecode/teerustpython/already/rust-csv-1.1.3"}

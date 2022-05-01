@@ -19,7 +19,7 @@ version = "0.8.0"
 features = ["small_rng"]
 
 [dev-dependencies]
-num-traits = { version = "0.2.14", default-features = false }
+num-traits = { path = "/root/sgx/samplecode/teerustpython/crate/num-traits-sgx", default-features = false }
 num-complex = { version = "0.4", default-features = false }
 
 [lib]

@@ -383,7 +383,7 @@ fn run_rustpython(vm: &VirtualMachine/*, matches: &ArgMatches*/) -> PyResult<()>
     println!(
         "Welcome to the magnificent SGX Rust Python  interpreter \u{1f631} \u{1f596}"
     );
-    run_script(&vm, scope.clone(), "./test.py")?;
+    println!("{:?}",run_script(&vm, scope.clone(), "./test.py")?);
     shell::run_shell(&vm, scope)?;
 
     Ok(())
